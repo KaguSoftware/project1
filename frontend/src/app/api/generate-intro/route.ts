@@ -1,23 +1,46 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI();
-
 export async function POST(req: Request) {
 	try {
-		const { title, clientName, deliverables } = await req.json();
+		const doc = await req.json();
+		const { type, projectTitle, clientName } = doc;
+
+		if (
+			!process.env.OPENAI_API_KEY ||
+			process.env.OPENAI_API_KEY.includes("your-key")
+		) {
+			return NextResponse.json({
+				intro: `[Mock] Professional AI content generated for ${projectTitle}.`,
+			});
+		}
+
+		const openai = new OpenAI();
+
+		// This logic ensures the AI knows exactly what data it has access to
+		let dataSummary = `Project: ${projectTitle}, Client: ${clientName}. `;
+
+		if (type === "social_media_report") {
+			dataSummary += `Metrics: ${JSON.stringify(doc.performanceMetrics)}`;
+		} else if (type === "influencer_campaign") {
+			dataSummary += `KPIs: Views ${doc.influencerKPIs.views}, ROI ${doc.influencerKPIs.roi}. Roster: ${JSON.stringify(doc.influencers)}`;
+		}
 
 		const prompt = `
-      You are an expert sales executive writing a professional introduction for a business proposal.
-      Proposal Title: ${title}
-      Client Name: ${clientName}
-      Deliverables: ${deliverables}
+      Act as a premium business consultant. Write a professional executive summary for a ${type.replace(/_/g, " ")}.
+      
+      CONTEXT DATA:
+      ${dataSummary}
 
-      Write a highly persuasive, 2-paragraph introduction. Explicitly state that we will accelerate their sales and build their brand identity. Keep the tone premium and direct.
+      INSTRUCTIONS:
+      1. Tone: Sophisticated, data-driven, and persuasive.
+      2. Format: Two clean paragraphs. 
+      3. Language: Match the professional standards of top-tier agencies.
+      4. Focus: If it's a report, highlight growth. If it's a proposal, highlight ROI and future success.
     `;
 
 		const response = await openai.chat.completions.create({
-			model: "gpt-4o-mini",
+			model: "gpt-4o", // Higher quality for "perfect" generation
 			messages: [{ role: "user", content: prompt }],
 			temperature: 0.7,
 		});
@@ -26,9 +49,8 @@ export async function POST(req: Request) {
 			intro: response.choices[0].message.content,
 		});
 	} catch (error) {
-		console.error("AI Generation Error:", error);
 		return NextResponse.json(
-			{ error: "Failed to generate text" },
+			{ error: "Generation failed" },
 			{ status: 500 },
 		);
 	}

@@ -1,6 +1,9 @@
 import { create } from "zustand";
 
-interface ProposalData {
+export type DocType = "proposal" | "contract" | "invoice" | "brief";
+
+interface DocumentData {
+	type: DocType;
 	title: string;
 	clientName: string;
 	deliverables: string;
@@ -10,19 +13,20 @@ interface ProposalData {
 interface AppState {
 	language: "en" | "ar";
 	setLanguage: (lang: "en" | "ar") => void;
-	proposal: ProposalData;
-	updateProposal: (data: Partial<ProposalData>) => void;
+	document: DocumentData;
+	updateDocument: (data: Partial<DocumentData>) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
 	language: "en",
 	setLanguage: (lang) => set({ language: lang }),
-	proposal: {
+	document: {
+		type: "proposal",
 		title: "",
 		clientName: "",
 		deliverables: "",
 		aiIntro: "",
 	},
-	updateProposal: (data) =>
-		set((state) => ({ proposal: { ...state.proposal, ...data } })),
+	updateDocument: (data) =>
+		set((state) => ({ document: { ...state.document, ...data } })),
 }));
