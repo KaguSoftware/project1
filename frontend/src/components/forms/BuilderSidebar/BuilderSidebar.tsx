@@ -1,14 +1,16 @@
 "use client";
-import { useAppStore } from "../../../lib/store";
+import { useAppStore } from "@/src/lib/store";
 import { SIDEBAR_CONTENT } from "./constants";
+import { ProposalForm } from "../ProposalForm/ProposalForm";
 import type { BuilderSidebarProps } from "./types";
 
 export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 	const { language, setLanguage } = useAppStore();
 
 	return (
-		<div className={`w-full lg:w-100 xl:w-112.5 shrink-0 ${className}`}>
-			{/* Notice the softer slate colors and subtle borders */}
+		<div
+			className={`w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 ${className}`}
+		>
 			<div className="bg-base-100 rounded-3xl p-8 shadow-sm border border-slate-200/60">
 				<div className="mb-8">
 					<h1 className="text-2xl font-bold text-slate-800 tracking-tight">
@@ -35,10 +37,9 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 					</label>
 				</div>
 
+				{/* We dropped the ProposalForm right here */}
 				<div className="space-y-4">
-					<p className="text-sm text-slate-400">
-						{SIDEBAR_CONTENT.placeholderText}
-					</p>
+					<ProposalForm />
 				</div>
 			</div>
 		</div>

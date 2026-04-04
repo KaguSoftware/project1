@@ -8,7 +8,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 
 	return (
 		<div
-			className={`flex-1 bg-white rounded-3xl p-10 xl:p-16 shadow-sm border border-slate-200/60 min-h-[800px] ${className}`}
+			className={`flex-1 bg-white rounded-3xl p-10 xl:p-16 shadow-sm border border-slate-200/60 min-h-200 ${className}`}
 		>
 			<div className="max-w-4xl mx-auto">
 				<div className="border-b border-slate-100 pb-8 mb-8">
