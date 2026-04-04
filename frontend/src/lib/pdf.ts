@@ -11,7 +11,18 @@ export async function exportToPDF(elementId: string, filename: string) {
 		const element = document.getElementById(elementId);
 		if (!element) return;
 
+		const scale = 2;
+		const style = {
+			transform: `scale(${scale})`,
+			transformOrigin: "top left",
+			width: element.offsetWidth + "px",
+			height: element.offsetHeight + "px",
+		};
+
 		const dataUrl = await domtoimage.toPng(element, {
+			width: element.offsetWidth * scale,
+			height: element.offsetHeight * scale,
+			style: style,
 			quality: 1.0,
 			bgcolor: "#ffffff",
 		});

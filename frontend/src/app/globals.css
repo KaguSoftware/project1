@@ -2,42 +2,65 @@
 @plugin "daisyui";
 
 @layer components {
-	/* This class forces standard Hex colors for the PDF engine */
 	.pdf-safe-mode {
-		--color-slate-50: #f8fafc;
-		--color-slate-100: #f1f5f9;
+		/* Restores your brand colors using safe Hex */
+		--color-primary: #7c3aed;
 		--color-slate-200: #e2e8f0;
-		--color-slate-300: #cbd5e1;
-		--color-slate-400: #94a3b8;
-		--color-slate-500: #64748b;
-		--color-slate-600: #475569;
-		--color-slate-700: #334155;
-		--color-slate-800: #1e293b;
 		--color-slate-900: #0f172a;
-		--color-primary: #0f172a;
 
 		background-color: #ffffff !important;
-		color: #0f172a !important;
-		font-family: sans-serif !important;
-		color-interpolation: sRGB !important;
+		color: #1e293b !important;
+		font-family: "Inter", "Helvetica Neue", Arial, sans-serif !important;
 	}
 
-	.pdf-safe-mode {
-		/* Hard-code standard hex colors for the PDF engine */
-		background-color: #ffffff !important;
-		color: #0f172a !important;
+	.pdf-safe-mode h3 {
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-weight: 800;
+		border-bottom: 1px solid #e2e8f0;
+		padding-bottom: 0.5rem;
+		margin-bottom: 1rem;
 	}
 
-	/* Force every child to use standard borders and colors */
+	/* 1. THE NUCLEAR RESET: Kill borders on EVERYTHING in the PDF area */
 	.pdf-safe-mode * {
-		border-color: #e2e8f0 !important; /* slate-200 */
-		border-style: solid; /* Ensure borders show up but aren't 'lab' based */
+		border-width: 0px !important;
+		border-style: none !important;
+		border-color: transparent !important;
+		/* Ensure standard color math */
 		color-interpolation: sRGB !important;
 	}
 
-	/* Hide the delete buttons and UI noise in the PDF */
+	/* 2. RE-ENABLE ONLY THE BORDERS WE WANT */
+	/* If an element has 'border', 'border-b', etc., give it back its life */
+	.pdf-safe-mode .border {
+		border-width: 1px !important;
+		border-style: solid !important;
+		border-color: #e2e8f0 !important;
+	}
+	.pdf-safe-mode .border-b {
+		border-bottom-width: 1px !important;
+		border-style: solid !important;
+		border-color: #e2e8f0 !important;
+	}
+	.pdf-safe-mode .border-t {
+		border-top-width: 1px !important;
+		border-style: solid !important;
+		border-color: #e2e8f0 !important;
+	}
+
+	/* 3. PROTECT THE GENBUZZ LOGO / DIVIDERS */
+	/* These use background colors, not borders, so we keep them clean */
+	.pdf-safe-mode .bg-slate-900 {
+		background-color: #0f172a !important;
+		border: none !important;
+	}
+
+	/* 4. HIDE UI NOISE */
 	.pdf-safe-mode button,
-	.pdf-safe-mode .btn {
+	.pdf-safe-mode .btn,
+	.pdf-safe-mode .trash-icon,
+	.pdf-safe-mode [class*="opacity-0"] {
 		display: none !important;
 	}
 }

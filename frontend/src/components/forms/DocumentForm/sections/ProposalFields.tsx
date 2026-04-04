@@ -105,7 +105,7 @@ export const ProposalFields = () => {
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
 					Terms & Conditions
 				</label>
-				{document.termsAndConditions.map((clause, idx) => (
+				{(document.termsAndConditions || []).map((clause, idx) => (
 					<div
 						key={clause.id}
 						className="flex gap-3 items-center group"

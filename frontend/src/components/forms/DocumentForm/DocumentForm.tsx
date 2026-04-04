@@ -37,23 +37,19 @@ export const DocumentForm = () => {
 
 			const aiData = await response.json();
 
-			// Update multiple fields at once
+			// Use functional update to ensure we don't wipe out existing metadata
 			updateDocument({
 				aiIntro: aiData.aiIntro,
 				scopeOfWork: aiData.scopeOfWork,
-				// Map the AI deliverables to our store format
-				deliverables: aiData.deliverables.map((d: any) => ({
+				pricingPackage: aiData.pricingPackage,
+				// Map the AI strings into the object format our UI expects
+				termsAndConditions: aiData.termsAndConditions.map((t: any) => ({
 					id: Math.random().toString(36).substr(2, 9),
-					...d,
-				})),
-				// Map terms
-				termsAndConditions: aiData.terms.map((t: string) => ({
-					id: Math.random().toString(36).substr(2, 9),
-					text: t,
+					text: typeof t === "string" ? t : t.text,
 				})),
 			});
 		} catch (error) {
-			console.error("Generation failed:", error);
+			console.error("AI transfer failed:", error);
 		} finally {
 			setIsGenerating(false);
 		}
