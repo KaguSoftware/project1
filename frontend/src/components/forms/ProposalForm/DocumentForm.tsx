@@ -620,7 +620,7 @@ export const DocumentForm = () => {
 						<div className="form-control">
 							<label className={labelClass}>Message Body</label>
 							<textarea
-								className={`${inputClass} h-[400px] resize-none`}
+								className={`${inputClass} h-100 resize-none`}
 								placeholder="Write your letter here..."
 								value={document.body}
 								onChange={(e) =>

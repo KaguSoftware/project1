@@ -27,7 +27,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			className={`flex-1 flex flex-col items-center gap-6 overflow-y-auto ${className}`}
 		>
 			{/* Action Bar */}
-			<div className="w-full max-w-[800px] flex justify-end">
+			<div className="w-full max-w-200 flex justify-end">
 				<button
 					onClick={handleDownload}
 					disabled={isExporting}
@@ -41,7 +41,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-20 border border-slate-200 rounded-sm">
 				<div
 					id="document-page"
-					className="bg-white w-[794px] min-h-[1123px] px-16 py-20 relative flex flex-col text-slate-800"
+					className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800"
 				>
 					<style
 						dangerouslySetInnerHTML={{
