@@ -1,64 +1,34 @@
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
-export const exportToPDF = async (elementId: string, filename: string) => {
-	const element = document.getElementById(elementId);
-	if (!element) return;
+export async function exportToPDF(elementId: string, filename: string) {
+	// Add a quick safety check to ensure we are in the browser
+	if (typeof window === "undefined") return;
 
-	const canvas = await html2canvas(element, {
-		scale: 2,
-		useCORS: true,
-		logging: false,
-		backgroundColor: "#ffffff",
-		// THE FIX: This function runs on a hidden copy of your page before the PDF is made
-		onclone: (clonedDoc) => {
-			const clonedElement = clonedDoc.getElementById(elementId);
-			if (!clonedElement) return;
+	try {
+		// Dynamically import the library only when the function is called
+		const domtoimage = (await import("dom-to-image-more")).default;
 
-			// Find every single element and convert oklch/lab colors to standard RGB
-			const allElements = clonedElement.getElementsByTagName("*");
-			for (let i = 0; i < allElements.length; i++) {
-				const el = allElements[i] as HTMLElement;
-				const style = window.getComputedStyle(el);
+		const element = document.getElementById(elementId);
+		if (!element) return;
 
-				// Force convert colors to RGB strings (browser handles the conversion)
-				if (
-					style.color.includes("oklch") ||
-					style.color.includes("lab")
-				) {
-					el.style.color = "rgb(30, 41, 59)"; // Slate-800
-				}
-				if (
-					style.backgroundColor.includes("oklch") ||
-					style.backgroundColor.includes("lab")
-				) {
-					// If it's a background, usually it's white or light slate
-					el.style.backgroundColor =
-						el.tagName === "DIV" ? "#ffffff" : "rgb(248, 250, 252)";
-				}
-				if (
-					style.borderColor.includes("oklch") ||
-					style.borderColor.includes("lab")
-				) {
-					el.style.borderColor = "rgb(226, 232, 240)"; // Slate-200
-				}
-			}
+		const dataUrl = await domtoimage.toPng(element, {
+			quality: 1.0,
+			bgcolor: "#ffffff",
+		});
 
-			// Force the main container to be safe
-			clonedElement.style.fontFamily = "Arial, sans-serif";
-		},
-	});
+		const pdf = new jsPDF({
+			orientation: "portrait",
+			unit: "px",
+			format: "a4",
+		});
 
-	const imgData = canvas.toDataURL("image/png");
-	const pdf = new jsPDF({
-		orientation: "p",
-		unit: "px",
-		format: "a4",
-	});
+		const pdfWidth = pdf.internal.pageSize.getWidth();
+		const pdfHeight =
+			(element.offsetHeight * pdfWidth) / element.offsetWidth;
 
-	const width = pdf.internal.pageSize.getWidth();
-	const height = (canvas.height * width) / canvas.width;
-
-	pdf.addImage(imgData, "PNG", 0, 0, width, height);
-	pdf.save(`${filename}.pdf`);
-};
+		pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+		pdf.save("document.pdf");
+	} catch (error) {
+		console.error("Failed to generate PDF:", error);
+	}
+}

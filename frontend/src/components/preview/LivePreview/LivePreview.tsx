@@ -50,7 +50,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 								{doc.type.replace(/_/g, " ")}
 							</h1>
 							<p className="text-slate-500 font-medium tracking-widest uppercase text-[10px] italic">
-								Reference:{" "}
+								Reference:
 								{doc.projectTitle || "Untitled Project"} •{" "}
 								{today}
 							</p>
@@ -76,23 +76,15 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 							<p className="text-2xl font-bold text-slate-900">
 								{doc.clientName || "Client Name"}
 							</p>
-							<p className="text-slate-500 mt-1">
-								{doc.projectTitle || "Project Description"}
-							</p>
 						</div>
 						<div className="text-right">
-							<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
-								Document Status
-							</p>
-							<p className="text-lg font-bold text-primary uppercase">
-								Draft / Finalization
+							<p className="text-2xl font-bold text-slate-900">
+								{doc.projectTitle || "Project Description"}
 							</p>
 						</div>
 					</div>
 
-					{/* --- DYNAMIC CONTENT SECTIONS --- */}
 					<div className="flex-1 space-y-12">
-						{/* Executive Intro (Universal for most types) */}
 						{doc.aiIntro && (
 							<section>
 								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
