@@ -1,7 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
 import { SIDEBAR_CONTENT } from "./constants";
-import { DocumentForm } from "../ProposalForm/DocumentForm";
+import { DocumentForm } from "../DocumentForm/DocumentForm";
 import type { BuilderSidebarProps } from "./types";
 
 export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
