@@ -41,14 +41,8 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-20 border border-slate-200 rounded-sm">
 				<div
 					id="document-page"
-					className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800"
+					className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800 pdf-safe-mode"
 				>
-					<style
-						dangerouslySetInnerHTML={{
-							__html: `#document-page * { border-style: hidden !important; }`,
-						}}
-					/>
-
 					{/* --- DYNAMIC HEADER --- */}
 					<div className="flex justify-between items-start mb-8">
 						<div>

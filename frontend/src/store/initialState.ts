@@ -36,11 +36,11 @@ export const initialDocumentState: DocumentData = {
 	lineItems: [
 		{ id: generateId(), description: "", qty: 1, rate: 0, amount: 0 },
 	],
-	performanceMetrics: [
-		{ id: generateId(), metric: "", number: "", delta: "" },
-	],
 	topPosts: [
 		{ id: generateId(), post: "", likes: "", comments: "", shares: "" },
+	],
+	performanceMetrics: [
+		{ id: generateId(), metric: "", number: "", delta: "" },
 	],
 	salesMetrics: [{ id: generateId(), title: "", money: "", delta: "" }],
 	dealBreakdown: [{ id: generateId(), client: "", dealValue: "", stage: "" }],

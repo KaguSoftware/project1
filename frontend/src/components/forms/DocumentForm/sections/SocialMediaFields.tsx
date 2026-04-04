@@ -56,7 +56,7 @@ export const SocialMediaFields = () => {
 								}
 							/>
 							<input
-								className={`${inputClass} col-span-2 py-2 font-bold ${row.delta.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
+								className={`${inputClass} col-span-2 py-2 font-bold ${row.delta?.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
 								placeholder="+2%"
 								value={row.delta}
 								onChange={(e) =>
@@ -81,7 +81,13 @@ export const SocialMediaFields = () => {
 						</div>
 					))}
 					<button
-						onClick={() => addArrayItem("performanceMetrics")}
+						onClick={() =>
+							addArrayItem("performanceMetrics", {
+								metric: "",
+								number: "",
+								delta: "",
+							})
+						}
 						className="btn btn-ghost btn-sm text-primary font-bold"
 					>
 						+ Add Metric
@@ -116,7 +122,7 @@ export const SocialMediaFields = () => {
 					>
 						<input
 							className={`${inputClass} col-span-5 py-2`}
-							value={row.post}
+							value={row.post || ""}
 							onChange={(e) =>
 								updateArrayItem("topPosts", row.id, {
 									post: e.target.value,
@@ -125,7 +131,7 @@ export const SocialMediaFields = () => {
 						/>
 						<input
 							className={`${inputClass} col-span-2 py-2 text-center`}
-							value={row.likes}
+							value={row.likes || ""}
 							onChange={(e) =>
 								updateArrayItem("topPosts", row.id, {
 									likes: e.target.value,

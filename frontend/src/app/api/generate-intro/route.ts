@@ -1,57 +1,49 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
 	try {
 		const doc = await req.json();
 		const { type, projectTitle, clientName } = doc;
 
-		if (
-			!process.env.OPENAI_API_KEY ||
-			process.env.OPENAI_API_KEY.includes("your-key")
-		) {
-			return NextResponse.json({
-				intro: `[Mock] Professional AI content generated for ${projectTitle}.`,
-			});
-		}
-
-		const openai = new OpenAI();
-
-		// This logic ensures the AI knows exactly what data it has access to
-		let dataSummary = `Project: ${projectTitle}, Client: ${clientName}. `;
-
-		if (type === "social_media_report") {
-			dataSummary += `Metrics: ${JSON.stringify(doc.performanceMetrics)}`;
-		} else if (type === "influencer_campaign") {
-			dataSummary += `KPIs: Views ${doc.influencerKPIs.views}, ROI ${doc.influencerKPIs.roi}. Roster: ${JSON.stringify(doc.influencers)}`;
-		}
+		const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 		const prompt = `
-      Act as a premium business consultant. Write a professional executive summary for a ${type.replace(/_/g, " ")}.
+      Act as a world-class business consultant. Generate a full ${type} for "${projectTitle}" for the client "${clientName}".
       
-      CONTEXT DATA:
-      ${dataSummary}
+      You must return ONLY a valid JSON object with the following structure:
+      {
+        "aiIntro": "A 2-paragraph professional executive summary",
+        "scopeOfWork": "A detailed 3-4 paragraph breakdown of the project scope",
+        "deliverables": [
+          {"deliverable": "Name of task", "timeline": "e.g. Week 1", "status": "Pending"}
+        ],
+        "terms": ["Clause 1", "Clause 2"]
+      }
 
-      INSTRUCTIONS:
-      1. Tone: Sophisticated, data-driven, and persuasive.
-      2. Format: Two clean paragraphs. 
-      3. Language: Match the professional standards of top-tier agencies.
-      4. Focus: If it's a report, highlight growth. If it's a proposal, highlight ROI and future success.
+      Context for content:
+      Type: ${type}
+      Project: ${projectTitle}
+      Client: ${clientName}
+      
+      Ensure the tone is premium, expert, and highly specific to the industry implied by the title.
     `;
 
-		const response = await openai.chat.completions.create({
-			model: "gpt-4o", // Higher quality for "perfect" generation
-			messages: [{ role: "user", content: prompt }],
-			temperature: 0.7,
-		});
+		const result = await model.generateContent(prompt);
+		const response = await result.response;
+		// Clean the text in case Gemini adds markdown code blocks
+		const cleanedText = response
+			.text()
+			.replace(/```json/g, "")
+			.replace(/```/g, "")
+			.trim();
+		const aiData = JSON.parse(cleanedText);
 
-		return NextResponse.json({
-			intro: response.choices[0].message.content,
-		});
+		return NextResponse.json(aiData);
 	} catch (error) {
-		return NextResponse.json(
-			{ error: "Generation failed" },
-			{ status: 500 },
-		);
+		console.error("Gemini Error:", error);
+		return NextResponse.json({ error: "Failed" }, { status: 500 });
 	}
 }

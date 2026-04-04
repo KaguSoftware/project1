@@ -34,10 +34,24 @@ export const DocumentForm = () => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(document),
 			});
-			const data = await response.json();
-			if (data.intro) {
-				updateDocument({ aiIntro: data.intro });
-			}
+
+			const aiData = await response.json();
+
+			// Update multiple fields at once
+			updateDocument({
+				aiIntro: aiData.aiIntro,
+				scopeOfWork: aiData.scopeOfWork,
+				// Map the AI deliverables to our store format
+				deliverables: aiData.deliverables.map((d: any) => ({
+					id: Math.random().toString(36).substr(2, 9),
+					...d,
+				})),
+				// Map terms
+				termsAndConditions: aiData.terms.map((t: string) => ({
+					id: Math.random().toString(36).substr(2, 9),
+					text: t,
+				})),
+			});
 		} catch (error) {
 			console.error("Generation failed:", error);
 		} finally {

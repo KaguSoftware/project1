@@ -49,7 +49,7 @@ export const SalesFields = () => {
 							}
 						/>
 						<input
-							className={`${inputClass} col-span-2 py-2 font-bold ${row.delta.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
+							className={`${inputClass} col-span-2 py-2 font-bold ${row.delta?.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
 							value={row.delta}
 							onChange={(e) =>
 								updateArrayItem("salesMetrics", row.id, {
@@ -101,7 +101,7 @@ export const SalesFields = () => {
 					>
 						<input
 							className={`${inputClass} col-span-5 py-2`}
-							value={row.client}
+							value={row.client || ""}
 							onChange={(e) =>
 								updateArrayItem("dealBreakdown", row.id, {
 									client: e.target.value,
@@ -110,7 +110,7 @@ export const SalesFields = () => {
 						/>
 						<input
 							className={`${inputClass} col-span-4 py-2`}
-							value={row.dealValue}
+							value={row.dealValue || ""}
 							onChange={(e) =>
 								updateArrayItem("dealBreakdown", row.id, {
 									dealValue: e.target.value,
@@ -119,7 +119,7 @@ export const SalesFields = () => {
 						/>
 						<input
 							className={`${inputClass} col-span-2 py-2`}
-							value={row.stage}
+							value={row.stage || ""}
 							onChange={(e) =>
 								updateArrayItem("dealBreakdown", row.id, {
 									stage: e.target.value,
@@ -137,7 +137,13 @@ export const SalesFields = () => {
 					</div>
 				))}
 				<button
-					onClick={() => addArrayItem("dealBreakdown")}
+					onClick={() =>
+						addArrayItem("dealBreakdown", {
+							client: "",
+							dealValue: "",
+							stage: "",
+						})
+					}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
 					+ Add Deal
