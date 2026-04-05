@@ -113,13 +113,138 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 								</section>
 
 								<section className="bg-slate-50 p-8 border-l-4 border-slate-900">
-									<h3 className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mb-2 font-black">
+									<h3 className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mb-4 font-black">
 										Financial Investment
 									</h3>
-									<p className="text-4xl font-black text-slate-900">
-										{doc.pricingPackage || "TBD"}
-									</p>
+
+									<div className="space-y-3">
+										<p className="text-[10px] uppercase tracking-widest text-slate-500 font-black">
+											Package:{" "}
+											{doc.pricingPackage || "TBD"}
+										</p>
+
+										<p className="text-4xl font-black text-slate-900">
+											{doc.totalPrice || "TBD"}
+										</p>
+
+										<div className="grid grid-cols-2 gap-4 text-sm text-slate-700">
+											<p>
+												<span className="font-bold">
+													Currency:
+												</span>{" "}
+												{doc.defaultCurrency || "—"}
+											</p>
+											<p>
+												<span className="font-bold">
+													Timeline:
+												</span>{" "}
+												{doc.timeline || "—"}
+											</p>
+											<p>
+												<span className="font-bold">
+													Valid Until:
+												</span>{" "}
+												{doc.validUntil || "—"}
+											</p>
+										</div>
+									</div>
 								</section>
+								{doc.deliverables?.length > 0 && (
+									<section>
+										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
+											03. Deliverables
+										</h3>
+
+										<div className="space-y-3">
+											{doc.deliverables.map((item, i) => (
+												<div
+													key={item.id}
+													className="border border-slate-200 rounded-xl p-4 bg-white"
+												>
+													<p className="font-bold text-slate-900">
+														{i + 1}.{" "}
+														{item.deliverable ||
+															"Untitled Deliverable"}
+													</p>
+													<p className="text-sm text-slate-600">
+														<span className="font-semibold">
+															Timeline:
+														</span>{" "}
+														{item.timeline || "—"}
+													</p>
+													<p className="text-sm text-slate-600">
+														<span className="font-semibold">
+															Status:
+														</span>{" "}
+														{item.status ||
+															"Pending"}
+													</p>
+												</div>
+											))}
+										</div>
+									</section>
+								)}
+							</>
+						)}
+						{doc.type === "contract" && (
+							<>
+								{doc.agreementOverview && (
+									<section>
+										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
+											02. Agreement Overview
+										</h3>
+										<div className="text-slate-900 leading-relaxed whitespace-pre-wrap font-medium">
+											{doc.agreementOverview}
+										</div>
+									</section>
+								)}
+
+								{doc.scopeOfWork && (
+									<section>
+										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
+											03. Scope of Services
+										</h3>
+										<div className="text-slate-900 leading-relaxed whitespace-pre-wrap font-medium">
+											{doc.scopeOfWork}
+										</div>
+									</section>
+								)}
+
+								{doc.deliverables?.length > 0 && (
+									<section>
+										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
+											04. Deliverables
+										</h3>
+
+										<div className="space-y-3">
+											{doc.deliverables.map((item, i) => (
+												<div
+													key={item.id}
+													className="border border-slate-200 rounded-xl p-4 bg-white"
+												>
+													<p className="font-bold text-slate-900">
+														{i + 1}.{" "}
+														{item.deliverable ||
+															"Untitled Deliverable"}
+													</p>
+													<p className="text-sm text-slate-600">
+														<span className="font-semibold">
+															Timeline:
+														</span>{" "}
+														{item.timeline || "—"}
+													</p>
+													<p className="text-sm text-slate-600">
+														<span className="font-semibold">
+															Status:
+														</span>{" "}
+														{item.status ||
+															"Pending"}
+													</p>
+												</div>
+											))}
+										</div>
+									</section>
+								)}
 							</>
 						)}
 

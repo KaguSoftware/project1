@@ -37,16 +37,70 @@ export const DocumentForm = () => {
 
 			const aiData = await response.json();
 
-			// Use functional update to ensure we don't wipe out existing metadata
+			if (!response.ok || aiData.error) {
+				console.error(
+					"AI Generation failed on the backend:",
+					aiData.error,
+				);
+				alert("AI generation failed. Check the console for details.");
+				return;
+			}
+
+			const safeTerms = Array.isArray(aiData.termsAndConditions)
+				? aiData.termsAndConditions
+				: document.termsAndConditions;
+
+			const safeDeliverables = Array.isArray(aiData.deliverables)
+				? aiData.deliverables
+				: document.deliverables;
+
+			if (document.type === "proposal") {
+				updateDocument({
+					aiIntro: aiData.aiIntro ?? document.aiIntro,
+					scopeOfWork: aiData.scopeOfWork ?? document.scopeOfWork,
+					pricingPackage:
+						aiData.pricingPackage ?? document.pricingPackage,
+					defaultCurrency:
+						aiData.defaultCurrency ?? document.defaultCurrency,
+					totalPrice: aiData.totalPrice ?? document.totalPrice,
+					timeline: aiData.timeline ?? document.timeline,
+					validUntil: aiData.validUntil ?? document.validUntil,
+					deliverables: safeDeliverables.map((d: any) => ({
+						id: d.id || crypto.randomUUID(),
+						deliverable: d.deliverable || "",
+						timeline: d.timeline || "",
+						status: d.status || "Pending",
+					})),
+					termsAndConditions: safeTerms.map((t: any) => ({
+						id: t.id || crypto.randomUUID(),
+						text: typeof t === "string" ? t : t.text || "",
+					})),
+				});
+				return;
+			}
+
+			if (document.type === "contract") {
+				updateDocument({
+					aiIntro: aiData.aiIntro ?? document.aiIntro,
+					agreementOverview:
+						aiData.agreementOverview ?? document.agreementOverview,
+					scopeOfWork: aiData.scopeOfWork ?? document.scopeOfWork,
+					deliverables: safeDeliverables.map((d: any) => ({
+						id: d.id || crypto.randomUUID(),
+						deliverable: d.deliverable || "",
+						timeline: d.timeline || "",
+						status: d.status || "Pending",
+					})),
+					termsAndConditions: safeTerms.map((t: any) => ({
+						id: t.id || crypto.randomUUID(),
+						text: typeof t === "string" ? t : t.text || "",
+					})),
+				});
+				return;
+			}
+
 			updateDocument({
-				aiIntro: aiData.aiIntro,
-				scopeOfWork: aiData.scopeOfWork,
-				pricingPackage: aiData.pricingPackage,
-				// Map the AI strings into the object format our UI expects
-				termsAndConditions: aiData.termsAndConditions.map((t: any) => ({
-					id: Math.random().toString(36).substr(2, 9),
-					text: typeof t === "string" ? t : t.text,
-				})),
+				aiIntro: aiData.aiIntro ?? document.aiIntro,
 			});
 		} catch (error) {
 			console.error("AI transfer failed:", error);
