@@ -89,7 +89,7 @@ export const ContractFields = () => {
 					</div>
 				))}
 				<button
-					onClick={() => addArrayItem("deliverables")}
+					onClick={() => addArrayItem("deliverables", { deliverable: "", timeline: "", status: "Pending" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
 					+ Add Row

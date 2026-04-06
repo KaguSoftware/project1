@@ -11,7 +11,6 @@ import {
 	UsersIcon,
 } from "lucide-react";
 
-// Import all your modular sections
 import { ProposalFields } from "./sections/ProposalFields";
 import { ContractFields } from "./sections/ContractFields";
 import { InvoiceFields } from "./sections/InvoiceFields";
@@ -25,7 +24,6 @@ export const DocumentForm = () => {
 	const { document, updateDocument } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 
-	// The AI Generation Trigger
 	const handleGenerate = async () => {
 		setIsGenerating(true);
 		try {
@@ -35,23 +33,64 @@ export const DocumentForm = () => {
 				body: JSON.stringify(document),
 			});
 
-			const aiData = await response.json();
+			const ai = await response.json();
+			if (ai.error) throw new Error(ai.error);
 
-			// Update multiple fields at once
-			updateDocument({
-				aiIntro: aiData.aiIntro,
-				scopeOfWork: aiData.scopeOfWork,
-				// Map the AI deliverables to our store format
-				deliverables: aiData.deliverables.map((d: any) => ({
-					id: Math.random().toString(36).substr(2, 9),
-					...d,
-				})),
-				// Map terms
-				termsAndConditions: aiData.terms.map((t: string) => ({
-					id: Math.random().toString(36).substr(2, 9),
-					text: t,
-				})),
-			});
+			const genId = () => Math.random().toString(36).substring(2, 11);
+
+			// Build a partial update — only include keys the AI actually returned
+			const update: Partial<typeof document> = {};
+
+			// Scalar fields
+			if (ai.aiIntro) update.aiIntro = ai.aiIntro;
+			if (ai.scopeOfWork) update.scopeOfWork = ai.scopeOfWork;
+			if (ai.agreementOverview) update.agreementOverview = ai.agreementOverview;
+			if (ai.campaignOverview) update.campaignOverview = ai.campaignOverview;
+			if (ai.body) update.body = ai.body;
+			if (ai.pricingPackage) update.pricingPackage = ai.pricingPackage;
+			if (ai.defaultCurrency) update.defaultCurrency = ai.defaultCurrency;
+			if (ai.totalPrice) update.totalPrice = ai.totalPrice;
+			if (ai.timeline) update.timeline = ai.timeline;
+			if (ai.validUntil) update.validUntil = ai.validUntil;
+
+			// KPIs object (influencer)
+			if (ai.influencerKPIs) update.influencerKPIs = ai.influencerKPIs;
+
+			// Array fields — attach a generated id to each item
+			if (Array.isArray(ai.deliverables) && ai.deliverables.length > 0)
+				update.deliverables = ai.deliverables.map((d: any) => ({ id: genId(), ...d }));
+
+			if (Array.isArray(ai.termsAndConditions) && ai.termsAndConditions.length > 0)
+				update.termsAndConditions = ai.termsAndConditions.map((t: any) => ({
+					id: genId(),
+					text: typeof t === "string" ? t : t.text ?? "",
+				}));
+
+			if (Array.isArray(ai.lineItems) && ai.lineItems.length > 0)
+				update.lineItems = ai.lineItems.map((item: any) => ({
+					id: genId(),
+					description: item.description ?? "",
+					qty: Number(item.qty) || 1,
+					rate: Number(item.rate) || 0,
+					amount: Number(item.amount) || Number(item.qty) * Number(item.rate) || 0,
+				}));
+
+			if (Array.isArray(ai.performanceMetrics) && ai.performanceMetrics.length > 0)
+				update.performanceMetrics = ai.performanceMetrics.map((m: any) => ({ id: genId(), ...m }));
+
+			if (Array.isArray(ai.topPosts) && ai.topPosts.length > 0)
+				update.topPosts = ai.topPosts.map((p: any) => ({ id: genId(), ...p }));
+
+			if (Array.isArray(ai.salesMetrics) && ai.salesMetrics.length > 0)
+				update.salesMetrics = ai.salesMetrics.map((m: any) => ({ id: genId(), ...m }));
+
+			if (Array.isArray(ai.dealBreakdown) && ai.dealBreakdown.length > 0)
+				update.dealBreakdown = ai.dealBreakdown.map((d: any) => ({ id: genId(), ...d }));
+
+			if (Array.isArray(ai.influencers) && ai.influencers.length > 0)
+				update.influencers = ai.influencers.map((inf: any) => ({ id: genId(), ...inf }));
+
+			updateDocument(update);
 		} catch (error) {
 			console.error("Generation failed:", error);
 		} finally {
@@ -70,7 +109,7 @@ export const DocumentForm = () => {
 	];
 
 	return (
-		<div className="w-full max-w-4xl mx-auto space-y-12 pb-32">
+		<div className="w-full max-w-4xl mx-auto space-y-12 pb-40">
 			{/* 1. Category Selector */}
 			<section>
 				<label className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 px-1">
@@ -138,17 +177,16 @@ export const DocumentForm = () => {
 					<InfluencerFields />
 				)}
 			</div>
-
-			{/* 4. Floating Action Bar */}
-			<div className="fixed bottom-10 left-81.25 right-106.25 flex justify-center z-50 pointer-events-none">
-				<div className="w-full max-w-xl pointer-events-auto">
+			<div className="fixed bottom-0 left-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none">
+				<div className="h-10 bg-gradient-to-t from-white to-transparent" />
+				<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
 					<button
 						onClick={handleGenerate}
 						disabled={isGenerating}
-						className="btn btn-primary w-full h-16 rounded-2xl shadow-2xl shadow-primary/30 gap-4 text-lg font-black uppercase tracking-widest transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:bg-slate-400"
+						className="btn btn-primary w-full h-14 rounded-2xl shadow-lg shadow-primary/20 gap-3 text-base font-black uppercase tracking-widest transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:bg-slate-400"
 					>
 						<SparklesIcon
-							size={22}
+							size={20}
 							className={
 								isGenerating ? "animate-spin" : "animate-pulse"
 							}
