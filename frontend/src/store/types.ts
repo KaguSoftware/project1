@@ -55,6 +55,17 @@ export interface InfluencerRow {
 	status: string;
 }
 
+export type CustomSectionType = "text" | "terms" | "deliverables";
+
+export interface CustomSection {
+	id: string;
+	type: CustomSectionType;
+	header: string;
+	content: string;
+	termsRows?: { id: string; text: string }[];
+	deliverablesRows?: DeliverableRow[];
+}
+
 export interface DocumentData {
 	type: DocType;
 	title: string; // The "Document Title" (e.g., "SOW", "Proposal")
@@ -91,4 +102,6 @@ export interface DocumentData {
 	salesMetrics: SalesMetricRow[];
 	dealBreakdown: DealRow[];
 	influencers: InfluencerRow[];
+	customSections: CustomSection[];
+	sectionOrder?: string[];
 }

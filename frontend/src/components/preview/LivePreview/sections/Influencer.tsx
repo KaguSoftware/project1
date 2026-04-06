@@ -1,7 +1,16 @@
 import type { DocumentData } from "@/src/store";
 
 export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
-	if (!Object.values(doc.influencerKPIs).some(Boolean)) return null;
+	const kpis = doc.influencerKPIs;
+	if (!Object.values(kpis).some(Boolean)) return null;
+
+	const entries = [
+		{ label: "Views", val: kpis.views },
+		{ label: "Engagement", val: kpis.engagement },
+		{ label: "Clicks", val: kpis.clicks },
+		{ label: "Conversions", val: kpis.conversions },
+		{ label: "ROI", val: kpis.roi },
+	];
 
 	return (
 		<section>
@@ -9,13 +18,7 @@ export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
 				Campaign KPIs
 			</h3>
 			<div className="grid grid-cols-5 gap-4">
-				{[
-					{ label: "Views", val: doc.influencerKPIs.views },
-					{ label: "Engagement", val: doc.influencerKPIs.engagement },
-					{ label: "Clicks", val: doc.influencerKPIs.clicks },
-					{ label: "Conversions", val: doc.influencerKPIs.conversions },
-					{ label: "ROI", val: doc.influencerKPIs.roi },
-				].map((k) => (
+				{entries.map((k) => (
 					<div
 						key={k.label}
 						className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100"
@@ -23,9 +26,7 @@ export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
 						<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
 							{k.label}
 						</p>
-						<p className="text-xl font-black text-slate-900">
-							{k.val || "—"}
-						</p>
+						<p className="text-xl font-black text-slate-900">{k.val || "—"}</p>
 					</div>
 				))}
 			</div>
@@ -34,7 +35,8 @@ export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
 };
 
 export const InfluencerRosterPreview = ({ doc }: { doc: DocumentData }) => {
-	if (!doc.influencers.some((i) => i.name)) return null;
+	const filtered = doc.influencers.filter((i) => i.name);
+	if (filtered.length === 0) return null;
 
 	return (
 		<section>
@@ -58,13 +60,11 @@ export const InfluencerRosterPreview = ({ doc }: { doc: DocumentData }) => {
 					</tr>
 				</thead>
 				<tbody className="divide-y divide-slate-100">
-					{doc.influencers.map((inf) => (
+					{filtered.map((inf) => (
 						<tr key={inf.id}>
 							<td className="py-3 font-medium text-slate-700">{inf.name}</td>
 							<td className="py-3 text-slate-500">{inf.platform}</td>
-							<td className="py-3 text-center text-slate-500">
-								{inf.followers}
-							</td>
+							<td className="py-3 text-center text-slate-500">{inf.followers}</td>
 							<td className="py-3 text-right font-bold text-slate-700">
 								{inf.rate}
 							</td>

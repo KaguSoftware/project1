@@ -60,10 +60,20 @@
 	.pdf-safe-mode button,
 	.pdf-safe-mode .btn,
 	.pdf-safe-mode .trash-icon,
-	.pdf-safe-mode [class*="opacity-0"] {
+	.pdf-safe-mode [class*="opacity-0"],
+	.pdf-safe-mode .no-print {
 		display: none !important;
 	}
+
+	/* 5. SHOW PRINT-ONLY ELEMENTS */
+	.pdf-safe-mode .print-only {
+		display: block !important;
+	}
 }
+.print-only {
+	display: none;
+}
+
 :root {
 	--background: #ffffff;
 	--foreground: #171717;

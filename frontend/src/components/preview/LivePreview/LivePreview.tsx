@@ -1,19 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+
 import { useAppStore } from "@/src/store";
 import { exportToPDF } from "@/src/lib/pdf";
+import type { CustomSectionType, CustomSection } from "@/src/store";
+import { generateId } from "@/src/store/initialState";
 import type { LivePreviewProps } from "./types";
+
 import { DocHeader } from "./sections/DocHeader";
-import { EngagementOverviewPreview, DeliverablesPreview } from "./sections/ProposalContract";
+import { TextSectionPreview, TermsPreview, DeliverablesPreview, CustomSectionPreview } from "./sections/Common";
+import { EngagementOverviewPreview } from "./sections/ProposalContract";
 import { InvoicePreview } from "./sections/Invoice";
 import { PerformanceMetricsPreview, TopPostsPreview } from "./sections/SocialMedia";
 import { SalesMetricsPreview, DealBreakdownPreview } from "./sections/Sales";
 import { KPIGridPreview, InfluencerRosterPreview } from "./sections/Influencer";
-import { TermsPreview, TextSectionPreview } from "./sections/Common";
+import { AddSectionBar } from "./AddSectionBar";
+
+type SectionEntry = { id: string; label: string; node: ReactNode };
 
 export const LivePreview = ({ className = "" }: LivePreviewProps) => {
-	const { document: doc } = useAppStore();
+	const { document: doc, updateDocument } = useAppStore();
 	const [isExporting, setIsExporting] = useState(false);
+	const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+
+	const today = new Date().toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 
 	const handleDownload = async () => {
 		setIsExporting(true);
@@ -22,157 +36,257 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				doc.clientName.replace(/\s+/g, "-").toLowerCase() || "draft"
 			}`;
 			await exportToPDF(doc, filename);
-		} catch (error) {
-			console.error("PDF export failed:", error);
+		} catch (err) {
+			console.error("PDF export failed:", err);
 		} finally {
 			setIsExporting(false);
 		}
 	};
 
-	const today = new Date().toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
+	const addCustomSection = (type: CustomSectionType, header: string) => {
+		const next: CustomSection = {
+			id: generateId(),
+			type,
+			header,
+			content: "",
+			termsRows: type === "terms" ? [] : undefined,
+			deliverablesRows: type === "deliverables" ? [] : undefined,
+		};
+		updateDocument({ customSections: [...doc.customSections, next] });
+	};
+
+	const removeCustomSection = (id: string) => {
+		updateDocument({
+			customSections: doc.customSections.filter((s) => s.id !== id),
+			sectionOrder: doc.sectionOrder?.filter((sid) => sid !== id),
+		});
+	};
+
+	const updateCustomSection = (id: string, updates: Partial<CustomSection>) => {
+		updateDocument({
+			customSections: doc.customSections.map((s) =>
+				s.id === id ? { ...s, ...updates } : s
+			),
+		});
+	};
+
+	// ── Build the available sections for this doc type ───────
+	const built: SectionEntry[] = [];
+	const push = (id: string, label: string, node: ReactNode) =>
+		built.push({ id, label, node });
+
+	if (doc.type === "proposal") {
+		if (doc.aiIntro) push("executiveSummary", "Executive Summary",
+			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" />);
+		push("engagementOverview", "Engagement Overview", <EngagementOverviewPreview doc={doc} />);
+		if (doc.scopeOfWork) push("scopeOfWork", "Scope of Work",
+			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Work" />);
+		push("deliverables", "Deliverables", <DeliverablesPreview rows={doc.deliverables} />);
+		push("terms", "Terms & Conditions", <TermsPreview doc={doc} label="Terms & Conditions" />);
+	}
+	if (doc.type === "contract") {
+		if (doc.agreementOverview) push("agreementOverview", "Agreement Overview",
+			<TextSectionPreview text={doc.agreementOverview} label="Agreement Overview" />);
+		if (doc.scopeOfWork) push("scopeOfServices", "Scope of Services",
+			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Services" />);
+		push("deliverables", "Deliverables", <DeliverablesPreview rows={doc.deliverables} />);
+	}
+	if (doc.type === "invoice") {
+		push("invoice", "Invoice", <InvoicePreview doc={doc} />);
+		push("paymentTerms", "Payment Terms", <TermsPreview doc={doc} label="Payment Terms" />);
+	}
+	if (doc.type === "letter" && doc.body) {
+		push("message", "Message", <TextSectionPreview text={doc.body} label="Message" />);
+	}
+	if (doc.type === "social_media_report") {
+		if (doc.aiIntro) push("executiveSummary", "Executive Summary",
+			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" />);
+		push("performanceMetrics", "Performance Metrics", <PerformanceMetricsPreview doc={doc} />);
+		push("topPosts", "Top Posts", <TopPostsPreview doc={doc} />);
+	}
+	if (doc.type === "weekly_sales_report") {
+		if (doc.aiIntro) push("weeklySummary", "Weekly Summary",
+			<TextSectionPreview text={doc.aiIntro} label="Weekly Summary" />);
+		push("salesMetrics", "Sales Metrics", <SalesMetricsPreview doc={doc} />);
+		push("dealBreakdown", "Deal Breakdown", <DealBreakdownPreview doc={doc} />);
+	}
+	if (doc.type === "influencer_campaign") {
+		if (doc.campaignOverview) push("campaignOverview", "Campaign Overview",
+			<TextSectionPreview text={doc.campaignOverview} label="Campaign Overview" />);
+		push("kpiGrid", "Campaign KPIs", <KPIGridPreview doc={doc} />);
+		push("influencerRoster", "Influencer Roster", <InfluencerRosterPreview doc={doc} />);
+	}
+
+	// Custom sections (use their id directly)
+	doc.customSections?.forEach((section) => {
+		built.push({
+			id: section.id,
+			label: section.header || "Custom Section",
+			node: (
+				<CustomSectionPreview
+					section={section}
+					doc={doc}
+					onRemove={removeCustomSection}
+					onUpdate={updateCustomSection}
+				/>
+			),
+		});
 	});
 
+	// ── Apply ordering ────────────────────────────────────────
+	const order = doc.sectionOrder ?? [];
+	const byId = new Map(built.map((s) => [s.id, s]));
+	const ordered: SectionEntry[] = [];
+	order.forEach((id) => {
+		const s = byId.get(id);
+		if (s) {
+			ordered.push(s);
+			byId.delete(id);
+		}
+	});
+	// Append any newly available sections that aren't in the saved order
+	built.forEach((s) => {
+		if (byId.has(s.id)) ordered.push(s);
+	});
+
+	const moveSection = (id: string, dir: "up" | "down") => {
+		const ids = ordered.map((s) => s.id);
+		const idx = ids.indexOf(id);
+		if (idx === -1) return;
+		const swap = dir === "up" ? idx - 1 : idx + 1;
+		if (swap < 0 || swap >= ids.length) return;
+		[ids[idx], ids[swap]] = [ids[swap], ids[idx]];
+		updateDocument({ sectionOrder: ids });
+	};
+
 	return (
-		<div
-			className={`flex-1 flex flex-col items-center gap-6 overflow-y-auto ${className}`}
-		>
-			{/* Action Bar */}
-			<div className="w-full max-w-200 flex justify-end">
-				<button
-					onClick={handleDownload}
-					disabled={isExporting}
-					className="btn bg-slate-900 text-white hover:bg-slate-800 border-none shadow-md px-6 rounded-xl"
-				>
-					{isExporting ? "Exporting..." : "Download Clean PDF"}
-				</button>
-			</div>
+		<div className={`flex-1 relative overflow-y-auto ${className}`}>
+			{/* Mobile toggle button */}
+			<button
+				onClick={() => setOrderPanelOpen((v) => !v)}
+				className="lg:hidden fixed bottom-6 right-6 z-40 bg-slate-900 text-white rounded-full shadow-lg w-14 h-14 flex items-center justify-center text-xl"
+				title="Section order"
+			>
+				☰
+			</button>
 
-			{/* Paper */}
-			<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-20 border border-slate-200 rounded-sm">
-				<div
-					id="document-page"
-					className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800 pdf-safe-mode"
-				>
-					<DocHeader doc={doc} today={today} />
+			{/* ── MAIN COLUMN ───────────────────────────────── */}
+			<div className="flex flex-col items-center gap-6">
+				{/* Action Bar */}
+				<div className="w-full max-w-200 flex justify-end">
+					<button
+						onClick={handleDownload}
+						disabled={isExporting}
+						className="btn bg-slate-900 text-white hover:bg-slate-800 border-none shadow-md px-6 rounded-xl"
+					>
+						{isExporting ? "Exporting..." : "Download Clean PDF"}
+					</button>
+				</div>
 
-					<div className="w-full h-1 bg-slate-900 mb-12" />
+				{/* Paper */}
+				<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-4 border border-slate-200 rounded-sm">
+					<div
+						id="document-page"
+						className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800 pdf-safe-mode"
+					>
+						<DocHeader doc={doc} today={today} />
 
-					{/* CLIENT / PROJECT ROW */}
-					<div className="grid grid-cols-2 gap-8 mb-16">
-						<div>
-							<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
-								Prepared For
-							</p>
-							<p className="text-2xl font-bold text-slate-900">
-								{doc.clientName || "Client Name"}
-							</p>
-						</div>
-						<div className="text-right">
-							<p className="text-2xl font-bold text-slate-900">
-								{doc.projectTitle || "Project Description"}
-							</p>
-						</div>
-					</div>
+						<div className="w-full h-1 bg-slate-900 mb-12" />
 
-					<div className="flex-1 space-y-12">
-						{/* EXECUTIVE SUMMARY */}
-						{doc.aiIntro && (
-							<section>
-								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-									Executive Summary
-								</h3>
-								<p className="text-slate-700 leading-loose text-lg italic border-l-4 border-slate-100 pl-6">
-									{doc.aiIntro}
+						{/* CLIENT / PROJECT ROW */}
+						<div className="grid grid-cols-2 gap-8 mb-16">
+							<div>
+								<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
+									Prepared For
 								</p>
-							</section>
-						)}
+								<p className="text-2xl font-bold text-slate-900">
+									{doc.clientName || "Client Name"}
+								</p>
+							</div>
+							<div className="text-right">
+								<p className="text-2xl font-bold text-slate-900">
+									{doc.projectTitle || "Project Description"}
+								</p>
+							</div>
+						</div>
 
-						{/* ── PROPOSAL ── */}
-						{doc.type === "proposal" && (
-							<EngagementOverviewPreview doc={doc} />
-						)}
+						<div className="flex-1 space-y-12">
+							{ordered.map((s) => (
+								<div key={s.id}>{s.node}</div>
+							))}
+						</div>
 
-						{/* ── CONTRACT ── */}
-						{doc.type === "contract" && doc.agreementOverview && (
-							<TextSectionPreview
-								text={doc.agreementOverview}
-								label="Agreement Overview"
-							/>
-						)}
-
-						{/* ── INFLUENCER CAMPAIGN OVERVIEW ── */}
-						{doc.type === "influencer_campaign" && doc.campaignOverview && (
-							<TextSectionPreview
-								text={doc.campaignOverview}
-								label="Campaign Overview"
-							/>
-						)}
-
-						{/* SCOPE OF WORK / BODY */}
-						{(doc.scopeOfWork || doc.body) && (
-							<TextSectionPreview
-								text={doc.scopeOfWork || doc.body}
-								label={doc.type === "letter" ? "Message" : "Scope of Work"}
-							/>
-						)}
-
-						{/* DELIVERABLES */}
-						<DeliverablesPreview doc={doc} />
-
-						{/* TERMS */}
-						<TermsPreview doc={doc} />
-
-						{/* ── INVOICE ── */}
-						{doc.type === "invoice" && <InvoicePreview doc={doc} />}
-
-						{/* ── SOCIAL MEDIA REPORT ── */}
-						{doc.type === "social_media_report" && (
-							<>
-								<PerformanceMetricsPreview doc={doc} />
-								<TopPostsPreview doc={doc} />
-							</>
-						)}
-
-						{/* ── WEEKLY SALES REPORT ── */}
-						{doc.type === "weekly_sales_report" && (
-							<>
-								<SalesMetricsPreview doc={doc} />
-								<DealBreakdownPreview doc={doc} />
-							</>
-						)}
-
-						{/* ── INFLUENCER CAMPAIGN ── */}
-						{doc.type === "influencer_campaign" && (
-							<>
-								<KPIGridPreview doc={doc} />
-								<InfluencerRosterPreview doc={doc} />
-							</>
-						)}
-
-						{/* ADDITIONAL NOTES */}
-						{doc.additionalNotes && (
-							<TextSectionPreview
-								text={doc.additionalNotes}
-								label="Additional Notes"
-							/>
-						)}
-					</div>
-
-					{/* FOOTER */}
-					<div className="w-full h-px bg-slate-200 mb-6 mt-20" />
-					<div className="flex justify-between items-center text-slate-400">
-						<p className="text-[10px] tracking-widest uppercase font-bold italic">
-							GENBUZZ INTERNAL SYSTEMS
-						</p>
-						<p className="text-[10px] tracking-widest uppercase font-bold">
-							Confidential • 2026
-						</p>
+						{/* FOOTER */}
+						<div className="w-full h-px bg-slate-200 mb-6 mt-20" />
+						<div className="flex justify-between items-center text-slate-400">
+							<p className="text-[10px] tracking-widest uppercase font-bold italic">
+								GENBUZZ INTERNAL SYSTEMS
+							</p>
+							<p className="text-[10px] tracking-widest uppercase font-bold">
+								Confidential • {new Date().getFullYear()}
+							</p>
+						</div>
 					</div>
 				</div>
+
+				{/* ── ADD SECTION BAR — outside pdf-safe-mode ───── */}
+				<div className="w-full max-w-198.5 px-2 mb-20">
+					<AddSectionBar onAdd={addCustomSection} />
+				</div>
 			</div>
+
+			{/* ── ORDER PANEL (overlay, right side) ─────────── */}
+			{/* Mobile backdrop */}
+			{orderPanelOpen && (
+				<div
+					onClick={() => setOrderPanelOpen(false)}
+					className="lg:hidden fixed inset-0 bg-black/30 z-40"
+				/>
+			)}
+			<aside
+				className={`fixed top-1/2 -translate-y-1/2 right-3 z-50 max-h-[85vh] overflow-y-auto
+					${orderPanelOpen ? "block" : "hidden"} lg:block`}
+			>
+				<div className="relative pl-7 pr-3 py-4 w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-slate-200/70 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.3)]">
+					<p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3 pl-1">
+						Section Order
+					</p>
+					{/* Vertical axis line */}
+					<div className="absolute left-4 top-12 bottom-4 w-px bg-linear-to-b from-transparent via-slate-300 to-transparent" />
+
+					<ul className="space-y-1">
+						{ordered.map((s, idx) => (
+							<li key={s.id} className="relative flex items-center group gap-2">
+								<span className="absolute -left-[0.85rem] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-slate-900 transition-colors ring-2 ring-white" />
+								<span className="flex-1 truncate text-[12px] font-medium text-slate-700 px-2 py-1.5 rounded-md group-hover:bg-slate-100/70 transition-colors">
+									{s.label}
+								</span>
+								<div className="flex flex-col items-center shrink-0 -space-y-1">
+									<button
+										onClick={() => moveSection(s.id, "up")}
+										disabled={idx === 0}
+										className="text-slate-400 hover:text-slate-900 disabled:opacity-20 disabled:hover:text-slate-400 w-5 h-5 flex items-center justify-center leading-none text-sm"
+										title="Move up"
+									>
+										↑
+									</button>
+									<button
+										onClick={() => moveSection(s.id, "down")}
+										disabled={idx === ordered.length - 1}
+										className="text-slate-400 hover:text-slate-900 disabled:opacity-20 disabled:hover:text-slate-400 w-5 h-5 flex items-center justify-center leading-none text-sm"
+										title="Move down"
+									>
+										↓
+									</button>
+								</div>
+							</li>
+						))}
+					</ul>
+					{ordered.length === 0 && (
+						<p className="text-[10px] text-slate-400 italic px-2">Empty</p>
+					)}
+				</div>
+			</aside>
 		</div>
 	);
 };

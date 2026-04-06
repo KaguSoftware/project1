@@ -44,6 +44,7 @@ export const initialDocumentState: DocumentData = {
 	],
 	salesMetrics: [{ id: generateId(), title: "", money: "", delta: "" }],
 	dealBreakdown: [{ id: generateId(), client: "", dealValue: "", stage: "" }],
+	customSections: [],
 	influencers: [
 		{
 			id: generateId(),
