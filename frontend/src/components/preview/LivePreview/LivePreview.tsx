@@ -36,6 +36,21 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		(doc.type === "proposal" || doc.type === "invoice") &&
 		doc.termsAndConditions.some((c) => c.text);
 
+	const showTopPosts =
+		doc.type === "social_media_report" && doc.topPosts.some((p) => p.post);
+
+	const showSalesMetrics =
+		doc.type === "weekly_sales_report" &&
+		doc.salesMetrics.some((m) => m.title);
+
+	const showDealBreakdown =
+		doc.type === "weekly_sales_report" &&
+		doc.dealBreakdown.some((d) => d.client);
+
+	const showInfluencers =
+		doc.type === "influencer_campaign" &&
+		doc.influencers.some((i) => i.name);
+
 	return (
 		<div
 			className={`flex-1 flex flex-col items-center gap-6 overflow-y-auto ${className}`}
@@ -112,7 +127,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 						)}
 
 						{/* PROPOSAL / CONTRACT — pricing meta row */}
-						{(doc.type === "proposal" || doc.type === "contract") &&
+						{doc.type === "proposal" &&
 							(doc.pricingPackage ||
 								doc.timeline ||
 								doc.totalPrice ||
@@ -163,6 +178,31 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 												</p>
 											</div>
 										)}
+									</div>
+								</section>
+							)}
+
+						{/* AGREEMENT OVERVIEW — contract */}
+						{doc.type === "contract" && doc.agreementOverview && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Agreement Overview
+								</h3>
+								<div className="whitespace-pre-wrap text-slate-700 leading-relaxed text-base">
+									{doc.agreementOverview}
+								</div>
+							</section>
+						)}
+
+						{/* CAMPAIGN OVERVIEW — influencer */}
+						{doc.type === "influencer_campaign" &&
+							doc.campaignOverview && (
+								<section>
+									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+										Campaign Overview
+									</h3>
+									<div className="whitespace-pre-wrap text-slate-700 leading-relaxed text-base">
+										{doc.campaignOverview}
 									</div>
 								</section>
 							)}
@@ -316,9 +356,9 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 						)}
 
 						{/* SOCIAL MEDIA PERFORMANCE */}
-						{doc.type === "social_media_report" && (
-							<section className="grid grid-cols-2 gap-12">
-								<div>
+						{doc.type === "social_media_report" &&
+							doc.performanceMetrics.some((m) => m.metric) && (
+								<section>
 									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
 										Metric Performance
 									</h3>
@@ -336,7 +376,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 														{m.number}
 													</p>
 													<p
-														className={`text-[10px] font-bold ${m.delta.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
+														className={`text-[10px] font-bold ${m.delta?.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
 													>
 														{m.delta}
 													</p>
@@ -344,60 +384,237 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 											</div>
 										))}
 									</div>
-								</div>
-								<div>
-									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-										Key Insights
-									</h3>
-									<p className="text-sm text-slate-600 leading-relaxed">
-										Top post engagement remains steady.
-										Recommend increasing video frequency.
-									</p>
+								</section>
+							)}
+
+						{/* TOP POSTS — social media */}
+						{showTopPosts && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Top Performing Posts
+								</h3>
+								<table className="w-full text-left">
+									<thead>
+										<tr className="border-b border-slate-900">
+											<th className="py-3 text-[10px] uppercase font-black">
+												Post
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-center">
+												Likes
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-center">
+												Comments
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-center">
+												Shares
+											</th>
+										</tr>
+									</thead>
+									<tbody className="divide-y divide-slate-100">
+										{doc.topPosts.map((p) => (
+											<tr key={p.id}>
+												<td className="py-3 font-medium text-slate-700">
+													{p.post}
+												</td>
+												<td className="py-3 text-center text-slate-500">
+													{p.likes}
+												</td>
+												<td className="py-3 text-center text-slate-500">
+													{p.comments}
+												</td>
+												<td className="py-3 text-center text-slate-500">
+													{p.shares}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</section>
+						)}
+
+						{/* SALES METRICS — weekly_sales_report */}
+						{showSalesMetrics && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Weekly Sales Metrics
+								</h3>
+								<div className="space-y-4">
+									{doc.salesMetrics.map((m) => (
+										<div
+											key={m.id}
+											className="flex justify-between border-b border-slate-50 pb-2"
+										>
+											<span className="font-bold text-slate-600">
+												{m.title}
+											</span>
+											<div className="text-right">
+												<p className="font-black text-slate-900">
+													{m.money}
+												</p>
+												{m.delta && (
+													<p
+														className={`text-[10px] font-bold ${m.delta.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
+													>
+														{m.delta}
+													</p>
+												)}
+											</div>
+										</div>
+									))}
 								</div>
 							</section>
 						)}
 
-						{/* INFLUENCER CAMPAIGN KPIs */}
-						{doc.type === "influencer_campaign" && (
+						{/* DEAL BREAKDOWN — weekly_sales_report */}
+						{showDealBreakdown && (
 							<section>
-								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-6 font-black">
-									Campaign Impact Score
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Deal Breakdown
 								</h3>
-								<div className="grid grid-cols-5 gap-4">
-									{[
-										{
-											label: "Views",
-											val: doc.influencerKPIs.views,
-										},
-										{
-											label: "Engagement",
-											val: doc.influencerKPIs.engagement,
-										},
-										{
-											label: "Clicks",
-											val: doc.influencerKPIs.clicks,
-										},
-										{
-											label: "Conversions",
-											val: doc.influencerKPIs.conversions,
-										},
-										{
-											label: "ROI",
-											val: doc.influencerKPIs.roi,
-										},
-									].map((k) => (
-										<div
-											key={k.label}
-											className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100"
-										>
-											<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
-												{k.label}
-											</p>
-											<p className="text-xl font-black text-slate-900">
-												{k.val || "0"}
-											</p>
-										</div>
-									))}
+								<table className="w-full text-left">
+									<thead>
+										<tr className="border-b border-slate-900">
+											<th className="py-3 text-[10px] uppercase font-black">
+												Client
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black">
+												Deal Value
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-right">
+												Stage
+											</th>
+										</tr>
+									</thead>
+									<tbody className="divide-y divide-slate-100">
+										{doc.dealBreakdown.map((d) => (
+											<tr key={d.id}>
+												<td className="py-3 font-medium text-slate-700">
+													{d.client}
+												</td>
+												<td className="py-3 text-slate-500">
+													{d.dealValue}
+												</td>
+												<td className="py-3 text-right">
+													<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-500">
+														{d.stage}
+													</span>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</section>
+						)}
+
+						{/* INFLUENCER CAMPAIGN KPIs */}
+						{doc.type === "influencer_campaign" &&
+							Object.values(doc.influencerKPIs).some(Boolean) && (
+								<section>
+									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-6 font-black">
+										Campaign KPIs
+									</h3>
+									<div className="grid grid-cols-5 gap-4">
+										{[
+											{
+												label: "Views",
+												val: doc.influencerKPIs.views,
+											},
+											{
+												label: "Engagement",
+												val: doc.influencerKPIs
+													.engagement,
+											},
+											{
+												label: "Clicks",
+												val: doc.influencerKPIs.clicks,
+											},
+											{
+												label: "Conversions",
+												val: doc.influencerKPIs
+													.conversions,
+											},
+											{
+												label: "ROI",
+												val: doc.influencerKPIs.roi,
+											},
+										].map((k) => (
+											<div
+												key={k.label}
+												className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100"
+											>
+												<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
+													{k.label}
+												</p>
+												<p className="text-xl font-black text-slate-900">
+													{k.val || "—"}
+												</p>
+											</div>
+										))}
+									</div>
+								</section>
+							)}
+
+						{/* INFLUENCER ROSTER — influencer_campaign */}
+						{showInfluencers && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Influencer Roster
+								</h3>
+								<table className="w-full text-left">
+									<thead>
+										<tr className="border-b border-slate-900">
+											<th className="py-3 text-[10px] uppercase font-black">
+												Name
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black">
+												Platform
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-center">
+												Followers
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-right">
+												Rate
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-right">
+												Status
+											</th>
+										</tr>
+									</thead>
+									<tbody className="divide-y divide-slate-100">
+										{doc.influencers.map((inf) => (
+											<tr key={inf.id}>
+												<td className="py-3 font-medium text-slate-700">
+													{inf.name}
+												</td>
+												<td className="py-3 text-slate-500">
+													{inf.platform}
+												</td>
+												<td className="py-3 text-center text-slate-500">
+													{inf.followers}
+												</td>
+												<td className="py-3 text-right font-bold text-slate-700">
+													{inf.rate}
+												</td>
+												<td className="py-3 text-right">
+													<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-500">
+														{inf.status || "—"}
+													</span>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</section>
+						)}
+
+						{/* ADDITIONAL NOTES — all types */}
+						{doc.additionalNotes && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Additional Notes
+								</h3>
+								<div className="whitespace-pre-wrap text-slate-700 leading-relaxed text-base">
+									{doc.additionalNotes}
 								</div>
 							</section>
 						)}

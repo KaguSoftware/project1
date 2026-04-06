@@ -6,31 +6,20 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 function buildPrompt(doc: any, providedData: string) {
 	const baseRules = `
-        Act as a senior legal and business consultant.
+        Act as a senior business consultant and document specialist.
 
-        Generate a professional ${doc.type || "document"} for "${doc.projectTitle || "the project"}"
+        Generate professional content for a ${doc.type?.replace(/_/g, " ") || "document"} for project "${doc.projectTitle || "the project"}"
         for client "${doc.clientName || "the client"}".
 
         Here is the current data already filled by the user:
         ${providedData}
 
         RULES:
-        1. Use all provided fields as context.
-        2. If a field already has a non-empty user value, preserve it unless improvement is explicitly required.
-        3. Only generate values for fields that are empty or missing.
-        4. Do not invent or return legal clauses or terms and conditions.
-        5. In the written paragraphs, explicitly reference relevant provided fields when they exist, such as:
-        - projectTitle
-        - clientName
-        - pricingPackage
-        - totalPrice
-        - defaultCurrency
-        - timeline
-        - validUntil
-        - scopeOfWork
-        - deliverables
-        6. The executive summary / overview must sound grounded in the user's actual inputs, not generic.
-        7. Return ONLY a JSON object.
+        1. Use all provided fields as context — do not ignore any filled field.
+        2. Only generate values for fields that are empty or missing.
+        3. If a field already has a non-empty user value, preserve it exactly.
+        4. The written paragraphs must explicitly reference provided fields (projectTitle, clientName, etc).
+        5. Return ONLY valid JSON — no markdown, no code fences, no explanation.
     `;
 
 	switch (doc.type) {
@@ -38,53 +27,140 @@ function buildPrompt(doc: any, providedData: string) {
 			return `
         ${baseRules}
 
-            Return ONLY a JSON object using this exact structure:
+        Return ONLY a JSON object with this exact structure:
 
-            {
-            "aiIntro": "2 paragraphs of executive summary",
-            "scopeOfWork": "Detailed project scope based on the provided data",
-            "pricingPackage": "basic | standard | premium",
-            "defaultCurrency": "Use the user's provided currency if available",
-            "totalPrice": "Professional price string in the selected currency",
-            "timeline": "Project timeline string",
-            "validUntil": "Validity date string",
-            "deliverables": [
-                { "deliverable": "Task name", "timeline": "e.g. Phase 1", "status": "Pending" }
-            ]
-            }
-            The "aiIntro" must clearly mention the project title, the nature of the work, and when available the selected pricing package, total price, currency, timeline, and validity period in a natural professional way.
-            The "scopeOfWork" must reflect the actual filled project details and not remain generic.
+        {
+          "aiIntro": "2 paragraphs of executive summary referencing project title, client, package, price, timeline",
+          "scopeOfWork": "Detailed project scope based on the provided data",
+          "pricingPackage": "basic | standard | premium",
+          "defaultCurrency": "Use the user's provided currency or infer from context",
+          "totalPrice": "Professional price string",
+          "timeline": "Project timeline string",
+          "validUntil": "Validity date string",
+          "deliverables": [
+            { "deliverable": "Task name", "timeline": "e.g. Week 1-2", "status": "Pending" }
+          ]
+        }
         `;
+
 		case "contract":
 			return `
-            ${baseRules}
+        ${baseRules}
 
-            Return ONLY a JSON object using this exact structure:
+        Return ONLY a JSON object with this exact structure:
 
-            {
-            "aiIntro": "1 to 2 short professional introductory paragraphs",
-            "agreementOverview": "A concise agreement overview describing the nature and purpose of the contract",
-            "scopeOfWork": "Clear scope of services",
-            "deliverables": [
-                { "deliverable": "Task name", "timeline": "e.g. Phase 1", "status": "Pending" }
-            ]
-            }
+        {
+          "aiIntro": "1-2 short professional introductory paragraphs referencing the project and parties",
+          "agreementOverview": "A concise overview describing the nature and purpose of this contract",
+          "scopeOfWork": "Clear scope of services to be provided",
+          "deliverables": [
+            { "deliverable": "Task name", "timeline": "e.g. Phase 1", "status": "Pending" }
+          ]
+        }
+        `;
 
-            The "aiIntro" and "agreementOverview" must clearly mention the project title, client name, nature of services, and any relevant scope, deliverables, or timeline already provided.
-            The wording should reflect the user's actual business context rather than a generic template.
-            `;
+		case "invoice":
+			return `
+        ${baseRules}
+
+        Return ONLY a JSON object with this exact structure:
+
+        {
+          "lineItems": [
+            { "description": "Service or product name", "qty": 1, "rate": 0, "amount": 0 }
+          ],
+          "termsAndConditions": [
+            { "text": "Payment term clause" }
+          ]
+        }
+
+        Generate realistic line items based on the project context. Include 3-5 standard payment term clauses.
+        `;
+
+		case "letter":
+			return `
+        ${baseRules}
+
+        Return ONLY a JSON object with this exact structure:
+
+        {
+          "body": "A professional letter body (2-3 paragraphs). Reference the project title and client name naturally. The tone should be formal but warm."
+        }
+        `;
+
+		case "social_media_report":
+			return `
+        ${baseRules}
+
+        Return ONLY a JSON object with this exact structure:
+
+        {
+          "aiIntro": "2-paragraph executive summary of the social media campaign performance",
+          "performanceMetrics": [
+            { "metric": "Metric name e.g. Engagement Rate", "number": "e.g. 4.7%", "delta": "+0.3%" }
+          ],
+          "topPosts": [
+            { "post": "Post description or caption snippet", "likes": "1.2K", "comments": "234", "shares": "89" }
+          ]
+        }
+
+        Generate 5-7 realistic performance metrics and 3-5 top posts based on the project context.
+        Use realistic social media numbers. Deltas can be positive or negative.
+        `;
+
+		case "weekly_sales_report":
+			return `
+        ${baseRules}
+
+        Return ONLY a JSON object with this exact structure:
+
+        {
+          "aiIntro": "2-paragraph weekly sales executive summary referencing key wins and metrics",
+          "salesMetrics": [
+            { "title": "Metric name e.g. Total Revenue", "money": "e.g. $48,200", "delta": "+12%" }
+          ],
+          "dealBreakdown": [
+            { "client": "Client name", "dealValue": "$10,000", "stage": "Closed Won" }
+          ]
+        }
+
+        Generate 5-6 realistic sales metrics and 4-6 deals in various pipeline stages (Prospecting, Proposal Sent, Negotiation, Closed Won, Closed Lost).
+        `;
+
+		case "influencer_campaign":
+			return `
+        ${baseRules}
+
+        Return ONLY a JSON object with this exact structure:
+
+        {
+          "aiIntro": "2-paragraph campaign overview highlighting the strategy and expected impact",
+          "campaignOverview": "A detailed paragraph describing the campaign strategy, target audience, and goals",
+          "influencerKPIs": {
+            "views": "e.g. 500K",
+            "engagement": "e.g. 4.2%",
+            "clicks": "e.g. 12K",
+            "conversions": "e.g. 890",
+            "roi": "e.g. 3.2x"
+          },
+          "influencers": [
+            { "name": "Influencer Name", "platform": "Instagram", "followers": "120K", "rate": "$800", "status": "Confirmed" }
+          ]
+        }
+
+        Generate 3-5 realistic influencers with varied platforms (Instagram, TikTok, YouTube, Twitter/X).
+        Statuses can be: Confirmed, Pending, Negotiating.
+        `;
+
 		default:
 			return `
-            ${baseRules}
+        ${baseRules}
 
-            Return ONLY a JSON object using this exact structure:
+        Return ONLY a JSON object with this exact structure:
 
-            {
-            "aiIntro": "Professional summary based on the provided data"
-            }
-
-            The "aiIntro" must clearly mention the project title, client name, and the actual business context provided by the user.
-            Do not make it generic.
+        {
+          "aiIntro": "Professional summary based on the provided data"
+        }
         `;
 	}
 }
@@ -92,7 +168,6 @@ function buildPrompt(doc: any, providedData: string) {
 export async function POST(req: Request) {
 	try {
 		const doc = await req.json();
-		console.log("Incoming doc:", doc);
 
 		const model = genAI.getGenerativeModel({
 			model: "gemini-2.5-flash",
@@ -104,8 +179,6 @@ export async function POST(req: Request) {
 
 		const result = await model.generateContent(prompt);
 		const text = result.response.text();
-
-		console.log("AI raw response:", text);
 
 		return NextResponse.json(JSON.parse(text));
 	} catch (error) {

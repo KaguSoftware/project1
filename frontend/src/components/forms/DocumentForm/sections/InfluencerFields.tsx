@@ -60,7 +60,44 @@ export const InfluencerFields = () => {
 								/>
 							</FormField>
 						</div>
-						{/* More influencer fields here... */}
+						<div className="grid grid-cols-3 gap-4">
+							<FormField label="Followers">
+								<input
+									className={`${inputClass} py-2`}
+									placeholder="e.g. 50K"
+									value={inf.followers}
+									onChange={(e) =>
+										updateArrayItem("influencers", inf.id, {
+											followers: e.target.value,
+										})
+									}
+								/>
+							</FormField>
+							<FormField label="Rate">
+								<input
+									className={`${inputClass} py-2`}
+									placeholder="e.g. $500"
+									value={inf.rate}
+									onChange={(e) =>
+										updateArrayItem("influencers", inf.id, {
+											rate: e.target.value,
+										})
+									}
+								/>
+							</FormField>
+							<FormField label="Status">
+								<input
+									className={`${inputClass} py-2`}
+									placeholder="e.g. Confirmed"
+									value={inf.status}
+									onChange={(e) =>
+										updateArrayItem("influencers", inf.id, {
+											status: e.target.value,
+										})
+									}
+								/>
+							</FormField>
+						</div>
 						<button
 							onClick={() =>
 								removeArrayItem("influencers", inf.id)
@@ -72,7 +109,7 @@ export const InfluencerFields = () => {
 					</div>
 				))}
 				<button
-					onClick={() => addArrayItem("influencers")}
+					onClick={() => addArrayItem("influencers", { name: "", platform: "", followers: "", rate: "", status: "" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
 					+ Add Influencer

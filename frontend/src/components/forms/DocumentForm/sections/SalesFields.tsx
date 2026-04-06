@@ -68,7 +68,7 @@ export const SalesFields = () => {
 					</div>
 				))}
 				<button
-					onClick={() => addArrayItem("salesMetrics")}
+					onClick={() => addArrayItem("salesMetrics", { title: "", money: "", delta: "" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
 					+ Add Metric

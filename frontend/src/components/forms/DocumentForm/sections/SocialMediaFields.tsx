@@ -165,7 +165,7 @@ export const SocialMediaFields = () => {
 					</div>
 				))}
 				<button
-					onClick={() => addArrayItem("topPosts")}
+					onClick={() => addArrayItem("topPosts", { post: "", likes: "", comments: "", shares: "" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
 					+ Add Post
