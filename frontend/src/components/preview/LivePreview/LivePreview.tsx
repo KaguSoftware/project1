@@ -164,7 +164,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			{/* Mobile toggle button */}
 			<button
 				onClick={() => setOrderPanelOpen((v) => !v)}
-				className="lg:hidden fixed bottom-6 right-6 z-40 bg-slate-900 text-white rounded-full shadow-lg w-14 h-14 flex items-center justify-center text-xl"
+				className="lg:hidden fixed top-4 right-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center text-xl"
 				title="Section order"
 			>
 				☰
@@ -183,7 +183,8 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 					</button>
 				</div>
 
-				{/* Paper */}
+				{/* Paper — scaled down on mobile so the fixed-width PDF surface fits the viewport */}
+				<div className="origin-top scale-40 sm:scale-60 md:scale-75 lg:scale-100 -my-[30vh] sm:-my-[20vh] md:-my-[12vh] lg:my-0">
 				<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-4 border border-slate-200 rounded-sm">
 					<div
 						id="document-page"
@@ -227,6 +228,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 							</p>
 						</div>
 					</div>
+				</div>
 				</div>
 
 				{/* ── ADD SECTION BAR — outside pdf-safe-mode ───── */}
