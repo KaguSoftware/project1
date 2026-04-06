@@ -46,10 +46,6 @@ export const DocumentForm = () => {
 				return;
 			}
 
-			const safeTerms = Array.isArray(aiData.termsAndConditions)
-				? aiData.termsAndConditions
-				: document.termsAndConditions;
-
 			const safeDeliverables = Array.isArray(aiData.deliverables)
 				? aiData.deliverables
 				: document.deliverables;
@@ -71,10 +67,6 @@ export const DocumentForm = () => {
 						timeline: d.timeline || "",
 						status: d.status || "Pending",
 					})),
-					termsAndConditions: safeTerms.map((t: any) => ({
-						id: t.id || crypto.randomUUID(),
-						text: typeof t === "string" ? t : t.text || "",
-					})),
 				});
 				return;
 			}
@@ -90,10 +82,6 @@ export const DocumentForm = () => {
 						deliverable: d.deliverable || "",
 						timeline: d.timeline || "",
 						status: d.status || "Pending",
-					})),
-					termsAndConditions: safeTerms.map((t: any) => ({
-						id: t.id || crypto.randomUUID(),
-						text: typeof t === "string" ? t : t.text || "",
 					})),
 				});
 				return;
