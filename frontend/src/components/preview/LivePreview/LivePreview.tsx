@@ -19,7 +19,7 @@ import { AddSectionBar } from "./AddSectionBar";
 type SectionEntry = { id: string; label: string; node: ReactNode };
 
 export const LivePreview = ({ className = "" }: LivePreviewProps) => {
-	const { document: doc, updateDocument } = useAppStore();
+	const { document: doc, updateDocument, language, setLanguage } = useAppStore();
 	const [isExporting, setIsExporting] = useState(false);
 	const [orderPanelOpen, setOrderPanelOpen] = useState(false);
 
@@ -183,8 +183,17 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 					</button>
 				</div>
 
-				{/* Paper — scaled down on mobile so the fixed-width PDF surface fits the viewport */}
-				<div className="origin-top scale-40 sm:scale-60 md:scale-75 lg:scale-100 -my-[30vh] sm:-my-[20vh] md:-my-[12vh] lg:my-0">
+				{/* Paper — uses CSS zoom on mobile so the fixed-width PDF surface reflows cleanly */}
+				<div
+					className="paper-zoom"
+					style={{ ["--paper-zoom" as string]: "1" }}
+				>
+				<style>{`
+					.paper-zoom { zoom: var(--paper-zoom); }
+					@media (max-width: 639px) { .paper-zoom { zoom: 0.4; } }
+					@media (min-width: 640px) and (max-width: 767px) { .paper-zoom { zoom: 0.55; } }
+					@media (min-width: 768px) and (max-width: 1023px) { .paper-zoom { zoom: 0.7; } }
+				`}</style>
 				<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-4 border border-slate-200 rounded-sm">
 					<div
 						id="document-page"
@@ -246,28 +255,44 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				/>
 			)}
 			<aside
-				className={`fixed top-1/2 -translate-y-1/2 right-3 z-50 max-h-[85vh] overflow-y-auto
+				className={`fixed top-1/2 -translate-y-1/2 right-3 z-50 max-h-[90vh] overflow-y-auto
 					${orderPanelOpen ? "block" : "hidden"} lg:block`}
 			>
-				<div className="relative pl-7 pr-3 py-4 w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-slate-200/70 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.3)]">
+				<div className="relative pl-7 pr-4 py-5 w-76 lg:w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-slate-200/70 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.3)]">
 					<p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 mb-3 pl-1">
 						Section Order
 					</p>
+
+					{/* Language toggle — mobile only (desktop has it in the sidebar) */}
+					<div className="lg:hidden flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200 mb-4 ml-1 w-fit">
+						<button
+							onClick={() => setLanguage("en")}
+							className={`px-2.5 py-0.5 text-[10px] font-bold rounded-md transition-all ${language === "en" ? "bg-white shadow-sm text-primary" : "text-slate-500"}`}
+						>
+							EN
+						</button>
+						<button
+							onClick={() => setLanguage("ar")}
+							className={`px-2.5 py-0.5 text-[10px] font-bold rounded-md transition-all ${language === "ar" ? "bg-white shadow-sm text-primary" : "text-slate-500"}`}
+						>
+							AR
+						</button>
+					</div>
 					{/* Vertical axis line */}
 					<div className="absolute left-4 top-12 bottom-4 w-px bg-linear-to-b from-transparent via-slate-300 to-transparent" />
 
-					<ul className="space-y-1">
+					<ul className="space-y-1.5 lg:space-y-1">
 						{ordered.map((s, idx) => (
 							<li key={s.id} className="relative flex items-center group gap-2">
 								<span className="absolute -left-[0.85rem] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-slate-900 transition-colors ring-2 ring-white" />
-								<span className="flex-1 truncate text-[12px] font-medium text-slate-700 px-2 py-1.5 rounded-md group-hover:bg-slate-100/70 transition-colors">
+								<span className="flex-1 truncate text-sm lg:text-[12px] font-medium text-slate-700 px-2 py-2 lg:py-1.5 rounded-md group-hover:bg-slate-100/70 transition-colors">
 									{s.label}
 								</span>
 								<div className="flex flex-col items-center shrink-0 -space-y-1">
 									<button
 										onClick={() => moveSection(s.id, "up")}
 										disabled={idx === 0}
-										className="text-slate-400 hover:text-slate-900 disabled:opacity-20 disabled:hover:text-slate-400 w-5 h-5 flex items-center justify-center leading-none text-sm"
+										className="text-slate-400 hover:text-slate-900 disabled:opacity-20 disabled:hover:text-slate-400 w-7 h-7 lg:w-5 lg:h-5 flex items-center justify-center leading-none text-base lg:text-sm"
 										title="Move up"
 									>
 										↑
@@ -275,7 +300,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 									<button
 										onClick={() => moveSection(s.id, "down")}
 										disabled={idx === ordered.length - 1}
-										className="text-slate-400 hover:text-slate-900 disabled:opacity-20 disabled:hover:text-slate-400 w-5 h-5 flex items-center justify-center leading-none text-sm"
+										className="text-slate-400 hover:text-slate-900 disabled:opacity-20 disabled:hover:text-slate-400 w-7 h-7 lg:w-5 lg:h-5 flex items-center justify-center leading-none text-base lg:text-sm"
 										title="Move down"
 									>
 										↓
@@ -287,6 +312,14 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 					{ordered.length === 0 && (
 						<p className="text-[10px] text-slate-400 italic px-2">Empty</p>
 					)}
+
+					{/* Add section — mobile only (desktop has it under the paper) */}
+					<div className="lg:hidden mt-4 pt-4 border-t border-slate-200/70">
+						<p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 mb-2 pl-1">
+							Add Section
+						</p>
+						<AddSectionBar onAdd={addCustomSection} />
+					</div>
 				</div>
 			</aside>
 		</div>

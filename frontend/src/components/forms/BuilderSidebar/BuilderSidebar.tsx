@@ -21,7 +21,7 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 				</div>
 
 				{/* Language Toggle moved to a cleaner spot */}
-				<div className="flex items-center gap-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+				<div className="hidden lg:flex items-center gap-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
 					<button
 						onClick={() => setLanguage("en")}
 						className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${language === "en" ? "bg-white shadow-sm text-primary" : "text-slate-500"}`}
