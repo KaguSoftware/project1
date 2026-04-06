@@ -57,31 +57,35 @@ function buildPrompt(doc: any, providedData: string) {
         `;
 		case "contract":
 			return `
-${baseRules}
+            ${baseRules}
 
-Return ONLY a JSON object using this exact structure:
+            Return ONLY a JSON object using this exact structure:
 
-{
-  "aiIntro": "1 to 2 short professional introductory paragraphs",
-  "agreementOverview": "A concise agreement overview describing the nature and purpose of the contract",
-  "scopeOfWork": "Clear scope of services",
-  "deliverables": [
-    { "deliverable": "Task name", "timeline": "e.g. Phase 1", "status": "Pending" }
-  ]
-}
-`;
+            {
+            "aiIntro": "1 to 2 short professional introductory paragraphs",
+            "agreementOverview": "A concise agreement overview describing the nature and purpose of the contract",
+            "scopeOfWork": "Clear scope of services",
+            "deliverables": [
+                { "deliverable": "Task name", "timeline": "e.g. Phase 1", "status": "Pending" }
+            ]
+            }
+
+            The "aiIntro" and "agreementOverview" must clearly mention the project title, client name, nature of services, and any relevant scope, deliverables, or timeline already provided.
+            The wording should reflect the user's actual business context rather than a generic template.
+            `;
 		default:
 			return `
-        ${baseRules}
+            ${baseRules}
 
-        Return ONLY a JSON object using this exact structure:
+            Return ONLY a JSON object using this exact structure:
 
-        {
-        "aiIntro": "Professional summary based on the provided data"
-        }
-        The "aiIntro" and "agreementOverview" must clearly mention the project title, client name, nature of services, and any relevant scope, deliverables, or timeline already provided.
-        The wording should reflect the user's actual business context rather than a generic template.
-`;
+            {
+            "aiIntro": "Professional summary based on the provided data"
+            }
+
+            The "aiIntro" must clearly mention the project title, client name, and the actual business context provided by the user.
+            Do not make it generic.
+        `;
 	}
 }
 
