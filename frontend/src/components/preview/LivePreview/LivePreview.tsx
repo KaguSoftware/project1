@@ -10,9 +10,16 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 
 	const handleDownload = async () => {
 		setIsExporting(true);
-		const filename = `${doc.type}-${doc.clientName.replace(/\s+/g, "-").toLowerCase() || "draft"}`;
-		await exportToPDF("document-page", filename);
-		setIsExporting(false);
+		try {
+			const filename = `${doc.type}-${
+				doc.clientName.replace(/\s+/g, "-").toLowerCase() || "draft"
+			}`;
+			await exportToPDF(doc, filename);
+		} catch (error) {
+			console.error("PDF export failed:", error);
+		} finally {
+			setIsExporting(false);
+		}
 	};
 
 	const today = new Date().toLocaleDateString("en-US", {
@@ -20,6 +27,14 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		month: "long",
 		day: "numeric",
 	});
+
+	const showDeliverables =
+		(doc.type === "proposal" || doc.type === "contract") &&
+		doc.deliverables.some((d) => d.deliverable);
+
+	const showTerms =
+		(doc.type === "proposal" || doc.type === "invoice") &&
+		doc.termsAndConditions.some((c) => c.text);
 
 	return (
 		<div
@@ -30,25 +45,25 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				<button
 					onClick={handleDownload}
 					disabled={isExporting}
-					className="btn bg-slate-900 text-white hover:bg-slate-800 border-none shadow-md px-6 rounded-xl font-bold uppercase tracking-widest text-[10px]"
+					className="btn bg-slate-900 text-white hover:bg-slate-800 border-none shadow-md px-6 rounded-xl"
 				>
 					{isExporting ? "Exporting..." : "Download Clean PDF"}
 				</button>
 			</div>
 
-			{/* The Paper Context */}
+			{/* Paper */}
 			<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-20 border border-slate-200 rounded-sm">
 				<div
 					id="document-page"
 					className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800 pdf-safe-mode"
 				>
-					{/* --- HEADER --- */}
+					{/* HEADER */}
 					<div className="flex justify-between items-start mb-8">
 						<div>
 							<h1 className="text-4xl font-black text-slate-900 mb-2 uppercase tracking-widest">
 								{doc.type.replace(/_/g, " ")}
 							</h1>
-							<p className="text-slate-500 font-bold tracking-widest uppercase text-[10px]">
+							<p className="text-slate-500 font-medium tracking-widest uppercase text-[10px] italic">
 								Reference:{" "}
 								{doc.projectTitle || "Untitled Project"} •{" "}
 								{today}
@@ -59,231 +74,342 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 								GENBUZZ
 							</div>
 							<p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">
-								Official Business Document
+								Official Document
 							</p>
 						</div>
 					</div>
 
-					<div className="w-full h-1 bg-slate-900 mb-12"></div>
+					<div className="w-full h-1 bg-slate-900 mb-12" />
 
-					{/* --- CLIENT INFO --- */}
+					{/* CLIENT / PROJECT ROW */}
 					<div className="grid grid-cols-2 gap-8 mb-16">
 						<div>
 							<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
 								Prepared For
 							</p>
-							<p className="text-2xl font-bold text-slate-900 leading-tight">
+							<p className="text-2xl font-bold text-slate-900">
 								{doc.clientName || "Client Name"}
 							</p>
 						</div>
 						<div className="text-right">
-							<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
-								Project Context
-							</p>
-							<p className="text-lg font-bold text-slate-700">
+							<p className="text-2xl font-bold text-slate-900">
 								{doc.projectTitle || "Project Description"}
 							</p>
 						</div>
 					</div>
 
-					{/* --- CONTENT --- */}
 					<div className="flex-1 space-y-12">
-						{/* Executive Summary */}
+						{/* EXECUTIVE SUMMARY */}
 						{doc.aiIntro && (
 							<section>
-								<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
-									01. Executive Summary
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Executive Summary
 								</h3>
-								<p className="text-slate-900 leading-relaxed text-base font-medium">
+								<p className="text-slate-700 leading-loose text-lg italic border-l-4 border-slate-100 pl-6">
 									{doc.aiIntro}
 								</p>
 							</section>
 						)}
 
-						{/* Proposal Details & Pricing */}
-						{doc.type === "proposal" && (
-							<>
+						{/* PROPOSAL / CONTRACT — pricing meta row */}
+						{(doc.type === "proposal" || doc.type === "contract") &&
+							(doc.pricingPackage ||
+								doc.timeline ||
+								doc.totalPrice ||
+								doc.validUntil) && (
 								<section>
-									<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
-										02. Scope of Work
+									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+										Engagement Overview
 									</h3>
-									<div className="text-slate-900 leading-relaxed whitespace-pre-wrap font-medium">
-										{doc.scopeOfWork}
-									</div>
-								</section>
-
-								<section className="bg-slate-50 p-8 border-l-4 border-slate-900">
-									<h3 className="text-[10px] text-slate-500 uppercase tracking-[0.2em] mb-4 font-black">
-										Financial Investment
-									</h3>
-
-									<div className="space-y-3">
-										<p className="text-[10px] uppercase tracking-widest text-slate-500 font-black">
-											Package:{" "}
-											{doc.pricingPackage || "TBD"}
-										</p>
-
-										<p className="text-4xl font-black text-slate-900">
-											{doc.totalPrice || "TBD"}
-										</p>
-
-										<div className="grid grid-cols-2 gap-4 text-sm text-slate-700">
-											<p>
-												<span className="font-bold">
-													Currency:
-												</span>{" "}
-												{doc.defaultCurrency || "—"}
-											</p>
-											<p>
-												<span className="font-bold">
-													Timeline:
-												</span>{" "}
-												{doc.timeline || "—"}
-											</p>
-											<p>
-												<span className="font-bold">
-													Valid Until:
-												</span>{" "}
-												{doc.validUntil || "—"}
-											</p>
-										</div>
-									</div>
-								</section>
-								{doc.deliverables?.length > 0 && (
-									<section>
-										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
-											03. Deliverables
-										</h3>
-
-										<div className="space-y-3">
-											{doc.deliverables.map((item, i) => (
-												<div
-													key={item.id}
-													className="border border-slate-200 rounded-xl p-4 bg-white"
-												>
-													<p className="font-bold text-slate-900">
-														{i + 1}.{" "}
-														{item.deliverable ||
-															"Untitled Deliverable"}
-													</p>
-													<p className="text-sm text-slate-600">
-														<span className="font-semibold">
-															Timeline:
-														</span>{" "}
-														{item.timeline || "—"}
-													</p>
-													<p className="text-sm text-slate-600">
-														<span className="font-semibold">
-															Status:
-														</span>{" "}
-														{item.status ||
-															"Pending"}
-													</p>
-												</div>
-											))}
-										</div>
-									</section>
-								)}
-							</>
-						)}
-						{doc.type === "contract" && (
-							<>
-								{doc.agreementOverview && (
-									<section>
-										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
-											02. Agreement Overview
-										</h3>
-										<div className="text-slate-900 leading-relaxed whitespace-pre-wrap font-medium">
-											{doc.agreementOverview}
-										</div>
-									</section>
-								)}
-
-								{doc.scopeOfWork && (
-									<section>
-										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
-											03. Scope of Services
-										</h3>
-										<div className="text-slate-900 leading-relaxed whitespace-pre-wrap font-medium">
-											{doc.scopeOfWork}
-										</div>
-									</section>
-								)}
-
-								{doc.deliverables?.length > 0 && (
-									<section>
-										<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black border-b border-slate-100 pb-2">
-											04. Deliverables
-										</h3>
-
-										<div className="space-y-3">
-											{doc.deliverables.map((item, i) => (
-												<div
-													key={item.id}
-													className="border border-slate-200 rounded-xl p-4 bg-white"
-												>
-													<p className="font-bold text-slate-900">
-														{i + 1}.{" "}
-														{item.deliverable ||
-															"Untitled Deliverable"}
-													</p>
-													<p className="text-sm text-slate-600">
-														<span className="font-semibold">
-															Timeline:
-														</span>{" "}
-														{item.timeline || "—"}
-													</p>
-													<p className="text-sm text-slate-600">
-														<span className="font-semibold">
-															Status:
-														</span>{" "}
-														{item.status ||
-															"Pending"}
-													</p>
-												</div>
-											))}
-										</div>
-									</section>
-								)}
-							</>
-						)}
-
-						{/* Universal Terms & Clauses */}
-						{doc.termsAndConditions?.length > 0 && (
-							<section>
-								<h3 className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-6 font-black border-b border-slate-100 pb-2">
-									Terms & Legal Clauses
-								</h3>
-								<div className="space-y-4">
-									{doc.termsAndConditions.map(
-										(term: any, i: number) => (
-											<div
-												key={i}
-												className="flex gap-6 text-sm text-slate-800"
-											>
-												<span className="font-black text-slate-300">
-													{(i + 1)
-														.toString()
-														.padStart(2, "0")}
-												</span>
-												<p className="font-medium leading-relaxed">
-													{term.text}
+									<div className="grid grid-cols-4 gap-4">
+										{doc.pricingPackage && (
+											<div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+												<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
+													Package
+												</p>
+												<p className="font-black text-slate-900 capitalize">
+													{doc.pricingPackage}
 												</p>
 											</div>
-										),
-									)}
+										)}
+										{doc.timeline && (
+											<div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+												<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
+													Timeline
+												</p>
+												<p className="font-black text-slate-900">
+													{doc.timeline}
+												</p>
+											</div>
+										)}
+										{doc.totalPrice && (
+											<div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+												<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
+													Total
+												</p>
+												<p className="font-black text-slate-900">
+													{doc.defaultCurrency}{" "}
+													{doc.totalPrice}
+												</p>
+											</div>
+										)}
+										{doc.validUntil && (
+											<div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+												<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
+													Valid Until
+												</p>
+												<p className="font-black text-slate-900">
+													{doc.validUntil}
+												</p>
+											</div>
+										)}
+									</div>
+								</section>
+							)}
+
+						{/* SCOPE OF WORK / BODY */}
+						{(doc.scopeOfWork || doc.body) && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									{doc.type === "letter"
+										? "Message"
+										: "Scope of Work"}
+								</h3>
+								<div className="whitespace-pre-wrap text-slate-700 leading-relaxed text-base">
+									{doc.scopeOfWork || doc.body}
+								</div>
+							</section>
+						)}
+
+						{/* DELIVERABLES — proposal + contract */}
+						{showDeliverables && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Deliverables
+								</h3>
+								<table className="w-full text-left">
+									<thead>
+										<tr className="border-b border-slate-900">
+											<th className="py-3 text-[10px] uppercase font-black">
+												Deliverable
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black">
+												Timeline
+											</th>
+											<th className="py-3 text-[10px] uppercase font-black text-right">
+												Status
+											</th>
+										</tr>
+									</thead>
+									<tbody className="divide-y divide-slate-100">
+										{doc.deliverables.map((item) => (
+											<tr key={item.id}>
+												<td className="py-3 font-medium text-slate-700">
+													{item.deliverable}
+												</td>
+												<td className="py-3 text-slate-500 text-sm">
+													{item.timeline}
+												</td>
+												<td className="py-3 text-right">
+													<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-500">
+														{item.status ||
+															"Pending"}
+													</span>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</section>
+						)}
+
+						{/* TERMS & CONDITIONS */}
+						{showTerms && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									{doc.type === "invoice"
+										? "Payment Terms"
+										: "Terms & Conditions"}
+								</h3>
+								<ol className="space-y-3">
+									{doc.termsAndConditions
+										.filter((c) => c.text)
+										.map((clause, idx) => (
+											<li
+												key={clause.id}
+												className="flex gap-3 text-sm text-slate-600"
+											>
+												<span className="w-5 h-5 flex-shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-500 mt-0.5">
+													{idx + 1}
+												</span>
+												{clause.text}
+											</li>
+										))}
+								</ol>
+							</section>
+						)}
+
+						{/* INVOICE LINE ITEMS */}
+						{doc.type === "invoice" && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+									Billing Details
+								</h3>
+								<table className="w-full text-left">
+									<thead>
+										<tr className="border-b border-slate-900">
+											<th className="py-4 text-[10px] uppercase font-black">
+												Description
+											</th>
+											<th className="py-4 text-[10px] uppercase font-black text-center">
+												Qty
+											</th>
+											<th className="py-4 text-[10px] uppercase font-black text-right">
+												Rate
+											</th>
+											<th className="py-4 text-[10px] uppercase font-black text-right">
+												Total
+											</th>
+										</tr>
+									</thead>
+									<tbody className="divide-y divide-slate-100">
+										{doc.lineItems.map((item) => (
+											<tr key={item.id}>
+												<td className="py-4 font-medium">
+													{item.description}
+												</td>
+												<td className="py-4 text-center">
+													{item.qty}
+												</td>
+												<td className="py-4 text-right">
+													${item.rate}
+												</td>
+												<td className="py-4 text-right font-bold">
+													${item.qty * item.rate}
+												</td>
+											</tr>
+										))}
+									</tbody>
+									<tfoot>
+										<tr className="border-t-2 border-slate-900">
+											<td
+												colSpan={3}
+												className="pt-4 font-black text-right uppercase text-xs tracking-widest"
+											>
+												Total
+											</td>
+											<td className="pt-4 text-right font-black text-lg">
+												$
+												{doc.lineItems
+													.reduce(
+														(sum, i) =>
+															sum +
+															i.qty * i.rate,
+														0,
+													)
+													.toLocaleString()}
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</section>
+						)}
+
+						{/* SOCIAL MEDIA PERFORMANCE */}
+						{doc.type === "social_media_report" && (
+							<section className="grid grid-cols-2 gap-12">
+								<div>
+									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+										Metric Performance
+									</h3>
+									<div className="space-y-4">
+										{doc.performanceMetrics.map((m) => (
+											<div
+												key={m.id}
+												className="flex justify-between border-b border-slate-50 pb-2"
+											>
+												<span className="font-bold text-slate-600">
+													{m.metric}
+												</span>
+												<div className="text-right">
+													<p className="font-black text-slate-900">
+														{m.number}
+													</p>
+													<p
+														className={`text-[10px] font-bold ${m.delta.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}
+													>
+														{m.delta}
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+								<div>
+									<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+										Key Insights
+									</h3>
+									<p className="text-sm text-slate-600 leading-relaxed">
+										Top post engagement remains steady.
+										Recommend increasing video frequency.
+									</p>
+								</div>
+							</section>
+						)}
+
+						{/* INFLUENCER CAMPAIGN KPIs */}
+						{doc.type === "influencer_campaign" && (
+							<section>
+								<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-6 font-black">
+									Campaign Impact Score
+								</h3>
+								<div className="grid grid-cols-5 gap-4">
+									{[
+										{
+											label: "Views",
+											val: doc.influencerKPIs.views,
+										},
+										{
+											label: "Engagement",
+											val: doc.influencerKPIs.engagement,
+										},
+										{
+											label: "Clicks",
+											val: doc.influencerKPIs.clicks,
+										},
+										{
+											label: "Conversions",
+											val: doc.influencerKPIs.conversions,
+										},
+										{
+											label: "ROI",
+											val: doc.influencerKPIs.roi,
+										},
+									].map((k) => (
+										<div
+											key={k.label}
+											className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100"
+										>
+											<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
+												{k.label}
+											</p>
+											<p className="text-xl font-black text-slate-900">
+												{k.val || "0"}
+											</p>
+										</div>
+									))}
 								</div>
 							</section>
 						)}
 					</div>
 
-					{/* --- FOOTER --- */}
-					<div className="w-full h-px bg-slate-100 mb-6 mt-20"></div>
+					{/* FOOTER */}
+					<div className="w-full h-px bg-slate-200 mb-6 mt-20" />
 					<div className="flex justify-between items-center text-slate-400">
-						<p className="text-[9px] tracking-[0.3em] uppercase font-black">
+						<p className="text-[10px] tracking-widest uppercase font-bold italic">
 							GENBUZZ INTERNAL SYSTEMS
 						</p>
-						<p className="text-[9px] tracking-[0.3em] uppercase font-black">
+						<p className="text-[10px] tracking-widest uppercase font-bold">
 							Confidential • 2026
 						</p>
 					</div>

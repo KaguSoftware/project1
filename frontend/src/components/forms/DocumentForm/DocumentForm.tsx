@@ -11,7 +11,6 @@ import {
 	UsersIcon,
 } from "lucide-react";
 
-// Import all your modular sections
 import { ProposalFields } from "./sections/ProposalFields";
 import { ContractFields } from "./sections/ContractFields";
 import { InvoiceFields } from "./sections/InvoiceFields";
@@ -25,7 +24,6 @@ export const DocumentForm = () => {
 	const { document, updateDocument } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 
-	// The AI Generation Trigger
 	const handleGenerate = async () => {
 		setIsGenerating(true);
 		try {
@@ -37,61 +35,21 @@ export const DocumentForm = () => {
 
 			const aiData = await response.json();
 
-			if (!response.ok || aiData.error) {
-				console.error(
-					"AI Generation failed on the backend:",
-					aiData.error,
-				);
-				alert("AI generation failed. Check the console for details.");
-				return;
-			}
-
-			const safeDeliverables = Array.isArray(aiData.deliverables)
-				? aiData.deliverables
-				: document.deliverables;
-
-			if (document.type === "proposal") {
-				updateDocument({
-					aiIntro: aiData.aiIntro ?? document.aiIntro,
-					scopeOfWork: aiData.scopeOfWork ?? document.scopeOfWork,
-					pricingPackage:
-						aiData.pricingPackage ?? document.pricingPackage,
-					defaultCurrency:
-						aiData.defaultCurrency ?? document.defaultCurrency,
-					totalPrice: aiData.totalPrice ?? document.totalPrice,
-					timeline: aiData.timeline ?? document.timeline,
-					validUntil: aiData.validUntil ?? document.validUntil,
-					deliverables: safeDeliverables.map((d: any) => ({
-						id: d.id || crypto.randomUUID(),
-						deliverable: d.deliverable || "",
-						timeline: d.timeline || "",
-						status: d.status || "Pending",
-					})),
-				});
-				return;
-			}
-
-			if (document.type === "contract") {
-				updateDocument({
-					aiIntro: aiData.aiIntro ?? document.aiIntro,
-					agreementOverview:
-						aiData.agreementOverview ?? document.agreementOverview,
-					scopeOfWork: aiData.scopeOfWork ?? document.scopeOfWork,
-					deliverables: safeDeliverables.map((d: any) => ({
-						id: d.id || crypto.randomUUID(),
-						deliverable: d.deliverable || "",
-						timeline: d.timeline || "",
-						status: d.status || "Pending",
-					})),
-				});
-				return;
-			}
-
 			updateDocument({
 				aiIntro: aiData.aiIntro ?? document.aiIntro,
+				scopeOfWork: aiData.scopeOfWork ?? document.scopeOfWork,
+				// Guard both arrays — API may omit them on partial responses
+				deliverables: (aiData.deliverables ?? []).map((d: any) => ({
+					id: Math.random().toString(36).substr(2, 9),
+					...d,
+				})),
+				termsAndConditions: (aiData.terms ?? []).map((t: string) => ({
+					id: Math.random().toString(36).substr(2, 9),
+					text: t,
+				})),
 			});
 		} catch (error) {
-			console.error("AI transfer failed:", error);
+			console.error("Generation failed:", error);
 		} finally {
 			setIsGenerating(false);
 		}
@@ -108,7 +66,7 @@ export const DocumentForm = () => {
 	];
 
 	return (
-		<div className="w-full max-w-4xl mx-auto space-y-12 pb-32">
+		<div className="w-full max-w-4xl mx-auto space-y-12 pb-40">
 			{/* 1. Category Selector */}
 			<section>
 				<label className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 px-1">
@@ -176,17 +134,16 @@ export const DocumentForm = () => {
 					<InfluencerFields />
 				)}
 			</div>
-
-			{/* 4. Floating Action Bar */}
-			<div className="fixed bottom-10 left-81.25 right-106.25 flex justify-center z-50 pointer-events-none">
-				<div className="w-full max-w-xl pointer-events-auto">
+			<div className="fixed bottom-0 left-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none">
+				<div className="h-10 bg-gradient-to-t from-white to-transparent" />
+				<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
 					<button
 						onClick={handleGenerate}
 						disabled={isGenerating}
-						className="btn btn-primary w-full h-16 rounded-2xl shadow-2xl shadow-primary/30 gap-4 text-lg font-black uppercase tracking-widest transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:bg-slate-400"
+						className="btn btn-primary w-full h-14 rounded-2xl shadow-lg shadow-primary/20 gap-3 text-base font-black uppercase tracking-widest transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:bg-slate-400"
 					>
 						<SparklesIcon
-							size={22}
+							size={20}
 							className={
 								isGenerating ? "animate-spin" : "animate-pulse"
 							}
