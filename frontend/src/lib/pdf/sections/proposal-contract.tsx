@@ -103,7 +103,7 @@ export const DeliverablesTable = ({
 							<View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 14 }}>
 								{item.timeline ? (
 									<View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 3, alignItems: "center" }}>
-										<Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", letterSpacing: 0.5, color: colors.amber500 }}>
+										<Text style={[{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", letterSpacing: lang === "ar" ? 0 : 0.5, color: colors.amber500 }, af(lang)]}>
 											{t("Timeline", lang)}
 										</Text>
 										<Text style={[{ fontSize: 8, color: colors.slate500 }, af(lang)]}>
@@ -112,7 +112,7 @@ export const DeliverablesTable = ({
 									</View>
 								) : null}
 								<View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 3, alignItems: "center" }}>
-									<Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", letterSpacing: 0.5, color: colors.emerald600 }}>
+									<Text style={[{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", letterSpacing: lang === "ar" ? 0 : 0.5, color: colors.emerald600 }, af(lang)]}>
 										{t("Status", lang)}
 									</Text>
 									<View style={{ backgroundColor: colors.emerald50, borderWidth: 0.5, borderColor: colors.emerald100, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 1 }}>

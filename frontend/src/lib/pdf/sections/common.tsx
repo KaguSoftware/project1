@@ -71,6 +71,7 @@ export const ExecutiveSummary = ({ text, lang = "en" }: { text: string; lang?: L
 							borderRightColor: colors.slate200,
 							paddingLeft: 0,
 							paddingRight: 16,
+							lineHeight: 2.2,
 						}
 					: {},
 			]}
@@ -91,7 +92,7 @@ export const TextSection = ({
 }) => (
 	<View style={styles.section}>
 		<Text style={[styles.sectionTitle, af(lang)]}>{t(label, lang)}</Text>
-		<Text style={[styles.bodyText, af(lang)]}>{text}</Text>
+		<Text style={[styles.bodyText, af(lang), lang === "ar" ? { lineHeight: 2.2 } : {}]}>{text}</Text>
 	</View>
 );
 
@@ -117,7 +118,7 @@ export const TermsList = ({
 					<View style={[styles.termBadge, lang === "ar" ? { marginRight: 0, marginLeft: 10 } : {}]}>
 						<Text style={styles.termNumber}>{idx + 1}</Text>
 					</View>
-					<Text style={[styles.termText, af(lang)]}>{clause.text}</Text>
+					<Text style={[styles.termText, af(lang), lang === "ar" ? { lineHeight: 2.2 } : {}]}>{clause.text}</Text>
 				</View>
 			))}
 		</View>

@@ -1,6 +1,21 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@font-face {
+	font-family: "NotoSansArabic";
+	src: url("/fonts/NotoSansArabic-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "NotoSansArabic";
+	src: url("/fonts/NotoSansArabic-Bold.ttf") format("truetype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 @layer components {
 	.pdf-safe-mode {
 		/* Restores your brand colors using safe Hex */
@@ -54,6 +69,15 @@
 	.pdf-safe-mode .bg-slate-900 {
 		background-color: #0f172a !important;
 		border: none !important;
+	}
+
+	/* ARABIC MODE — override forced font with NotoSansArabic */
+	.pdf-safe-mode.doc-arabic,
+	.pdf-safe-mode.doc-arabic * {
+		font-family: "NotoSansArabic", Arial, sans-serif !important;
+		direction: rtl !important;
+		text-align: right !important;
+		letter-spacing: 0 !important;
 	}
 
 	/* 4. HIDE UI NOISE */

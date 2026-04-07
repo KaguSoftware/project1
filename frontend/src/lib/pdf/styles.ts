@@ -1,17 +1,23 @@
 import { StyleSheet, Font } from "@react-pdf/renderer";
 import type { Style } from "@react-pdf/types";
+import { NOTO_SANS_ARABIC_REGULAR, NOTO_SANS_ARABIC_BOLD } from "./arabicFontData";
 
 // Prevent ugly word hyphenation
 Font.registerHyphenationCallback((word) => [word]);
 
-// Arabic font for PDF rendering (files served from /public/fonts/)
+// Register Arabic font using inlined base64 data URIs — no network fetch needed
 Font.register({
 	family: "NotoSansArabic",
 	fonts: [
-		{ src: "/fonts/NotoSansArabic-Regular.ttf", fontWeight: 400 },
-		{ src: "/fonts/NotoSansArabic-Bold.ttf", fontWeight: 700 },
+		{ src: NOTO_SANS_ARABIC_REGULAR, fontWeight: 400 },
+		{ src: NOTO_SANS_ARABIC_BOLD, fontWeight: 700 },
 	],
 });
+
+/** No-op kept for call-site compatibility */
+export function ensureFontsRegistered(): Promise<void> {
+	return Promise.resolve();
+}
 
 type Lang = "en" | "ar";
 
@@ -22,8 +28,8 @@ export const af = (lang: Lang): Style =>
 				fontFamily: "NotoSansArabic",
 				textAlign: "right",
 				letterSpacing: 0,
-				// @ts-ignore — @react-pdf/renderer supports this prop at runtime
-				writingDirection: "rtl",
+				// @ts-ignore — react-pdf v4 uses `direction` for bidi layout
+				direction: "rtl",
 			}
 		: {};
 
@@ -36,7 +42,7 @@ export const afB = (lang: Lang): Style =>
 				textAlign: "right",
 				letterSpacing: 0,
 				// @ts-ignore
-				writingDirection: "rtl",
+				direction: "rtl",
 			}
 		: {};
 

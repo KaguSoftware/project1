@@ -10,26 +10,33 @@ export async function exportToPDF(
 
 	const blob = await generatePDFBlob(data, language);
 
-	const url = URL.createObjectURL(blob);
+	const safeFilename = `${filename}.pdf`;
+	const file = new File([blob], safeFilename, { type: "application/pdf" });
 
-	// Safari and iOS (all browsers on iOS use WebKit) don't honour the
-	// download attribute on programmatic clicks — open in a new tab instead
-	// so the user can save via the browser Share / Save to Files menu.
-	const ua = navigator.userAgent;
-	const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-	const isIOS = /iPad|iPhone|iPod/.test(ua);
+	// On iOS/mobile, use the Web Share API (triggers native "Save to Files" sheet).
+	// This is the only reliable way to get a real download on iOS.
+	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+	const isMobile = isIOS || /Android/i.test(navigator.userAgent);
 
-	if (isSafari || isIOS) {
-		window.open(url, "_blank");
-		// Revoke after a short delay so the new tab has time to load the blob
-		setTimeout(() => URL.revokeObjectURL(url), 10_000);
-	} else {
-		const link = document.createElement("a");
-		link.href = url;
-		link.download = `${filename}.pdf`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		URL.revokeObjectURL(url);
+	if (isMobile && "canShare" in navigator && navigator.canShare({ files: [file] })) {
+		try {
+			await navigator.share({ files: [file], title: safeFilename });
+			return;
+		} catch (e) {
+			// User dismissed share sheet — not an error, just return
+			if ((e as DOMException).name === "AbortError") return;
+			// Otherwise fall through to blob URL approach
+		}
 	}
+
+	// Desktop (and fallback): programmatic anchor click
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.href = url;
+	link.download = safeFilename;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	// Small delay on iOS Safari before revoking so WebKit has time to read the blob
+	setTimeout(() => URL.revokeObjectURL(url), 5_000);
 }
