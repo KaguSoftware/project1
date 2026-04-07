@@ -21,7 +21,7 @@ export const af = (lang: Lang): Style =>
 		? {
 				fontFamily: "NotoSansArabic",
 				textAlign: "right",
-				// Ensure RTL text direction for proper Arabic character shaping and joining
+				letterSpacing: 0,
 				// @ts-ignore — @react-pdf/renderer supports this prop at runtime
 				writingDirection: "rtl",
 			}
@@ -34,6 +34,7 @@ export const afB = (lang: Lang): Style =>
 				fontFamily: "NotoSansArabic",
 				fontWeight: 700,
 				textAlign: "right",
+				letterSpacing: 0,
 				// @ts-ignore
 				writingDirection: "rtl",
 			}
@@ -56,7 +57,14 @@ export const colors = {
 	slate50: "#f8fafc",
 	white: "#ffffff",
 	emerald500: "#10b981",
+	emerald50: "#ecfdf5",
+	emerald100: "#d1fae5",
+	emerald600: "#059669",
 	red500: "#ef4444",
+	indigo100: "#e0e7ff",
+	indigo200: "#c7d2fe",
+	indigo500: "#6366f1",
+	amber500: "#f59e0b",
 } as const;
 
 export const styles = StyleSheet.create({

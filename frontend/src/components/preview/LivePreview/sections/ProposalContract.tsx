@@ -18,7 +18,7 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 
 			{/* Pricing Tiers — 3-column card row */}
 			{(hasAnyTierData || doc.pricingPackage) && (
-				<div className="grid grid-cols-3 gap-3 mb-4">
+				<div className="grid gap-3 mb-4" style={{ gridTemplateColumns: `repeat(${tiers.length || 3}, 1fr)` }}>
 					{(tiers.length > 0
 						? tiers
 						: [
@@ -31,12 +31,20 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 						return (
 							<div
 								key={tier.id}
-								className={`rounded-xl p-4 border-2 flex flex-col gap-3 ${
+								className={`rounded-xl p-4 border-2 flex flex-col gap-3 relative overflow-hidden ${
 									selected
 										? "border-primary bg-primary/5"
+										: tier.isPopular
+										? "border-primary bg-white"
 										: "border-slate-100 bg-slate-50"
 								}`}
 							>
+								{/* Popular corner badge */}
+								{tier.isPopular && (
+									<div className="absolute top-0 right-0 bg-primary text-white text-[8px] font-black uppercase tracking-wider px-2.5 py-1 rounded-bl-lg">
+										{t("Popular", lang)}
+									</div>
+								)}
 								{/* Name */}
 								<div className={`rounded-lg px-3 py-2 text-center text-sm font-black capitalize ${selected ? "bg-white text-primary" : "bg-white text-slate-700"}`}>
 									{tier.name}
@@ -53,17 +61,6 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 										{tier.description}
 									</div>
 								)}
-								{/* Popular badge */}
-								<div className="flex items-center gap-2 mt-auto px-1">
-									<div className={`w-4 h-4 rounded flex items-center justify-center border-2 shrink-0 ${tier.isPopular ? "bg-primary border-primary" : "border-slate-300 bg-white"}`}>
-										{tier.isPopular && (
-											<svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-												<path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-											</svg>
-										)}
-									</div>
-									<span className="text-[10px] font-black text-slate-500">{t("Popular", lang)}</span>
-								</div>
 							</div>
 						);
 					})}

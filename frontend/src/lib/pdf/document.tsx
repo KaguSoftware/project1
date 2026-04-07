@@ -11,6 +11,7 @@ import {
 	PageFooter,
 } from "./sections/common";
 import { EngagementOverview, DeliverablesTable } from "./sections/proposal-contract";
+import type { CustomSection } from "@/src/store";
 import { InvoiceTable } from "./sections/invoice";
 import { PerformanceMetrics, TopPostsTable } from "./sections/social-media";
 import { SalesMetrics, DealBreakdownTable } from "./sections/sales";
@@ -103,6 +104,40 @@ export const PDFDocument = ({ data, lang = "en" }: { data: DocumentData; lang?: 
 					<InfluencerRoster influencers={data.influencers} lang={lang} />
 				</>
 			)}
+
+			{/* ── CUSTOM SECTIONS ── */}
+			{data.customSections?.map((section: CustomSection) => {
+				if (section.type === "text" && section.content) {
+					return (
+						<TextSection
+							key={section.id}
+							text={section.content}
+							label={section.header}
+							lang={lang}
+						/>
+					);
+				}
+				if (section.type === "terms" && section.termsRows && section.termsRows.length > 0) {
+					return (
+						<TermsList
+							key={section.id}
+							terms={section.termsRows}
+							label={section.header}
+							lang={lang}
+						/>
+					);
+				}
+				if (section.type === "deliverables" && section.deliverablesRows && section.deliverablesRows.length > 0) {
+					return (
+						<DeliverablesTable
+							key={section.id}
+							rows={section.deliverablesRows}
+							lang={lang}
+						/>
+					);
+				}
+				return null;
+			})}
 
 			{data.additionalNotes ? (
 				<TextSection

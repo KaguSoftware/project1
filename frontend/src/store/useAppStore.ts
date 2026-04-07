@@ -75,6 +75,14 @@ export const useAppStore = create<AppState>((set) => ({
 
 	hiddenFields: [],
 	hideField: (key) =>
-		set((state) => ({ hiddenFields: [...state.hiddenFields, key] })),
+		set((state) => {
+			const doc = state.document as any;
+			// If the field is a string, clear its value so it disappears from the live preview
+			const cleared = typeof doc[key] === "string" ? { [key]: "" } : {};
+			return {
+				hiddenFields: [...state.hiddenFields, key],
+				document: { ...state.document, ...cleared },
+			};
+		}),
 	showAllFields: () => set({ hiddenFields: [] }),
 }));
