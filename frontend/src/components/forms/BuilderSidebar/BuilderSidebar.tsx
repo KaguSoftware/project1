@@ -12,9 +12,8 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 		<div className={`w-full h-full p-6 lg:p-10 ${className}`}>
 			<div className="mb-10 flex justify-between items-center">
 				<div>
-					<h1 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">
-						{SIDEBAR_CONTENT.title}
-					</h1>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<img src="/genbuzz-logo.svg" alt="GenBuzz" className="h-9" />
 					<p className="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">
 						v1.0 • Phase 1
 					</p>

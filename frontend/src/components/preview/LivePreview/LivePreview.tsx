@@ -165,7 +165,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			{/* Mobile toggle button */}
 			<button
 				onClick={() => setOrderPanelOpen((v) => !v)}
-				className="lg:hidden fixed top-4 right-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center"
+				className={`lg:hidden fixed top-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center ${language === "ar" ? "left-4" : "right-4"}`}
 				title="Section order"
 			>
 				<svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -191,17 +191,19 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				{/* Paper — transform:scale for mobile so the fixed-width PDF surface fits the screen.
 				    CSS zoom is non-standard and ignored by Safari/iOS; transform works everywhere. */}
 				<style>{`
-					/* w-198.5 = 794px. wrapper height = 794px * scale so it doesn't collapse */
-					.paper-scale-outer { width: 100%; display: flex; justify-content: center; }
+					/* w-198.5 = 794px fixed PDF surface.
+					   transform:scale shrinks visually but keeps layout dimensions.
+					   We use margin-bottom to compensate for the "phantom" space. */
+					.paper-scale-outer { width: 100%; display: flex; justify-content: center; overflow: visible; }
 					.paper-scale-inner { transform-origin: top center; }
 					@media (max-width: 639px) {
-						.paper-scale-inner { transform: scale(0.42); }
+						.paper-scale-inner { transform: scale(0.42); margin-bottom: calc((0.42 - 1) * 100%); }
 					}
 					@media (min-width: 640px) and (max-width: 767px) {
-						.paper-scale-inner { transform: scale(0.58); }
+						.paper-scale-inner { transform: scale(0.58); margin-bottom: calc((0.58 - 1) * 100%); }
 					}
 					@media (min-width: 768px) and (max-width: 1023px) {
-						.paper-scale-inner { transform: scale(0.72); }
+						.paper-scale-inner { transform: scale(0.72); margin-bottom: calc((0.72 - 1) * 100%); }
 					}
 				`}</style>
 				<div className="paper-scale-outer">
@@ -268,7 +270,8 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				/>
 			)}
 			<aside
-				className={`fixed top-1/2 -translate-y-1/2 right-3 z-50 max-h-[90vh] overflow-y-auto
+				className={`fixed top-1/2 -translate-y-1/2 z-50 max-h-[90vh] overflow-y-auto
+					${language === "ar" ? "left-3" : "right-3"}
 					${orderPanelOpen ? "block" : "hidden"} lg:block`}
 			>
 				<div className="relative pl-7 pr-4 py-5 w-76 lg:w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-slate-200/70 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.3)]">

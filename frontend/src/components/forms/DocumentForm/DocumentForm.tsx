@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useAppStore, DocType } from "@/src/store";
+import { t } from "@/src/lib/translations";
 import {
 	SparklesIcon,
 	FileTextIcon,
@@ -25,7 +26,7 @@ import type { CustomSection, DeliverableRow } from "@/src/store";
 const rowId = () => Math.random().toString(36).substring(2, 11);
 
 export const DocumentForm = () => {
-	const { document, updateDocument } = useAppStore();
+	const { document, updateDocument, language } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 
 	const handleGenerate = async () => {
@@ -141,13 +142,14 @@ export const DocumentForm = () => {
 		{ id: "weekly_sales_report", label: "Sales", icon: BarChart3Icon },
 		{ id: "influencer_campaign", label: "Influencer", icon: UsersIcon },
 	];
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="w-full max-w-4xl mx-auto space-y-12 pb-40">
 			{/* 1. Category Selector */}
 			<section>
 				<label className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 px-1">
-					Select Document Category
+					{tr("Select Document Category")}
 				</label>
 				<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
 					{categories.map((item) => (
@@ -164,7 +166,7 @@ export const DocumentForm = () => {
 						>
 							<item.icon size={20} />
 							<span className="text-[10px] font-bold uppercase tracking-wider text-center">
-								{item.label}
+								{tr(item.label)}
 							</span>
 						</button>
 					))}
@@ -215,7 +217,7 @@ export const DocumentForm = () => {
 			{document.customSections && document.customSections.length > 0 && (
 				<section className="space-y-6">
 					<label className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2 px-1">
-						Custom Sections
+						{tr("Custom Sections")}
 					</label>
 					{document.customSections.map((s) => (
 						<div
@@ -281,7 +283,7 @@ export const DocumentForm = () => {
 									return (
 										<div className="space-y-3">
 											<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-												Clauses
+												{tr("Clauses")}
 											</label>
 											{rows.map((clause, idx) => (
 												<div
@@ -344,8 +346,8 @@ export const DocumentForm = () => {
 												}
 												className="btn btn-ghost btn-sm text-primary font-bold"
 											>
-												+ Add Clause
-											</button>
+												{tr("+ Add Clause")}
+</button>
 										</div>
 									);
 								}
@@ -356,18 +358,12 @@ export const DocumentForm = () => {
 									return (
 										<div className="space-y-3">
 											<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-												Deliverables
+												{tr("Deliverables")}
 											</label>
 											<div className="grid grid-cols-12 gap-3 px-1 text-[10px] font-black uppercase text-slate-400">
-												<div className="col-span-5">
-													Deliverable
-												</div>
-												<div className="col-span-3">
-													Timeline
-												</div>
-												<div className="col-span-3">
-													Status
-												</div>
+												<div className="col-span-5">{tr("Deliverable")}</div>
+												<div className="col-span-3">{tr("Timeline")}</div>
+												<div className="col-span-3">{tr("Status")}</div>
 											</div>
 											{rows.map((row) => (
 												<div
@@ -475,8 +471,8 @@ export const DocumentForm = () => {
 												}
 												className="btn btn-ghost btn-sm text-primary font-bold"
 											>
-												+ Add Deliverable
-											</button>
+												{tr("+ Add Deliverable")}
+</button>
 										</div>
 									);
 								}
@@ -488,7 +484,7 @@ export const DocumentForm = () => {
 				</section>
 			)}
 
-			<div className="fixed bottom-0 left-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none">
+			<div className={`fixed bottom-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none ${language === "ar" ? "right-0" : "left-0"}`}>
 				<div className="h-10 bg-linear-to-t from-white to-transparent" />
 				<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
 					<button
@@ -503,8 +499,8 @@ export const DocumentForm = () => {
 							}
 						/>
 						{isGenerating
-							? "Synthesizing..."
-							: `Generate ${document.type.replace(/_/g, " ")}`}
+							? tr("Synthesizing...")
+							: `${tr("Generate")} ${document.type.replace(/_/g, " ")}`}
 					</button>
 				</div>
 			</div>
