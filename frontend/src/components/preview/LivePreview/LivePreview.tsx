@@ -164,10 +164,14 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			{/* Mobile toggle button */}
 			<button
 				onClick={() => setOrderPanelOpen((v) => !v)}
-				className="lg:hidden fixed top-4 right-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center text-xl"
+				className="lg:hidden fixed top-4 right-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center"
 				title="Section order"
 			>
-				☰
+				<svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="20" height="2" rx="1" fill="white"/>
+					<rect y="6" width="20" height="2" rx="1" fill="white"/>
+					<rect y="12" width="20" height="2" rx="1" fill="white"/>
+				</svg>
 			</button>
 
 			{/* ── MAIN COLUMN ───────────────────────────────── */}
@@ -183,29 +187,24 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 					</button>
 				</div>
 
-				{/* Paper — uses CSS zoom on mobile so the fixed-width PDF surface reflows cleanly */}
-				<div className="paper-zoom-wrapper">
-				<div
-					className="paper-zoom"
-					style={{ ["--paper-zoom" as string]: "1" }}
-				>
+				{/* Paper — transform:scale for mobile so the fixed-width PDF surface fits the screen.
+				    CSS zoom is non-standard and ignored by Safari/iOS; transform works everywhere. */}
 				<style>{`
-					/* w-198.5 = 198.5 * 4px = 794px */
-					.paper-zoom { zoom: var(--paper-zoom); }
-					.paper-zoom-wrapper { width: 100%; display: flex; justify-content: center; }
+					/* w-198.5 = 794px. wrapper height = 794px * scale so it doesn't collapse */
+					.paper-scale-outer { width: 100%; display: flex; justify-content: center; }
+					.paper-scale-inner { transform-origin: top center; }
 					@media (max-width: 639px) {
-						.paper-zoom { zoom: 0.4; }
-						.paper-zoom-wrapper { width: calc(794px * 0.4); overflow: visible; }
+						.paper-scale-inner { transform: scale(0.42); }
 					}
 					@media (min-width: 640px) and (max-width: 767px) {
-						.paper-zoom { zoom: 0.55; }
-						.paper-zoom-wrapper { width: calc(794px * 0.55); overflow: visible; }
+						.paper-scale-inner { transform: scale(0.58); }
 					}
 					@media (min-width: 768px) and (max-width: 1023px) {
-						.paper-zoom { zoom: 0.7; }
-						.paper-zoom-wrapper { width: calc(794px * 0.7); overflow: visible; }
+						.paper-scale-inner { transform: scale(0.72); }
 					}
 				`}</style>
+				<div className="paper-scale-outer">
+				<div className="paper-scale-inner">
 				<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-4 border border-slate-200 rounded-sm">
 					<div
 						id="document-page"
