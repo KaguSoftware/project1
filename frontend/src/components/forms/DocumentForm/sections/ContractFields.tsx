@@ -36,71 +36,96 @@ export const ContractFields = () => {
 			)}
 
 			{!hiddenFields.includes("scopeOfWork") && (
-				<FormField label="Scope of Services" onDelete={() => hideField("scopeOfWork")}>
-					<textarea
-						className={`${inputClass} h-32`}
-						value={document.scopeOfWork}
-						onChange={(e) =>
-							updateDocument({ scopeOfWork: e.target.value })
-						}
-					/>
-				</FormField>
-			)}
-
-			<div className="space-y-4">
-				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					{tr("Deliverables Table")}
-				</label>
-				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">{tr("Deliverable")}</div>
-					<div className="col-span-3">{tr("Timeline")}</div>
-					<div className="col-span-3">{tr("Status")}</div>
-				</div>
-				{document.deliverables.map((row) => (
-					<div
-						key={row.id}
-						className="grid grid-cols-12 gap-3 items-center group"
-					>
-						<input
-							className={`${inputClass} col-span-5 py-2`}
-							value={row.deliverable}
-							onChange={(e) =>
-								updateArrayItem("deliverables", row.id, {
-									deliverable: e.target.value,
-								})
-							}
-						/>
-						<input
-							className={`${inputClass} col-span-3 py-2`}
-							value={row.timeline}
-							onChange={(e) =>
-								updateArrayItem("deliverables", row.id, {
-									timeline: e.target.value,
-								})
-							}
-						/>
-						<input
-							className={`${inputClass} col-span-3 py-2`}
-							value={row.status}
-							onChange={(e) =>
-								updateArrayItem("deliverables", row.id, {
-									status: e.target.value,
-								})
-							}
-						/>
+				<div className="space-y-2">
+					<div className="flex items-center justify-between px-1">
+						<label className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500">
+							{tr("Scope of Services")}
+						</label>
 						<button
-							onClick={() =>
-								removeArrayItem("deliverables", row.id)
-							}
-							className="col-span-1 text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
+							onClick={() => hideField("scopeOfWork")}
+							className="text-slate-300 hover:text-red-400 transition-colors"
+							title="Remove field"
 						>
-							<TrashIcon size={14} />
+							<TrashIcon size={13} />
 						</button>
 					</div>
-				))}
+					<div className="border-l-4 border-violet-200 bg-violet-50/40 rounded-r-xl p-4">
+						<textarea
+							className={`${inputClass} h-32 bg-white`}
+							placeholder={tr("Describe the full scope of services for this contract…")}
+							value={document.scopeOfWork}
+							onChange={(e) => updateDocument({ scopeOfWork: e.target.value })}
+						/>
+					</div>
+				</div>
+			)}
+
+			<div className="space-y-2">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 px-1">
+					{tr("Deliverables Table")}
+				</label>
+				<div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-200">
+					{document.deliverables.map((row, idx) => (
+						<div key={row.id} className="flex gap-4 items-start p-4 group/del bg-white hover:bg-slate-50/60 transition-colors">
+							<div className="w-7 h-7 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center shrink-0 mt-0.5">
+								<span className="text-[10px] font-black text-indigo-500">{idx + 1}</span>
+							</div>
+							<div className="flex-1 space-y-3">
+								<input
+									className={inputClass}
+									placeholder={tr("e.g. Brand Strategy Deck")}
+									value={row.deliverable}
+									onChange={(e) =>
+										updateArrayItem("deliverables", row.id, { deliverable: e.target.value })
+									}
+								/>
+								<div className="grid grid-cols-2 gap-3">
+									<div className="space-y-1">
+										<label className="text-[9px] font-black uppercase tracking-[0.15em] text-amber-500">
+											{tr("Timeline")}
+										</label>
+										<input
+											className={inputClass}
+											placeholder={tr("e.g. Week 2")}
+											value={row.timeline}
+											onChange={(e) =>
+												updateArrayItem("deliverables", row.id, { timeline: e.target.value })
+											}
+										/>
+									</div>
+									<div className="space-y-1">
+										<label className="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-500">
+											{tr("Status")}
+										</label>
+										<input
+											className={inputClass}
+											placeholder={tr("Pending")}
+											value={row.status}
+											onChange={(e) =>
+												updateArrayItem("deliverables", row.id, { status: e.target.value })
+											}
+										/>
+									</div>
+								</div>
+							</div>
+							<button
+								onClick={() => removeArrayItem("deliverables", row.id)}
+								className="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 border border-red-200 text-red-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/del:opacity-100 shrink-0 mt-0.5"
+								title="Remove deliverable"
+							>
+								<TrashIcon size={10} />
+							</button>
+						</div>
+					))}
+					{document.deliverables.length === 0 && (
+						<div className="p-6 text-center text-slate-300 text-sm font-medium">
+							{tr("No deliverables yet")}
+						</div>
+					)}
+				</div>
 				<button
 					onClick={() => addArrayItem("deliverables", { deliverable: "", timeline: "", status: "Pending" })}
-					className="btn btn-ghost btn-sm text-primary font-bold"
+					className="btn btn-ghost btn-sm text-indigo-500 font-bold"
 				>
 					{tr("+ Add Row")}
 				</button>

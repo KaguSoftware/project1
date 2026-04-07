@@ -64,7 +64,14 @@ export const ExecutiveSummary = ({ text, lang = "en" }: { text: string; lang?: L
 				styles.summaryText,
 				af(lang),
 				lang === "ar"
-					? { borderLeftWidth: 0, borderRightWidth: 3, borderRightColor: colors.slate200, paddingLeft: 0, paddingRight: 16 }
+					? {
+							fontFamily: "NotoSansArabic",
+							borderLeftWidth: 0,
+							borderRightWidth: 3,
+							borderRightColor: colors.slate200,
+							paddingLeft: 0,
+							paddingRight: 16,
+						}
 					: {},
 			]}
 		>

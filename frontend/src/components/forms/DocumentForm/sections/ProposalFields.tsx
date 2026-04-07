@@ -61,15 +61,28 @@ export const ProposalFields = () => {
 			)}
 
 			{!hiddenFields.includes("scopeOfWork") && (
-				<FormField label="Scope of Work" onDelete={() => hideField("scopeOfWork")}>
-					<textarea
-						className={`${inputClass} h-32`}
-						value={document.scopeOfWork}
-						onChange={(e) =>
-							updateDocument({ scopeOfWork: e.target.value })
-						}
-					/>
-				</FormField>
+				<div className="space-y-2">
+					<div className="flex items-center justify-between px-1">
+						<label className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500">
+							{tr("Scope of Work")}
+						</label>
+						<button
+							onClick={() => hideField("scopeOfWork")}
+							className="text-slate-300 hover:text-red-400 transition-colors"
+							title="Remove field"
+						>
+							<TrashIcon size={13} />
+						</button>
+					</div>
+					<div className="border-l-4 border-violet-200 bg-violet-50/40 rounded-r-xl p-4">
+						<textarea
+							className={`${inputClass} h-32 bg-white`}
+							placeholder={tr("Describe the full scope of work for this project…")}
+							value={document.scopeOfWork}
+							onChange={(e) => updateDocument({ scopeOfWork: e.target.value })}
+						/>
+					</div>
+				</div>
 			)}
 
 			{/* ── Pricing Packages ─────────────────────────────────────────── */}
@@ -108,19 +121,20 @@ export const ProposalFields = () => {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				<div
+					className="grid gap-4"
+					style={{ gridTemplateColumns: `repeat(${Math.max(document.pricingTiers.length, 1)}, 1fr)` }}
+				>
 					{(document.pricingTiers ?? []).map((tier) => (
 						<div key={tier.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 group/tier relative">
 							{/* Delete tier button */}
-							{document.pricingTiers.length > 1 && (
-								<button
-									onClick={() => removeTier(tier.id)}
-									className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-50 border border-red-200 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center opacity-0 group-hover/tier:opacity-100"
-									title="Remove package"
-								>
-									<TrashIcon size={10} />
-								</button>
-							)}
+							<button
+							onClick={() => removeTier(tier.id)}
+							className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-50 border border-red-200 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center opacity-0 group-hover/tier:opacity-100"
+							title="Remove package"
+						>
+							<TrashIcon size={10} />
+						</button>
 
 							{/* Package name — editable */}
 							<input
@@ -220,69 +234,77 @@ export const ProposalFields = () => {
 			)}
 
 			{/* ── Deliverables ─────────────────────────────────────────── */}
-			<div className="space-y-4">
-				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
+			<div className="space-y-2">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 px-1">
 					{tr("Deliverables")}
 				</label>
-				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">{tr("Deliverable")}</div>
-					<div className="col-span-3">{tr("Timeline")}</div>
-					<div className="col-span-3">{tr("Status")}</div>
+				<div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-200">
+					{document.deliverables.map((row, idx) => (
+						<div key={row.id} className="flex gap-4 items-start p-4 group/del bg-white hover:bg-slate-50/60 transition-colors">
+							{/* Numbered bullet */}
+							<div className="w-7 h-7 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center shrink-0 mt-0.5">
+								<span className="text-[10px] font-black text-indigo-500">{idx + 1}</span>
+							</div>
+							{/* Fields */}
+							<div className="flex-1 space-y-3">
+								<input
+									className={inputClass}
+									placeholder={tr("e.g. Brand Strategy Deck")}
+									value={row.deliverable}
+									onChange={(e) =>
+										updateArrayItem("deliverables", row.id, { deliverable: e.target.value })
+									}
+								/>
+								<div className="grid grid-cols-2 gap-3">
+									<div className="space-y-1">
+										<label className="text-[9px] font-black uppercase tracking-[0.15em] text-amber-500">
+											{tr("Timeline")}
+										</label>
+										<input
+											className={inputClass}
+											placeholder={tr("e.g. Week 2")}
+											value={row.timeline}
+											onChange={(e) =>
+												updateArrayItem("deliverables", row.id, { timeline: e.target.value })
+											}
+										/>
+									</div>
+									<div className="space-y-1">
+										<label className="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-500">
+											{tr("Status")}
+										</label>
+										<input
+											className={inputClass}
+											placeholder={tr("Pending")}
+											value={row.status}
+											onChange={(e) =>
+												updateArrayItem("deliverables", row.id, { status: e.target.value })
+											}
+										/>
+									</div>
+								</div>
+							</div>
+							{/* Delete */}
+							<button
+								onClick={() => removeArrayItem("deliverables", row.id)}
+								className="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 border border-red-200 text-red-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/del:opacity-100 shrink-0 mt-0.5"
+								title="Remove deliverable"
+							>
+								<TrashIcon size={10} />
+							</button>
+						</div>
+					))}
+					{document.deliverables.length === 0 && (
+						<div className="p-6 text-center text-slate-300 text-sm font-medium">
+							{tr("No deliverables yet")}
+						</div>
+					)}
 				</div>
-				{document.deliverables.map((row) => (
-					<div
-						key={row.id}
-						className="grid grid-cols-12 gap-3 items-center group"
-					>
-						<input
-							className={`${inputClass} col-span-5 py-2`}
-							placeholder={tr("e.g. Brand Strategy Deck")}
-							value={row.deliverable}
-							onChange={(e) =>
-								updateArrayItem("deliverables", row.id, {
-									deliverable: e.target.value,
-								})
-							}
-						/>
-						<input
-							className={`${inputClass} col-span-3 py-2`}
-							placeholder={tr("e.g. Week 2")}
-							value={row.timeline}
-							onChange={(e) =>
-								updateArrayItem("deliverables", row.id, {
-									timeline: e.target.value,
-								})
-							}
-						/>
-						<input
-							className={`${inputClass} col-span-3 py-2`}
-							placeholder={tr("Pending")}
-							value={row.status}
-							onChange={(e) =>
-								updateArrayItem("deliverables", row.id, {
-									status: e.target.value,
-								})
-							}
-						/>
-						<button
-							onClick={() =>
-								removeArrayItem("deliverables", row.id)
-							}
-							className="col-span-1 text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
-						>
-							<TrashIcon size={14} />
-						</button>
-					</div>
-				))}
 				<button
 					onClick={() =>
-						addArrayItem("deliverables", {
-							deliverable: "",
-							timeline: "",
-							status: "Pending",
-						})
+						addArrayItem("deliverables", { deliverable: "", timeline: "", status: "Pending" })
 					}
-					className="btn btn-ghost btn-sm text-primary font-bold"
+					className="btn btn-ghost btn-sm text-indigo-500 font-bold"
 				>
 					{tr("+ Add Deliverable")}
 				</button>

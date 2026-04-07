@@ -1,5 +1,5 @@
 import { View, Text } from "@react-pdf/renderer";
-import { styles, af, afB, rowDir } from "../styles";
+import { styles, colors, af, afB, rowDir } from "../styles";
 import { t } from "@/src/lib/translations";
 import type { DocumentData } from "@/src/store";
 
@@ -57,38 +57,70 @@ export const DeliverablesTable = ({
 
 	return (
 		<View style={styles.section}>
-			<Text style={[styles.sectionTitle, af(lang)]}>{t("Deliverables", lang)}</Text>
-			<View>
-				<View style={[styles.tableHeaderRow, rowDir(lang)]}>
-					<Text style={[styles.tableHeaderCell, { flex: 3 }, af(lang)]}>
-						{t("Deliverable", lang)}
-					</Text>
-					<Text style={[styles.tableHeaderCell, { flex: 2 }, af(lang)]}>
-						{t("Timeline", lang)}
-					</Text>
-					<Text
+			<Text style={[styles.sectionTitle, af(lang), { color: colors.indigo500 }]}>
+				{t("Deliverables", lang)}
+			</Text>
+			<View style={{ borderWidth: 0.5, borderColor: colors.slate200, borderRadius: 8, overflow: "hidden" }}>
+				{filtered.map((item, idx) => (
+					<View
+						key={item.id}
 						style={[
-							styles.tableHeaderCell,
-							{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
-							af(lang),
+							{
+								flexDirection: lang === "ar" ? "row-reverse" : "row",
+								alignItems: "flex-start",
+								paddingHorizontal: 12,
+								paddingVertical: 10,
+								borderBottomWidth: idx < filtered.length - 1 ? 0.5 : 0,
+								borderBottomColor: colors.slate100,
+								gap: 10,
+							},
 						]}
+						wrap={false}
 					>
-						{t("Status", lang)}
-					</Text>
-				</View>
-				{filtered.map((item) => (
-					<View key={item.id} style={[styles.tableRow, rowDir(lang)]} wrap={false}>
-						<Text style={[styles.tableCellBold, { flex: 3 }, afB(lang)]}>
-							{item.deliverable}
-						</Text>
-						<Text style={[styles.tableCell, { flex: 2 }, af(lang)]}>
-							{item.timeline}
-						</Text>
-						<View style={{ flex: 1, alignItems: lang === "ar" ? "flex-start" : "flex-end" }}>
-							<View style={styles.badge}>
-								<Text style={[styles.badgeText, af(lang)]}>
-									{item.status || t("Pending", lang)}
-								</Text>
+						{/* Numbered badge */}
+						<View
+							style={{
+								width: 18,
+								height: 18,
+								borderRadius: 9,
+								backgroundColor: colors.indigo100,
+								borderWidth: 0.5,
+								borderColor: colors.indigo200,
+								alignItems: "center",
+								justifyContent: "center",
+								marginTop: 1,
+							}}
+						>
+							<Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: colors.indigo500 }}>
+								{idx + 1}
+							</Text>
+						</View>
+						{/* Content */}
+						<View style={{ flex: 1 }}>
+							<Text style={[styles.tableCellBold, { marginBottom: 4 }, afB(lang)]}>
+								{item.deliverable}
+							</Text>
+							<View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 14 }}>
+								{item.timeline ? (
+									<View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 3, alignItems: "center" }}>
+										<Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", letterSpacing: 0.5, color: colors.amber500 }}>
+											{t("Timeline", lang)}
+										</Text>
+										<Text style={[{ fontSize: 8, color: colors.slate500 }, af(lang)]}>
+											{item.timeline}
+										</Text>
+									</View>
+								) : null}
+								<View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 3, alignItems: "center" }}>
+									<Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", letterSpacing: 0.5, color: colors.emerald600 }}>
+										{t("Status", lang)}
+									</Text>
+									<View style={{ backgroundColor: colors.emerald50, borderWidth: 0.5, borderColor: colors.emerald100, borderRadius: 8, paddingHorizontal: 6, paddingVertical: 1 }}>
+										<Text style={[{ fontSize: 7, fontFamily: "Helvetica-Bold", textTransform: "uppercase", color: colors.emerald600 }, af(lang)]}>
+											{item.status || t("Pending", lang)}
+										</Text>
+									</View>
+								</View>
 							</View>
 						</View>
 					</View>
