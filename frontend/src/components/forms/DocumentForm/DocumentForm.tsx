@@ -48,8 +48,10 @@ export const DocumentForm = () => {
 			// Scalar fields
 			if (ai.aiIntro) update.aiIntro = ai.aiIntro;
 			if (ai.scopeOfWork) update.scopeOfWork = ai.scopeOfWork;
-			if (ai.agreementOverview) update.agreementOverview = ai.agreementOverview;
-			if (ai.campaignOverview) update.campaignOverview = ai.campaignOverview;
+			if (ai.agreementOverview)
+				update.agreementOverview = ai.agreementOverview;
+			if (ai.campaignOverview)
+				update.campaignOverview = ai.campaignOverview;
 			if (ai.body) update.body = ai.body;
 			if (ai.pricingPackage) update.pricingPackage = ai.pricingPackage;
 			if (ai.defaultCurrency) update.defaultCurrency = ai.defaultCurrency;
@@ -62,13 +64,21 @@ export const DocumentForm = () => {
 
 			// Array fields — attach a generated id to each item
 			if (Array.isArray(ai.deliverables) && ai.deliverables.length > 0)
-				update.deliverables = ai.deliverables.map((d: any) => ({ id: genId(), ...d }));
-
-			if (Array.isArray(ai.termsAndConditions) && ai.termsAndConditions.length > 0)
-				update.termsAndConditions = ai.termsAndConditions.map((t: any) => ({
+				update.deliverables = ai.deliverables.map((d: any) => ({
 					id: genId(),
-					text: typeof t === "string" ? t : t.text ?? "",
+					...d,
 				}));
+
+			if (
+				Array.isArray(ai.termsAndConditions) &&
+				ai.termsAndConditions.length > 0
+			)
+				update.termsAndConditions = ai.termsAndConditions.map(
+					(t: any) => ({
+						id: genId(),
+						text: typeof t === "string" ? t : (t.text ?? ""),
+					}),
+				);
 
 			if (Array.isArray(ai.lineItems) && ai.lineItems.length > 0)
 				update.lineItems = ai.lineItems.map((item: any) => ({
@@ -76,23 +86,43 @@ export const DocumentForm = () => {
 					description: item.description ?? "",
 					qty: Number(item.qty) || 1,
 					rate: Number(item.rate) || 0,
-					amount: Number(item.amount) || Number(item.qty) * Number(item.rate) || 0,
+					amount:
+						Number(item.amount) ||
+						Number(item.qty) * Number(item.rate) ||
+						0,
 				}));
 
-			if (Array.isArray(ai.performanceMetrics) && ai.performanceMetrics.length > 0)
-				update.performanceMetrics = ai.performanceMetrics.map((m: any) => ({ id: genId(), ...m }));
+			if (
+				Array.isArray(ai.performanceMetrics) &&
+				ai.performanceMetrics.length > 0
+			)
+				update.performanceMetrics = ai.performanceMetrics.map(
+					(m: any) => ({ id: genId(), ...m }),
+				);
 
 			if (Array.isArray(ai.topPosts) && ai.topPosts.length > 0)
-				update.topPosts = ai.topPosts.map((p: any) => ({ id: genId(), ...p }));
+				update.topPosts = ai.topPosts.map((p: any) => ({
+					id: genId(),
+					...p,
+				}));
 
 			if (Array.isArray(ai.salesMetrics) && ai.salesMetrics.length > 0)
-				update.salesMetrics = ai.salesMetrics.map((m: any) => ({ id: genId(), ...m }));
+				update.salesMetrics = ai.salesMetrics.map((m: any) => ({
+					id: genId(),
+					...m,
+				}));
 
 			if (Array.isArray(ai.dealBreakdown) && ai.dealBreakdown.length > 0)
-				update.dealBreakdown = ai.dealBreakdown.map((d: any) => ({ id: genId(), ...d }));
+				update.dealBreakdown = ai.dealBreakdown.map((d: any) => ({
+					id: genId(),
+					...d,
+				}));
 
 			if (Array.isArray(ai.influencers) && ai.influencers.length > 0)
-				update.influencers = ai.influencers.map((inf: any) => ({ id: genId(), ...inf }));
+				update.influencers = ai.influencers.map((inf: any) => ({
+					id: genId(),
+					...inf,
+				}));
 
 			updateDocument(update);
 		} catch (error) {
@@ -200,19 +230,33 @@ export const DocumentForm = () => {
 									value={s.header}
 									onChange={(e) =>
 										updateDocument({
-											customSections: document.customSections.map((c) =>
-												c.id === s.id ? { ...c, header: e.target.value } : c
-											),
+											customSections:
+												document.customSections.map(
+													(c) =>
+														c.id === s.id
+															? {
+																	...c,
+																	header: e
+																		.target
+																		.value,
+																}
+															: c,
+												),
 										})
 									}
 								/>
 							</FormField>
 							{(() => {
-								const patch = (updates: Partial<CustomSection>) =>
+								const patch = (
+									updates: Partial<CustomSection>,
+								) =>
 									updateDocument({
-										customSections: document.customSections.map((c) =>
-											c.id === s.id ? { ...c, ...updates } : c
-										),
+										customSections:
+											document.customSections.map((c) =>
+												c.id === s.id
+													? { ...c, ...updates }
+													: c,
+											),
 									});
 
 								if (s.type === "text") {
@@ -222,7 +266,11 @@ export const DocumentForm = () => {
 												className={`${inputClass} min-h-32`}
 												placeholder="Write your content here…"
 												value={s.content}
-												onChange={(e) => patch({ content: e.target.value })}
+												onChange={(e) =>
+													patch({
+														content: e.target.value,
+													})
+												}
 											/>
 										</FormField>
 									);
@@ -236,7 +284,10 @@ export const DocumentForm = () => {
 												Clauses
 											</label>
 											{rows.map((clause, idx) => (
-												<div key={clause.id} className="flex gap-3 items-center group">
+												<div
+													key={clause.id}
+													className="flex gap-3 items-center group"
+												>
 													<div className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-400 border border-slate-200">
 														{idx + 1}
 													</div>
@@ -246,15 +297,32 @@ export const DocumentForm = () => {
 														value={clause.text}
 														onChange={(e) =>
 															patch({
-																termsRows: rows.map((c) =>
-																	c.id === clause.id ? { ...c, text: e.target.value } : c
-																),
+																termsRows:
+																	rows.map(
+																		(c) =>
+																			c.id ===
+																			clause.id
+																				? {
+																						...c,
+																						text: e
+																							.target
+																							.value,
+																					}
+																				: c,
+																	),
 															})
 														}
 													/>
 													<button
 														onClick={() =>
-															patch({ termsRows: rows.filter((c) => c.id !== clause.id) })
+															patch({
+																termsRows:
+																	rows.filter(
+																		(c) =>
+																			c.id !==
+																			clause.id,
+																	),
+															})
 														}
 														className="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
 													>
@@ -264,7 +332,15 @@ export const DocumentForm = () => {
 											))}
 											<button
 												onClick={() =>
-													patch({ termsRows: [...rows, { id: rowId(), text: "" }] })
+													patch({
+														termsRows: [
+															...rows,
+															{
+																id: rowId(),
+																text: "",
+															},
+														],
+													})
 												}
 												className="btn btn-ghost btn-sm text-primary font-bold"
 											>
@@ -275,28 +351,49 @@ export const DocumentForm = () => {
 								}
 
 								if (s.type === "deliverables") {
-									const rows: DeliverableRow[] = s.deliverablesRows ?? [];
+									const rows: DeliverableRow[] =
+										s.deliverablesRows ?? [];
 									return (
 										<div className="space-y-3">
 											<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
 												Deliverables
 											</label>
 											<div className="grid grid-cols-12 gap-3 px-1 text-[10px] font-black uppercase text-slate-400">
-												<div className="col-span-5">Deliverable</div>
-												<div className="col-span-3">Timeline</div>
-												<div className="col-span-3">Status</div>
+												<div className="col-span-5">
+													Deliverable
+												</div>
+												<div className="col-span-3">
+													Timeline
+												</div>
+												<div className="col-span-3">
+													Status
+												</div>
 											</div>
 											{rows.map((row) => (
-												<div key={row.id} className="grid grid-cols-12 gap-3 items-center group">
+												<div
+													key={row.id}
+													className="grid grid-cols-12 gap-3 items-center group"
+												>
 													<input
 														className={`${inputClass} col-span-5 py-2`}
 														placeholder="e.g. Brand Strategy Deck"
 														value={row.deliverable}
 														onChange={(e) =>
 															patch({
-																deliverablesRows: rows.map((r) =>
-																	r.id === row.id ? { ...r, deliverable: e.target.value } : r
-																),
+																deliverablesRows:
+																	rows.map(
+																		(r) =>
+																			r.id ===
+																			row.id
+																				? {
+																						...r,
+																						deliverable:
+																							e
+																								.target
+																								.value,
+																					}
+																				: r,
+																	),
 															})
 														}
 													/>
@@ -306,9 +403,20 @@ export const DocumentForm = () => {
 														value={row.timeline}
 														onChange={(e) =>
 															patch({
-																deliverablesRows: rows.map((r) =>
-																	r.id === row.id ? { ...r, timeline: e.target.value } : r
-																),
+																deliverablesRows:
+																	rows.map(
+																		(r) =>
+																			r.id ===
+																			row.id
+																				? {
+																						...r,
+																						timeline:
+																							e
+																								.target
+																								.value,
+																					}
+																				: r,
+																	),
 															})
 														}
 													/>
@@ -318,16 +426,31 @@ export const DocumentForm = () => {
 														value={row.status}
 														onChange={(e) =>
 															patch({
-																deliverablesRows: rows.map((r) =>
-																	r.id === row.id ? { ...r, status: e.target.value } : r
-																),
+																deliverablesRows:
+																	rows.map(
+																		(r) =>
+																			r.id ===
+																			row.id
+																				? {
+																						...r,
+																						status: e
+																							.target
+																							.value,
+																					}
+																				: r,
+																	),
 															})
 														}
 													/>
 													<button
 														onClick={() =>
 															patch({
-																deliverablesRows: rows.filter((r) => r.id !== row.id),
+																deliverablesRows:
+																	rows.filter(
+																		(r) =>
+																			r.id !==
+																			row.id,
+																	),
 															})
 														}
 														className="col-span-1 text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
@@ -341,7 +464,12 @@ export const DocumentForm = () => {
 													patch({
 														deliverablesRows: [
 															...rows,
-															{ id: rowId(), deliverable: "", timeline: "", status: "Pending" },
+															{
+																id: rowId(),
+																deliverable: "",
+																timeline: "",
+																status: "Pending",
+															},
 														],
 													})
 												}
@@ -361,7 +489,7 @@ export const DocumentForm = () => {
 			)}
 
 			<div className="fixed bottom-0 left-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none">
-				<div className="h-10 bg-gradient-to-t from-white to-transparent" />
+				<div className="h-10 bg-linear-to-t from-white to-transparent" />
 				<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
 					<button
 						onClick={handleGenerate}

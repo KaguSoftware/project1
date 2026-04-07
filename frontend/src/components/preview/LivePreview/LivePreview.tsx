@@ -184,15 +184,27 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				</div>
 
 				{/* Paper — uses CSS zoom on mobile so the fixed-width PDF surface reflows cleanly */}
+				<div className="paper-zoom-wrapper">
 				<div
 					className="paper-zoom"
 					style={{ ["--paper-zoom" as string]: "1" }}
 				>
 				<style>{`
+					/* w-198.5 = 198.5 * 4px = 794px */
 					.paper-zoom { zoom: var(--paper-zoom); }
-					@media (max-width: 639px) { .paper-zoom { zoom: 0.4; } }
-					@media (min-width: 640px) and (max-width: 767px) { .paper-zoom { zoom: 0.55; } }
-					@media (min-width: 768px) and (max-width: 1023px) { .paper-zoom { zoom: 0.7; } }
+					.paper-zoom-wrapper { width: 100%; display: flex; justify-content: center; }
+					@media (max-width: 639px) {
+						.paper-zoom { zoom: 0.4; }
+						.paper-zoom-wrapper { width: calc(794px * 0.4); overflow: visible; }
+					}
+					@media (min-width: 640px) and (max-width: 767px) {
+						.paper-zoom { zoom: 0.55; }
+						.paper-zoom-wrapper { width: calc(794px * 0.55); overflow: visible; }
+					}
+					@media (min-width: 768px) and (max-width: 1023px) {
+						.paper-zoom { zoom: 0.7; }
+						.paper-zoom-wrapper { width: calc(794px * 0.7); overflow: visible; }
+					}
 				`}</style>
 				<div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] mb-4 border border-slate-200 rounded-sm">
 					<div
@@ -237,6 +249,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 							</p>
 						</div>
 					</div>
+				</div>
 				</div>
 				</div>
 
