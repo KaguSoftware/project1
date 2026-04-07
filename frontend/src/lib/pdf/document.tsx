@@ -1,5 +1,5 @@
 import { Document, Page, pdf } from "@react-pdf/renderer";
-import { styles } from "./styles";
+import { styles, ensureFontsRegistered } from "./styles";
 import type { DocumentData } from "@/src/store";
 
 import {
@@ -153,5 +153,6 @@ export const PDFDocument = ({ data, lang = "en" }: { data: DocumentData; lang?: 
 );
 
 export async function generatePDFBlob(data: DocumentData, lang: Lang = "en"): Promise<Blob> {
+	await ensureFontsRegistered();
 	return pdf(<PDFDocument data={data} lang={lang} />).toBlob();
 }
