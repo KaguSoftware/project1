@@ -22,6 +22,10 @@ interface AppState {
 		id: string,
 	) => void;
 	resetDocument: () => void;
+	// Hidden fields (fields removed from the form UI)
+	hiddenFields: string[];
+	hideField: (key: string) => void;
+	showAllFields: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -30,7 +34,11 @@ export const useAppStore = create<AppState>((set) => ({
 	document: initialDocumentState,
 
 	updateDocument: (data) =>
-		set((state) => ({ document: { ...state.document, ...data } })),
+		set((state) => ({
+			document: { ...state.document, ...data },
+			// Reset hidden fields whenever the doc type changes
+			...(data.type !== undefined ? { hiddenFields: [] } : {}),
+		})),
 
 	updateArrayItem: (field, id, data) =>
 		set((state) => ({
@@ -63,5 +71,10 @@ export const useAppStore = create<AppState>((set) => ({
 			},
 		})),
 
-	resetDocument: () => set({ document: initialDocumentState }),
+	resetDocument: () => set({ document: initialDocumentState, hiddenFields: [] }),
+
+	hiddenFields: [],
+	hideField: (key) =>
+		set((state) => ({ hiddenFields: [...state.hiddenFields, key] })),
+	showAllFields: () => set({ hiddenFields: [] }),
 }));

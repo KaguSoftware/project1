@@ -22,12 +22,12 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 					{(tiers.length > 0
 						? tiers
 						: [
-								{ id: "t1", name: "basic" as const, price: "", description: "", isPopular: false },
-								{ id: "t2", name: "standard" as const, price: "", description: "", isPopular: true },
-								{ id: "t3", name: "premium" as const, price: "", description: "", isPopular: false },
+								{ id: "t1", name: "Basic", price: "", description: "", isPopular: false },
+								{ id: "t2", name: "Standard", price: "", description: "", isPopular: true },
+								{ id: "t3", name: "Premium", price: "", description: "", isPopular: false },
 						  ]
 					).map((tier) => {
-						const selected = tier.name === doc.pricingPackage;
+						const selected = tier.name.toLowerCase() === (doc.pricingPackage || "").toLowerCase();
 						return (
 							<div
 								key={tier.id}

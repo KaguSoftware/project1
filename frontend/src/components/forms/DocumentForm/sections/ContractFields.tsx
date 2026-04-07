@@ -13,6 +13,8 @@ export const ContractFields = () => {
 		updateArrayItem,
 		removeArrayItem,
 		language,
+		hiddenFields,
+		hideField,
 	} = useAppStore();
 
 	const tr = (key: string) => t(key, language);
@@ -21,25 +23,29 @@ export const ContractFields = () => {
 		<div className="space-y-8">
 			<SectionHeader title="Agreement Details" icon={LayoutGridIcon} />
 
-			<FormField label="Agreement Overview">
-				<textarea
-					className={`${inputClass} h-24`}
-					value={document.agreementOverview}
-					onChange={(e) =>
-						updateDocument({ agreementOverview: e.target.value })
-					}
-				/>
-			</FormField>
+			{!hiddenFields.includes("agreementOverview") && (
+				<FormField label="Agreement Overview" onDelete={() => hideField("agreementOverview")}>
+					<textarea
+						className={`${inputClass} h-24`}
+						value={document.agreementOverview}
+						onChange={(e) =>
+							updateDocument({ agreementOverview: e.target.value })
+						}
+					/>
+				</FormField>
+			)}
 
-			<FormField label="Scope of Services">
-				<textarea
-					className={`${inputClass} h-32`}
-					value={document.scopeOfWork}
-					onChange={(e) =>
-						updateDocument({ scopeOfWork: e.target.value })
-					}
-				/>
-			</FormField>
+			{!hiddenFields.includes("scopeOfWork") && (
+				<FormField label="Scope of Services" onDelete={() => hideField("scopeOfWork")}>
+					<textarea
+						className={`${inputClass} h-32`}
+						value={document.scopeOfWork}
+						onChange={(e) =>
+							updateDocument({ scopeOfWork: e.target.value })
+						}
+					/>
+				</FormField>
+			)}
 
 			<div className="space-y-4">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">

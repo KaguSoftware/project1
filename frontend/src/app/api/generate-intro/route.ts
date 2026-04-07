@@ -20,6 +20,7 @@ function buildPrompt(doc: any, providedData: string) {
         3. If a field already has a non-empty user value, preserve it exactly.
         4. The written paragraphs must explicitly reference provided fields (projectTitle, clientName, etc).
         5. Return ONLY valid JSON — no markdown, no code fences, no explanation.
+        ${doc.additionalInstructions ? `6. ADDITIONAL INSTRUCTIONS (highest priority — follow these exactly):\n        ${doc.additionalInstructions}` : ""}
     `;
 
 	switch (doc.type) {
@@ -32,7 +33,7 @@ function buildPrompt(doc: any, providedData: string) {
         {
           "aiIntro": "2 paragraphs of executive summary referencing project title, client, package, price, timeline",
           "scopeOfWork": "Detailed project scope based on the provided data",
-          "pricingPackage": "basic | standard | premium",
+          "pricingPackage": "Name of the recommended pricing tier (match one of the tier names if provided)",
           "defaultCurrency": "Use the user's provided currency or infer from context",
           "totalPrice": "Professional price string",
           "timeline": "Project timeline string",

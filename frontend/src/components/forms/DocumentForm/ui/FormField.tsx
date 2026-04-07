@@ -1,20 +1,34 @@
 "use client";
 import React from "react";
+import { TrashIcon } from "lucide-react";
 import { useAppStore } from "@/src/store";
 import { t } from "@/src/lib/translations";
 
 interface FormFieldProps {
 	label: string;
 	children: React.ReactNode;
+	onDelete?: () => void;
 }
 
-export const FormField = ({ label, children }: FormFieldProps) => {
+export const FormField = ({ label, children, onDelete }: FormFieldProps) => {
 	const { language } = useAppStore();
 	return (
 		<div className="form-control w-full">
-			<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 px-1">
-				{t(label, language)}
-			</label>
+			<div className="flex items-center justify-between mb-2 px-1">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+					{t(label, language)}
+				</label>
+				{onDelete && (
+					<button
+						type="button"
+						onClick={onDelete}
+						className="text-slate-300 hover:text-red-400 transition-colors"
+						title="Remove field"
+					>
+						<TrashIcon size={12} />
+					</button>
+				)}
+			</div>
 			{children}
 		</div>
 	);

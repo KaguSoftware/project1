@@ -18,13 +18,25 @@ type Lang = "en" | "ar";
 /** Apply to any <Text> that should render in Arabic. */
 export const af = (lang: Lang): Style =>
 	lang === "ar"
-		? { fontFamily: "NotoSansArabic", textAlign: "right" }
+		? {
+				fontFamily: "NotoSansArabic",
+				textAlign: "right",
+				// Ensure RTL text direction for proper Arabic character shaping and joining
+				// @ts-ignore — @react-pdf/renderer supports this prop at runtime
+				writingDirection: "rtl",
+			}
 		: {};
 
 /** Bold variant for Arabic text. */
 export const afB = (lang: Lang): Style =>
 	lang === "ar"
-		? { fontFamily: "NotoSansArabic", fontWeight: 700, textAlign: "right" }
+		? {
+				fontFamily: "NotoSansArabic",
+				fontWeight: 700,
+				textAlign: "right",
+				// @ts-ignore
+				writingDirection: "rtl",
+			}
 		: {};
 
 /** Reverse a flex row for RTL. */

@@ -7,13 +7,14 @@ export const initialDocumentState: DocumentData = {
 	title: "",
 	projectTitle: "", // Added this
 	clientName: "",
+	additionalInstructions: "",
 	aiIntro: "",
 	scopeOfWork: "",
-	pricingPackage: "standard",
+	pricingPackage: "Standard",
 	pricingTiers: [
-		{ id: "tier-basic", name: "basic", price: "", description: "", isPopular: false },
-		{ id: "tier-standard", name: "standard", price: "", description: "", isPopular: true },
-		{ id: "tier-premium", name: "premium", price: "", description: "", isPopular: false },
+		{ id: "tier-basic", name: "Basic", price: "", description: "", isPopular: false },
+		{ id: "tier-standard", name: "Standard", price: "", description: "", isPopular: true },
+		{ id: "tier-premium", name: "Premium", price: "", description: "", isPopular: false },
 	] as PricingTier[],
 	timeline: "",
 	defaultCurrency: "USD",

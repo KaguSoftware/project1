@@ -68,7 +68,7 @@ export interface CustomSection {
 
 export interface PricingTier {
 	id: string;
-	name: "basic" | "standard" | "premium";
+	name: string;
 	price: string;
 	description: string;
 	isPopular: boolean;
@@ -79,9 +79,10 @@ export interface DocumentData {
 	title: string; // The "Document Title" (e.g., "SOW", "Proposal")
 	projectTitle: string; // The specific project name
 	clientName: string;
+	additionalInstructions: string;
 	aiIntro: string;
 	scopeOfWork: string;
-	pricingPackage: "basic" | "standard" | "premium";
+	pricingPackage: string;
 	pricingTiers: PricingTier[];
 	timeline: string;
 	defaultCurrency: string;

@@ -6,8 +6,13 @@ import type { DocumentData } from "@/src/store";
 type Lang = "en" | "ar";
 
 export const EngagementOverview = ({ data, lang = "en" }: { data: DocumentData; lang?: Lang }) => {
+	// Find the selected tier to show its name (case-insensitive match)
+	const selectedTierName = data.pricingTiers?.find(
+		(t) => t.name.toLowerCase() === (data.pricingPackage || "").toLowerCase()
+	)?.name ?? data.pricingPackage;
+
 	const items = [
-		data.pricingPackage && { label: t("Package", lang), value: data.pricingPackage },
+		data.pricingPackage && { label: t("Package", lang), value: selectedTierName },
 		data.timeline && { label: t("Timeline", lang), value: data.timeline },
 		data.totalPrice && {
 			label: t("Total", lang),

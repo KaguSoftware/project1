@@ -13,6 +13,8 @@ export const SocialMediaFields = () => {
 		updateArrayItem,
 		removeArrayItem,
 		language,
+		hiddenFields,
+		hideField,
 	} = useAppStore();
 
 	const tr = (key: string) => t(key, language);
@@ -99,15 +101,17 @@ export const SocialMediaFields = () => {
 				</div>
 			</section>
 
-			<FormField label="Executive Summary">
-				<textarea
-					className={`${inputClass} h-32`}
-					value={document.aiIntro}
-					onChange={(e) =>
-						updateDocument({ aiIntro: e.target.value })
-					}
-				/>
-			</FormField>
+			{!hiddenFields.includes("aiIntro") && (
+				<FormField label="Executive Summary" onDelete={() => hideField("aiIntro")}>
+					<textarea
+						className={`${inputClass} h-32`}
+						value={document.aiIntro}
+						onChange={(e) =>
+							updateDocument({ aiIntro: e.target.value })
+						}
+					/>
+				</FormField>
+			)}
 
 			<section className="space-y-6">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">

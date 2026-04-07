@@ -21,12 +21,14 @@ import { SalesFields } from "./sections/SalesFields";
 import { InfluencerFields } from "./sections/InfluencerFields";
 import { FormField, inputClass } from "./ui/FormField";
 import { TrashIcon } from "lucide-react";
-import type { CustomSection, DeliverableRow } from "@/src/store";
+import type { CustomSection, CustomSectionType, DeliverableRow } from "@/src/store";
+import { generateId } from "@/src/store/initialState";
+import { AddSectionBar } from "@/src/components/preview/LivePreview/AddSectionBar";
 
 const rowId = () => Math.random().toString(36).substring(2, 11);
 
 export const DocumentForm = () => {
-	const { document, updateDocument, language } = useAppStore();
+	const { document, updateDocument, language, hiddenFields, hideField, showAllFields } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 
 	const handleGenerate = async () => {
@@ -133,6 +135,25 @@ export const DocumentForm = () => {
 		}
 	};
 
+	const addCustomSection = (type: CustomSectionType, header: string) => {
+		const next: CustomSection = {
+			id: generateId(),
+			type,
+			header,
+			content: "",
+			termsRows: type === "terms" ? [] : undefined,
+			deliverablesRows: type === "deliverables" ? [] : undefined,
+		};
+		updateDocument({ customSections: [...document.customSections, next] });
+	};
+
+	const removeCustomSection = (id: string) => {
+		updateDocument({
+			customSections: document.customSections.filter((s) => s.id !== id),
+			sectionOrder: document.sectionOrder?.filter((sid) => sid !== id),
+		});
+	};
+
 	const categories = [
 		{ id: "proposal", label: "Proposal", icon: FileTextIcon },
 		{ id: "contract", label: "Contract", icon: LayoutGridIcon },
@@ -173,30 +194,67 @@ export const DocumentForm = () => {
 				</div>
 			</section>
 
+			{/* Add Section Bar */}
+			<div className="relative">
+				<AddSectionBar onAdd={addCustomSection} direction="down" />
+			</div>
+
+			{/* Restore hidden fields banner */}
+			{hiddenFields.length > 0 && (
+				<div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
+					<span className="text-[11px] font-black uppercase tracking-widest text-amber-600">
+						{hiddenFields.length} field{hiddenFields.length > 1 ? "s" : ""} hidden
+					</span>
+					<button
+						type="button"
+						onClick={showAllFields}
+						className="text-[11px] font-black uppercase tracking-widest text-amber-700 hover:text-amber-900 transition-colors"
+					>
+						Restore all
+					</button>
+				</div>
+			)}
+
 			{/* 2. Global Identity Block */}
 			<section className="space-y-6 bg-slate-50/50 p-8 rounded-3xl border border-slate-200">
-				<FormField label="Project Title">
-					<input
-						type="text"
-						className={inputClass}
-						placeholder="e.g. Q4 Growth Phase"
-						value={document.projectTitle}
-						onChange={(e) =>
-							updateDocument({ projectTitle: e.target.value })
-						}
-					/>
-				</FormField>
-				<FormField label="Client Name">
-					<input
-						type="text"
-						className={inputClass}
-						placeholder="e.g. Acme Corp"
-						value={document.clientName}
-						onChange={(e) =>
-							updateDocument({ clientName: e.target.value })
-						}
-					/>
-				</FormField>
+				{!hiddenFields.includes("additionalInstructions") && (
+					<FormField label="Additional Instructions" onDelete={() => hideField("additionalInstructions")}>
+						<textarea
+							className={`${inputClass} h-20`}
+							placeholder="e.g. Use formal Arabic, focus on ROI, avoid technical jargon…"
+							value={document.additionalInstructions}
+							onChange={(e) =>
+								updateDocument({ additionalInstructions: e.target.value })
+							}
+						/>
+					</FormField>
+				)}
+				{!hiddenFields.includes("projectTitle") && (
+					<FormField label="Project Title" onDelete={() => hideField("projectTitle")}>
+						<input
+							type="text"
+							className={inputClass}
+							placeholder="e.g. Q4 Growth Phase"
+							value={document.projectTitle}
+							onChange={(e) =>
+								updateDocument({ projectTitle: e.target.value })
+							}
+						/>
+					</FormField>
+				)}
+				{!hiddenFields.includes("clientName") && (
+					<FormField label="Client Name" onDelete={() => hideField("clientName")}>
+						<input
+							type="text"
+							className={inputClass}
+							placeholder="e.g. Acme Corp"
+							value={document.clientName}
+							onChange={(e) =>
+								updateDocument({ clientName: e.target.value })
+							}
+						/>
+					</FormField>
+				)}
 			</section>
 
 			{/* 3. Dynamic Section Switcher */}
@@ -222,8 +280,16 @@ export const DocumentForm = () => {
 					{document.customSections.map((s) => (
 						<div
 							key={s.id}
-							className="space-y-4 bg-slate-50/50 p-6 rounded-2xl border border-slate-200"
+							className="space-y-4 bg-slate-50/50 p-6 rounded-2xl border border-slate-200 relative"
 						>
+							<button
+								type="button"
+								onClick={() => removeCustomSection(s.id)}
+								className="absolute top-4 right-4 text-slate-300 hover:text-red-400 transition-colors"
+								title="Remove section"
+							>
+								<TrashIcon size={14} />
+							</button>
 							<FormField label="Section Header">
 								<input
 									type="text"

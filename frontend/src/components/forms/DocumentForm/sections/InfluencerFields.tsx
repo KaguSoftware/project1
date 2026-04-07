@@ -13,6 +13,8 @@ export const InfluencerFields = () => {
 		updateArrayItem,
 		removeArrayItem,
 		language,
+		hiddenFields,
+		hideField,
 	} = useAppStore();
 
 	const tr = (key: string) => t(key, language);
@@ -21,15 +23,17 @@ export const InfluencerFields = () => {
 		<div className="space-y-8">
 			<SectionHeader title="Influencer Roster" icon={UsersIcon} />
 
-			<FormField label="Campaign Overview">
-				<textarea
-					className={`${inputClass} h-24`}
-					value={document.campaignOverview}
-					onChange={(e) =>
-						updateDocument({ campaignOverview: e.target.value })
-					}
-				/>
-			</FormField>
+			{!hiddenFields.includes("campaignOverview") && (
+				<FormField label="Campaign Overview" onDelete={() => hideField("campaignOverview")}>
+					<textarea
+						className={`${inputClass} h-24`}
+						value={document.campaignOverview}
+						onChange={(e) =>
+							updateDocument({ campaignOverview: e.target.value })
+						}
+					/>
+				</FormField>
+			)}
 
 			<div className="space-y-6">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
@@ -131,8 +135,8 @@ export const InfluencerFields = () => {
 						{ id: "clicks", label: "Clicks" },
 						{ id: "conversions", label: "Conversions" },
 						{ id: "roi", label: "ROI" },
-					].map((kpi) => (
-						<FormField key={kpi.id} label={kpi.label}>
+					].filter((kpi) => !hiddenFields.includes(`kpi_${kpi.id}`)).map((kpi) => (
+						<FormField key={kpi.id} label={kpi.label} onDelete={() => hideField(`kpi_${kpi.id}`)}>
 							<input
 								className={`${inputClass} py-2 px-3 text-sm`}
 								placeholder="0"
