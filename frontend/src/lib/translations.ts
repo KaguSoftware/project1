@@ -89,7 +89,6 @@ const ar: Record<string, string> = {
 	"Document Builder": "منشئ الوثائق",
 	"Select Document Category": "اختر نوع الوثيقة",
 	"Project Title": "عنوان المشروع",
-	"Client Name": "اسم العميل",
 	"e.g. Q4 Growth Phase": "مثال: مرحلة النمو Q4",
 	"e.g. Acme Corp": "مثال: شركة أكمي",
 	"Generate": "توليد",
