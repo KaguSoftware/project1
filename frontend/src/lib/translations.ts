@@ -101,7 +101,7 @@ const ar: Record<string, string> = {
 	"Letter": "رسالة",
 	"Social": "تواصل اجتماعي",
 	"Sales": "مبيعات",
-	"Influencer": "مؤثر",
+	"Influencer Type": "مؤثر",
 
 	// Proposal form
 	"Proposal Details": "تفاصيل العرض",

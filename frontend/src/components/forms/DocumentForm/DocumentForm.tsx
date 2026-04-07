@@ -140,7 +140,7 @@ export const DocumentForm = () => {
 		{ id: "letter", label: "Letter", icon: TypeIcon },
 		{ id: "social_media_report", label: "Social", icon: BarChart3Icon },
 		{ id: "weekly_sales_report", label: "Sales", icon: BarChart3Icon },
-		{ id: "influencer_campaign", label: "Influencer", icon: UsersIcon },
+		{ id: "influencer_campaign", label: "Influencer Type", icon: UsersIcon },
 	];
 	const tr = (key: string) => t(key, language);
 
