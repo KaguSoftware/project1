@@ -1,10 +1,14 @@
 import type { DocumentData } from "@/src/store";
 
-export async function exportToPDF(data: DocumentData, filename: string) {
+export async function exportToPDF(
+	data: DocumentData,
+	filename: string,
+	language: "en" | "ar" = "en"
+) {
 	// Dynamic import keeps @react-pdf/renderer out of the SSR bundle
 	const { generatePDFBlob } = await import("./document");
 
-	const blob = await generatePDFBlob(data);
+	const blob = await generatePDFBlob(data, language);
 
 	const url = URL.createObjectURL(blob);
 

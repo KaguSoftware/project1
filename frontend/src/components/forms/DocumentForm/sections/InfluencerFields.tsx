@@ -1,6 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
-import { UsersIcon, TrashIcon, PlusIcon } from "lucide-react";
+import { UsersIcon, TrashIcon } from "lucide-react";
+import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
 
@@ -11,7 +12,10 @@ export const InfluencerFields = () => {
 		addArrayItem,
 		updateArrayItem,
 		removeArrayItem,
+		language,
 	} = useAppStore();
+
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="space-y-8">
@@ -29,7 +33,7 @@ export const InfluencerFields = () => {
 
 			<div className="space-y-6">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Influencer List
+					{tr("Influencer List")}
 				</label>
 				{document.influencers.map((inf) => (
 					<div
@@ -64,7 +68,7 @@ export const InfluencerFields = () => {
 							<FormField label="Followers">
 								<input
 									className={`${inputClass} py-2`}
-									placeholder="e.g. 50K"
+									placeholder={tr("e.g. 50K")}
 									value={inf.followers}
 									onChange={(e) =>
 										updateArrayItem("influencers", inf.id, {
@@ -76,7 +80,7 @@ export const InfluencerFields = () => {
 							<FormField label="Rate">
 								<input
 									className={`${inputClass} py-2`}
-									placeholder="e.g. $500"
+									placeholder={tr("e.g. $500")}
 									value={inf.rate}
 									onChange={(e) =>
 										updateArrayItem("influencers", inf.id, {
@@ -88,7 +92,7 @@ export const InfluencerFields = () => {
 							<FormField label="Status">
 								<input
 									className={`${inputClass} py-2`}
-									placeholder="e.g. Confirmed"
+									placeholder={tr("e.g. Confirmed")}
 									value={inf.status}
 									onChange={(e) =>
 										updateArrayItem("influencers", inf.id, {
@@ -112,14 +116,13 @@ export const InfluencerFields = () => {
 					onClick={() => addArrayItem("influencers", { name: "", platform: "", followers: "", rate: "", status: "" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Influencer
+					{tr("+ Add Influencer")}
 				</button>
 			</div>
 
-			{/* Campaign KPIs Section from your image */}
 			<div className="space-y-6 pt-6 border-t border-slate-100">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Campaign KPIs
+					{tr("Campaign KPIs")}
 				</label>
 				<div className="grid grid-cols-5 gap-4">
 					{[

@@ -5,7 +5,20 @@
       "Bash(npm uninstall:*)",
       "Bash(npx tsc:*)",
       "Bash(npx next:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(grep -l \"updateDocument\\\\|useAppStore\" /c/Users/MnS/Kagu/project1/frontend/src/store/*.ts)",
+      "Bash(npx --yes tsc --noEmit)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(ls /tmp/*.png)",
+      "Bash(ls /tmp/*.jpg)",
+      "Bash(ls c:/Users/MnS/Kagu/project1/frontend/src/lib/translations*)",
+      "Bash(curl -L \"https://fonts.gstatic.com/s/notosansarabic/v18/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfyGyvu3CBFQLaig.woff\" -o \"c:/Users/MnS/Kagu/project1/frontend/public/fonts/NotoSansArabic.woff\")",
+      "Bash(curl -L \"https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700\" -A \"Mozilla/5.0\")",
+      "Bash(curl -L \"https://fonts.gstatic.com/s/notosansarabic/v33/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfyGyvuw.ttf\" -o \"c:/Users/MnS/Kagu/project1/frontend/public/fonts/NotoSansArabic-Regular.ttf\")",
+      "Bash(curl -L \"https://fonts.gstatic.com/s/notosansarabic/v33/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfL2uvuw.ttf\" -o \"c:/Users/MnS/Kagu/project1/frontend/public/fonts/NotoSansArabic-Bold.ttf\")",
+      "Bash(grep -rn \"export.*Style\" c:/Users/MnS/Kagu/project1/frontend/node_modules/@react-pdf/types/*.d.ts)",
+      "Bash(xargs grep:*)",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }

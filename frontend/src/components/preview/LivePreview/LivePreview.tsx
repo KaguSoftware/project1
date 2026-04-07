@@ -36,7 +36,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			const filename = `${doc.type}-${
 				doc.clientName.replace(/\s+/g, "-").toLowerCase() || "draft"
 			}`;
-			await exportToPDF(doc, filename);
+			await exportToPDF(doc, filename, language);
 		} catch (err) {
 			console.error("PDF export failed:", err);
 		} finally {

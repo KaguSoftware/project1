@@ -1,7 +1,35 @@
 import { StyleSheet, Font } from "@react-pdf/renderer";
+import type { Style } from "@react-pdf/types";
 
 // Prevent ugly word hyphenation
 Font.registerHyphenationCallback((word) => [word]);
+
+// Arabic font for PDF rendering (files served from /public/fonts/)
+Font.register({
+	family: "NotoSansArabic",
+	fonts: [
+		{ src: "/fonts/NotoSansArabic-Regular.ttf", fontWeight: 400 },
+		{ src: "/fonts/NotoSansArabic-Bold.ttf", fontWeight: 700 },
+	],
+});
+
+type Lang = "en" | "ar";
+
+/** Apply to any <Text> that should render in Arabic. */
+export const af = (lang: Lang): Style =>
+	lang === "ar"
+		? { fontFamily: "NotoSansArabic", textAlign: "right" }
+		: {};
+
+/** Bold variant for Arabic text. */
+export const afB = (lang: Lang): Style =>
+	lang === "ar"
+		? { fontFamily: "NotoSansArabic", fontWeight: 700, textAlign: "right" }
+		: {};
+
+/** Reverse a flex row for RTL. */
+export const rowDir = (lang: Lang): Style =>
+	lang === "ar" ? { flexDirection: "row-reverse" } : {};
 
 export const colors = {
 	slate900: "#0f172a",

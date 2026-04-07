@@ -1,6 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
 import { BarChart3Icon, TrashIcon } from "lucide-react";
+import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
 
@@ -11,7 +12,10 @@ export const SocialMediaFields = () => {
 		addArrayItem,
 		updateArrayItem,
 		removeArrayItem,
+		language,
 	} = useAppStore();
+
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="space-y-12">
@@ -22,9 +26,9 @@ export const SocialMediaFields = () => {
 				/>
 				<div className="space-y-4">
 					<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-						<div className="col-span-5">Metric</div>
-						<div className="col-span-4">Value</div>
-						<div className="col-span-2">Delta</div>
+						<div className="col-span-5">{tr("Metric")}</div>
+						<div className="col-span-4">{tr("Value")}</div>
+						<div className="col-span-2">{tr("Delta")}</div>
 					</div>
 					{document.performanceMetrics.map((row) => (
 						<div
@@ -33,7 +37,7 @@ export const SocialMediaFields = () => {
 						>
 							<input
 								className={`${inputClass} col-span-5 py-2`}
-								placeholder="e.g. Engagement"
+								placeholder={tr("e.g. Engagement")}
 								value={row.metric}
 								onChange={(e) =>
 									updateArrayItem(
@@ -90,7 +94,7 @@ export const SocialMediaFields = () => {
 						}
 						className="btn btn-ghost btn-sm text-primary font-bold"
 					>
-						+ Add Metric
+						{tr("+ Add Metric")}
 					</button>
 				</div>
 			</section>
@@ -107,13 +111,13 @@ export const SocialMediaFields = () => {
 
 			<section className="space-y-6">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Top Performing Posts
+					{tr("Top Performing Posts")}
 				</label>
 				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">Post</div>
-					<div className="col-span-2 text-center">Likes</div>
-					<div className="col-span-2 text-center">Comm.</div>
-					<div className="col-span-2 text-center">Shares</div>
+					<div className="col-span-5">{tr("Post")}</div>
+					<div className="col-span-2 text-center">{tr("Likes")}</div>
+					<div className="col-span-2 text-center">{tr("Comm.")}</div>
+					<div className="col-span-2 text-center">{tr("Shares")}</div>
 				</div>
 				{document.topPosts.map((row) => (
 					<div
@@ -168,7 +172,7 @@ export const SocialMediaFields = () => {
 					onClick={() => addArrayItem("topPosts", { post: "", likes: "", comments: "", shares: "" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Post
+					{tr("+ Add Post")}
 				</button>
 			</section>
 		</div>

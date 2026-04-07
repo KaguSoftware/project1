@@ -1,6 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
 import { FileTextIcon, TrashIcon } from "lucide-react";
+import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
 
@@ -11,7 +12,10 @@ export const ProposalFields = () => {
 		addArrayItem,
 		updateArrayItem,
 		removeArrayItem,
+		language,
 	} = useAppStore();
+
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="space-y-8">
@@ -20,7 +24,7 @@ export const ProposalFields = () => {
 			<FormField label="Executive Introduction">
 				<textarea
 					className={`${inputClass} h-32`}
-					placeholder="AI will help refine this..."
+					placeholder={tr("AI will help refine this...")}
 					value={document.aiIntro}
 					onChange={(e) =>
 						updateDocument({ aiIntro: e.target.value })
@@ -40,34 +44,17 @@ export const ProposalFields = () => {
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 				<FormField label="Pricing Package">
-					{/* Tier selector */}
-					<div className="grid grid-cols-3 gap-2 p-1.5 bg-white border border-slate-300 rounded-2xl mb-3">
-						{["basic", "standard", "premium"].map((pkg) => (
-							<button
-								key={pkg}
-								className={`py-2 text-[10px] font-black uppercase rounded-xl transition-all ${document.pricingPackage === pkg ? "bg-primary text-white" : "text-slate-400 hover:bg-slate-50"}`}
-								onClick={() =>
-									updateDocument({
-										pricingPackage: pkg as any,
-									})
-								}
-							>
-								{pkg}
-							</button>
-						))}
-					</div>
-					{/* Per-tier details */}
 					<div className="space-y-3">
 						{(document.pricingTiers ?? []).map((tier) => (
 							<div key={tier.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
-								<p className={`text-[10px] font-black uppercase tracking-widest ${document.pricingPackage === tier.name ? "text-primary" : "text-slate-400"}`}>
-									{tier.name} {document.pricingPackage === tier.name ? "(selected)" : ""}
+								<p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+									{tr(tier.name)}
 								</p>
 								<div className="grid grid-cols-2 gap-3">
 									<input
 										type="text"
 										className={inputClass}
-										placeholder="Price (e.g. 999)"
+										placeholder={tr("Price (e.g. 999)")}
 										value={tier.price}
 										onChange={(e) =>
 											updateDocument({
@@ -90,13 +77,13 @@ export const ProposalFields = () => {
 												})
 											}
 										/>
-										<span className="text-[10px] font-black uppercase text-slate-500">Popular</span>
+										<span className="text-[10px] font-black uppercase text-slate-500">{tr("Popular")}</span>
 									</label>
 								</div>
 								<input
 									type="text"
 									className={inputClass}
-									placeholder="Short description"
+									placeholder={tr("Short description")}
 									value={tier.description}
 									onChange={(e) =>
 										updateDocument({
@@ -158,12 +145,12 @@ export const ProposalFields = () => {
 			{/* ── Deliverables ─────────────────────────────────────────── */}
 			<div className="space-y-4">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Deliverables
+					{tr("Deliverables")}
 				</label>
 				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">Deliverable</div>
-					<div className="col-span-3">Timeline</div>
-					<div className="col-span-3">Status</div>
+					<div className="col-span-5">{tr("Deliverable")}</div>
+					<div className="col-span-3">{tr("Timeline")}</div>
+					<div className="col-span-3">{tr("Status")}</div>
 				</div>
 				{document.deliverables.map((row) => (
 					<div
@@ -172,7 +159,7 @@ export const ProposalFields = () => {
 					>
 						<input
 							className={`${inputClass} col-span-5 py-2`}
-							placeholder="e.g. Brand Strategy Deck"
+							placeholder={tr("e.g. Brand Strategy Deck")}
 							value={row.deliverable}
 							onChange={(e) =>
 								updateArrayItem("deliverables", row.id, {
@@ -182,7 +169,7 @@ export const ProposalFields = () => {
 						/>
 						<input
 							className={`${inputClass} col-span-3 py-2`}
-							placeholder="e.g. Week 2"
+							placeholder={tr("e.g. Week 2")}
 							value={row.timeline}
 							onChange={(e) =>
 								updateArrayItem("deliverables", row.id, {
@@ -192,7 +179,7 @@ export const ProposalFields = () => {
 						/>
 						<input
 							className={`${inputClass} col-span-3 py-2`}
-							placeholder="Pending"
+							placeholder={tr("Pending")}
 							value={row.status}
 							onChange={(e) =>
 								updateArrayItem("deliverables", row.id, {
@@ -220,14 +207,14 @@ export const ProposalFields = () => {
 					}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Deliverable
+					{tr("+ Add Deliverable")}
 				</button>
 			</div>
 
 			{/* ── Terms & Conditions ───────────────────────────────────── */}
 			<div className="space-y-4">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Terms & Conditions
+					{tr("Terms & Conditions")}
 				</label>
 				{document.termsAndConditions.map((clause, idx) => (
 					<div
@@ -265,7 +252,7 @@ export const ProposalFields = () => {
 					}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Clause
+					{tr("+ Add Clause")}
 				</button>
 			</div>
 		</div>

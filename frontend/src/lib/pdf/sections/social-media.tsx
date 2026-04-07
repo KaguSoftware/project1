@@ -1,24 +1,29 @@
 import { View, Text } from "@react-pdf/renderer";
-import { styles } from "../styles";
+import { styles, af, afB, rowDir } from "../styles";
 import { deltaStyle } from "./common";
+import { t } from "@/src/lib/translations";
 import type { DocumentData } from "@/src/store";
+
+type Lang = "en" | "ar";
 
 export const PerformanceMetrics = ({
 	metrics,
+	lang = "en",
 }: {
 	metrics: DocumentData["performanceMetrics"];
+	lang?: Lang;
 }) => {
 	const filtered = metrics.filter((m) => m.metric);
 	if (filtered.length === 0) return null;
 
 	return (
 		<View style={styles.section}>
-			<Text style={styles.sectionTitle}>Metric Performance</Text>
+			<Text style={[styles.sectionTitle, af(lang)]}>{t("Performance Metrics", lang)}</Text>
 			{filtered.map((m) => (
-				<View key={m.id} style={styles.metricRow} wrap={false}>
-					<Text style={styles.metricLabel}>{m.metric}</Text>
-					<View style={{ alignItems: "flex-end" }}>
-						<Text style={styles.metricValue}>{m.number}</Text>
+				<View key={m.id} style={[styles.metricRow, rowDir(lang)]} wrap={false}>
+					<Text style={[styles.metricLabel, afB(lang)]}>{m.metric}</Text>
+					<View style={{ alignItems: lang === "ar" ? "flex-start" : "flex-end" }}>
+						<Text style={[styles.metricValue, afB(lang)]}>{m.number}</Text>
 						<Text style={deltaStyle(m.delta)}>{m.delta}</Text>
 					</View>
 				</View>
@@ -29,54 +34,60 @@ export const PerformanceMetrics = ({
 
 export const TopPostsTable = ({
 	posts,
+	lang = "en",
 }: {
 	posts: DocumentData["topPosts"];
+	lang?: Lang;
 }) => {
 	const filtered = posts.filter((p) => p.post);
 	if (filtered.length === 0) return null;
 
 	return (
 		<View style={styles.section}>
-			<Text style={styles.sectionTitle}>Top Performing Posts</Text>
+			<Text style={[styles.sectionTitle, af(lang)]}>{t("Top Posts", lang)}</Text>
 			<View>
-				<View style={styles.tableHeaderRow}>
-					<Text style={[styles.tableHeaderCell, { flex: 4 }]}>
-						Post
+				<View style={[styles.tableHeaderRow, rowDir(lang)]}>
+					<Text style={[styles.tableHeaderCell, { flex: 4 }, af(lang)]}>
+						{t("Post", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.tableHeaderCell,
-							{ flex: 1, textAlign: "right" },
+							{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
+							af(lang),
 						]}
 					>
-						Likes
+						{t("Likes", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.tableHeaderCell,
-							{ flex: 1, textAlign: "right" },
+							{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
+							af(lang),
 						]}
 					>
-						Comments
+						{t("Comments", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.tableHeaderCell,
-							{ flex: 1, textAlign: "right" },
+							{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
+							af(lang),
 						]}
 					>
-						Shares
+						{t("Shares", lang)}
 					</Text>
 				</View>
 				{filtered.map((post) => (
-					<View key={post.id} style={styles.tableRow} wrap={false}>
-						<Text style={[styles.tableCellBold, { flex: 4 }]}>
+					<View key={post.id} style={[styles.tableRow, rowDir(lang)]} wrap={false}>
+						<Text style={[styles.tableCellBold, { flex: 4 }, afB(lang)]}>
 							{post.post}
 						</Text>
 						<Text
 							style={[
 								styles.tableCell,
-								{ flex: 1, textAlign: "right" },
+								{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
+								af(lang),
 							]}
 						>
 							{post.likes}
@@ -84,7 +95,8 @@ export const TopPostsTable = ({
 						<Text
 							style={[
 								styles.tableCell,
-								{ flex: 1, textAlign: "right" },
+								{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
+								af(lang),
 							]}
 						>
 							{post.comments}
@@ -92,7 +104,8 @@ export const TopPostsTable = ({
 						<Text
 							style={[
 								styles.tableCell,
-								{ flex: 1, textAlign: "right" },
+								{ flex: 1, textAlign: lang === "ar" ? "left" : "right" },
+								af(lang),
 							]}
 						>
 							{post.shares}

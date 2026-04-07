@@ -1,6 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
 import { ReceiptIcon, TrashIcon } from "lucide-react";
+import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
 
@@ -11,7 +12,10 @@ export const InvoiceFields = () => {
 		addArrayItem,
 		updateArrayItem,
 		removeArrayItem,
+		language,
 	} = useAppStore();
+
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="space-y-8">
@@ -19,10 +23,10 @@ export const InvoiceFields = () => {
 
 			<div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
 				<div className="grid grid-cols-12 gap-4 px-2 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">Description</div>
-					<div className="col-span-2 text-center">QTY</div>
-					<div className="col-span-2 text-center">Rate</div>
-					<div className="col-span-2 text-right">Amount</div>
+					<div className="col-span-5">{tr("Description")}</div>
+					<div className="col-span-2 text-center">{tr("QTY")}</div>
+					<div className="col-span-2 text-center">{tr("Rate")}</div>
+					<div className="col-span-2 text-right">{tr("Amount")}</div>
 				</div>
 				{document.lineItems.map((item) => (
 					<div
@@ -81,13 +85,13 @@ export const InvoiceFields = () => {
 					}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Item
+					{tr("+ Add Item")}
 				</button>
 			</div>
 
 			<div className="space-y-4">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Payment Terms
+					{tr("Payment Terms")}
 				</label>
 				{document.termsAndConditions.map((clause, idx) => (
 					<div
@@ -125,7 +129,7 @@ export const InvoiceFields = () => {
 					}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Term
+					{tr("+ Add Term")}
 				</button>
 			</div>
 		</div>

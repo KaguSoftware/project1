@@ -1,8 +1,11 @@
 import { View, Text } from "@react-pdf/renderer";
-import { styles } from "../styles";
+import { styles, af, afB, rowDir } from "../styles";
+import { t } from "@/src/lib/translations";
 import type { DocumentData } from "@/src/store";
 
-export const InvoiceTable = ({ data }: { data: DocumentData }) => {
+type Lang = "en" | "ar";
+
+export const InvoiceTable = ({ data, lang = "en" }: { data: DocumentData; lang?: Lang }) => {
 	const items = data.lineItems.filter((i) => i.description);
 	if (items.length === 0) return null;
 
@@ -11,47 +14,51 @@ export const InvoiceTable = ({ data }: { data: DocumentData }) => {
 
 	return (
 		<View style={styles.section}>
-			<Text style={styles.sectionTitle}>Billing Details</Text>
+			<Text style={[styles.sectionTitle, af(lang)]}>{t("Billing Details", lang)}</Text>
 			<View>
-				<View style={styles.tableHeaderRow}>
-					<Text style={[styles.tableHeaderCell, { flex: 4 }]}>
-						Description
+				<View style={[styles.tableHeaderRow, rowDir(lang)]}>
+					<Text style={[styles.tableHeaderCell, { flex: 4 }, af(lang)]}>
+						{t("Description", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.tableHeaderCell,
 							{ flex: 1, textAlign: "center" },
+							af(lang),
 						]}
 					>
-						Qty
+						{t("Qty", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.tableHeaderCell,
-							{ flex: 1.5, textAlign: "right" },
+							{ flex: 1.5, textAlign: lang === "ar" ? "left" : "right" },
+							af(lang),
 						]}
 					>
-						Rate
+						{t("Rate", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.tableHeaderCell,
-							{ flex: 1.5, textAlign: "right" },
+							{ flex: 1.5, textAlign: lang === "ar" ? "left" : "right" },
+							af(lang),
 						]}
 					>
-						Total
+						{t("Total", lang)}
 					</Text>
 				</View>
 
 				{items.map((item) => (
-					<View key={item.id} style={styles.tableRow} wrap={false}>
-						<Text style={[styles.tableCellBold, { flex: 4 }]}>
+					<View key={item.id} style={[styles.tableRow, rowDir(lang)]} wrap={false}>
+						<Text style={[styles.tableCellBold, { flex: 4 }, afB(lang)]}>
 							{item.description}
 						</Text>
 						<Text
 							style={[
 								styles.tableCell,
 								{ flex: 1, textAlign: "center" },
+								af(lang),
 							]}
 						>
 							{String(item.qty)}
@@ -59,7 +66,8 @@ export const InvoiceTable = ({ data }: { data: DocumentData }) => {
 						<Text
 							style={[
 								styles.tableCell,
-								{ flex: 1.5, textAlign: "right" },
+								{ flex: 1.5, textAlign: lang === "ar" ? "left" : "right" },
+								af(lang),
 							]}
 						>
 							{cur} {item.rate.toLocaleString()}
@@ -67,7 +75,8 @@ export const InvoiceTable = ({ data }: { data: DocumentData }) => {
 						<Text
 							style={[
 								styles.tableCellBold,
-								{ flex: 1.5, textAlign: "right" },
+								{ flex: 1.5, textAlign: lang === "ar" ? "left" : "right" },
+								afB(lang),
 							]}
 						>
 							{cur} {(item.qty * item.rate).toLocaleString()}
@@ -75,23 +84,26 @@ export const InvoiceTable = ({ data }: { data: DocumentData }) => {
 					</View>
 				))}
 
-				<View style={styles.tableTotalRow}>
+				<View style={[styles.tableTotalRow, rowDir(lang)]}>
 					<Text
 						style={[
 							styles.totalLabel,
 							{
 								flex: 6.5,
-								textAlign: "right",
-								paddingRight: 12,
+								textAlign: lang === "ar" ? "left" : "right",
+								paddingRight: lang === "ar" ? 0 : 12,
+								paddingLeft: lang === "ar" ? 12 : 0,
 							},
+							afB(lang),
 						]}
 					>
-						Total
+						{t("Total", lang)}
 					</Text>
 					<Text
 						style={[
 							styles.totalValue,
-							{ flex: 1.5, textAlign: "right" },
+							{ flex: 1.5, textAlign: lang === "ar" ? "left" : "right" },
+							afB(lang),
 						]}
 					>
 						{cur} {total.toLocaleString()}

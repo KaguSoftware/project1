@@ -1,6 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
 import { BarChart3Icon, TrashIcon } from "lucide-react";
+import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
 
@@ -11,7 +12,10 @@ export const SalesFields = () => {
 		addArrayItem,
 		updateArrayItem,
 		removeArrayItem,
+		language,
 	} = useAppStore();
+
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="space-y-12">
@@ -21,9 +25,9 @@ export const SalesFields = () => {
 					icon={BarChart3Icon}
 				/>
 				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">Metric</div>
-					<div className="col-span-4">Amount</div>
-					<div className="col-span-2">Delta</div>
+					<div className="col-span-5">{tr("Metric")}</div>
+					<div className="col-span-4">{tr("Amount")}</div>
+					<div className="col-span-2">{tr("Delta")}</div>
 				</div>
 				{document.salesMetrics.map((row) => (
 					<div
@@ -71,7 +75,7 @@ export const SalesFields = () => {
 					onClick={() => addArrayItem("salesMetrics", { title: "", money: "", delta: "" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Metric
+					{tr("+ Add Metric")}
 				</button>
 			</section>
 
@@ -87,12 +91,12 @@ export const SalesFields = () => {
 
 			<section className="space-y-6">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Deal Breakdown
+					{tr("Deal Breakdown")}
 				</label>
 				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">Client</div>
-					<div className="col-span-4">Deal Value</div>
-					<div className="col-span-2">Stage</div>
+					<div className="col-span-5">{tr("Client")}</div>
+					<div className="col-span-4">{tr("Deal Value")}</div>
+					<div className="col-span-2">{tr("Stage")}</div>
 				</div>
 				{document.dealBreakdown.map((row) => (
 					<div
@@ -146,7 +150,7 @@ export const SalesFields = () => {
 					}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Deal
+					{tr("+ Add Deal")}
 				</button>
 			</section>
 		</div>

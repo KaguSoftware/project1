@@ -1,6 +1,7 @@
 "use client";
 import { useAppStore } from "@/src/store";
 import { LayoutGridIcon, TrashIcon } from "lucide-react";
+import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
 
@@ -11,7 +12,10 @@ export const ContractFields = () => {
 		addArrayItem,
 		updateArrayItem,
 		removeArrayItem,
+		language,
 	} = useAppStore();
+
+	const tr = (key: string) => t(key, language);
 
 	return (
 		<div className="space-y-8">
@@ -39,12 +43,12 @@ export const ContractFields = () => {
 
 			<div className="space-y-4">
 				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
-					Deliverables Table
+					{tr("Deliverables Table")}
 				</label>
 				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
-					<div className="col-span-5">Deliverable</div>
-					<div className="col-span-3">Timeline</div>
-					<div className="col-span-3">Status</div>
+					<div className="col-span-5">{tr("Deliverable")}</div>
+					<div className="col-span-3">{tr("Timeline")}</div>
+					<div className="col-span-3">{tr("Status")}</div>
 				</div>
 				{document.deliverables.map((row) => (
 					<div
@@ -92,7 +96,7 @@ export const ContractFields = () => {
 					onClick={() => addArrayItem("deliverables", { deliverable: "", timeline: "", status: "Pending" })}
 					className="btn btn-ghost btn-sm text-primary font-bold"
 				>
-					+ Add Row
+					{tr("+ Add Row")}
 				</button>
 			</div>
 		</div>
