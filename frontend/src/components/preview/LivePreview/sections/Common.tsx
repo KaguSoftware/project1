@@ -1,16 +1,21 @@
 import type { DocumentData, CustomSection } from "@/src/store";
+import { t } from "@/src/lib/translations";
+
+type Lang = "en" | "ar";
 
 /** Generic plain-text section with a label above it */
 export const TextSectionPreview = ({
 	text,
 	label,
+	lang = "en",
 }: {
 	text: string;
 	label: string;
+	lang?: Lang;
 }) => (
 	<section>
 		<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-			{label}
+			{t(label, lang)}
 		</h3>
 		<div className="whitespace-pre-wrap text-slate-700 leading-relaxed text-base">
 			{text}
@@ -22,9 +27,11 @@ export const TextSectionPreview = ({
 export const TermsPreview = ({
 	doc,
 	label,
+	lang = "en",
 }: {
 	doc: DocumentData;
 	label?: string;
+	lang?: Lang;
 }) => {
 	const filtered = doc.termsAndConditions.filter((c) => c.text);
 	if (filtered.length === 0) return null;
@@ -32,7 +39,7 @@ export const TermsPreview = ({
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-				{label ?? "Terms & Conditions"}
+				{t(label ?? "Terms & Conditions", lang)}
 			</h3>
 			<ol className="space-y-3">
 				{filtered.map((clause, idx) => (
@@ -51,8 +58,10 @@ export const TermsPreview = ({
 /** Deliverables table — shared between proposal and contract */
 export const DeliverablesPreview = ({
 	rows,
+	lang = "en",
 }: {
 	rows: DocumentData["deliverables"];
+	lang?: Lang;
 }) => {
 	const filtered = rows.filter((d) => d.deliverable);
 	if (filtered.length === 0) return null;
@@ -60,15 +69,15 @@ export const DeliverablesPreview = ({
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-				Deliverables
+				{t("Deliverables", lang)}
 			</h3>
 			<table className="w-full text-left">
 				<thead>
 					<tr className="border-b border-slate-900">
-						<th className="py-3 text-[10px] uppercase font-black">Deliverable</th>
-						<th className="py-3 text-[10px] uppercase font-black">Timeline</th>
+						<th className="py-3 text-[10px] uppercase font-black">{t("Deliverable", lang)}</th>
+						<th className="py-3 text-[10px] uppercase font-black">{t("Timeline", lang)}</th>
 						<th className="py-3 text-[10px] uppercase font-black text-right">
-							Status
+							{t("Status", lang)}
 						</th>
 					</tr>
 				</thead>
@@ -81,7 +90,7 @@ export const DeliverablesPreview = ({
 							<td className="py-3 text-slate-500 text-sm">{item.timeline}</td>
 							<td className="py-3 text-right">
 								<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-500">
-									{item.status || "Pending"}
+									{item.status || t("Pending", lang)}
 								</span>
 							</td>
 						</tr>

@@ -1,13 +1,14 @@
 import type { DocumentData } from "@/src/store";
+import { t } from "@/src/lib/translations";
 
-export const SalesMetricsPreview = ({ doc }: { doc: DocumentData }) => {
+export const SalesMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
 	const filtered = doc.salesMetrics.filter((m) => m.title);
 	if (filtered.length === 0) return null;
 
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-				Weekly Sales Metrics
+				{t("Sales Metrics", lang)}
 			</h3>
 			<div className="space-y-4">
 				{filtered.map((m) => (
@@ -37,22 +38,22 @@ export const SalesMetricsPreview = ({ doc }: { doc: DocumentData }) => {
 	);
 };
 
-export const DealBreakdownPreview = ({ doc }: { doc: DocumentData }) => {
+export const DealBreakdownPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
 	const filtered = doc.dealBreakdown.filter((d) => d.client);
 	if (filtered.length === 0) return null;
 
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-				Deal Breakdown
+				{t("Deal Breakdown", lang)}
 			</h3>
 			<table className="w-full text-left">
 				<thead>
 					<tr className="border-b border-slate-900">
-						<th className="py-3 text-[10px] uppercase font-black">Client</th>
-						<th className="py-3 text-[10px] uppercase font-black">Deal Value</th>
+						<th className="py-3 text-[10px] uppercase font-black">{t("Client", lang)}</th>
+						<th className="py-3 text-[10px] uppercase font-black">{t("Deal Value", lang)}</th>
 						<th className="py-3 text-[10px] uppercase font-black text-right">
-							Stage
+							{t("Stage", lang)}
 						</th>
 					</tr>
 				</thead>

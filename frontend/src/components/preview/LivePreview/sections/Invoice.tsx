@@ -1,6 +1,7 @@
 import type { DocumentData } from "@/src/store";
+import { t } from "@/src/lib/translations";
 
-export const InvoicePreview = ({ doc }: { doc: DocumentData }) => {
+export const InvoicePreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
 	const items = doc.lineItems.filter((i) => i.description);
 	if (items.length === 0) return null;
 
@@ -9,20 +10,20 @@ export const InvoicePreview = ({ doc }: { doc: DocumentData }) => {
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-				Billing Details
+				{t("Billing Details", lang)}
 			</h3>
 			<table className="w-full text-left">
 				<thead>
 					<tr className="border-b border-slate-900">
-						<th className="py-4 text-[10px] uppercase font-black">Description</th>
+						<th className="py-4 text-[10px] uppercase font-black">{t("Description", lang)}</th>
 						<th className="py-4 text-[10px] uppercase font-black text-center">
-							Qty
+							{t("Qty", lang)}
 						</th>
 						<th className="py-4 text-[10px] uppercase font-black text-right">
-							Rate
+							{t("Rate", lang)}
 						</th>
 						<th className="py-4 text-[10px] uppercase font-black text-right">
-							Total
+							{t("Total", lang)}
 						</th>
 					</tr>
 				</thead>
@@ -46,7 +47,7 @@ export const InvoicePreview = ({ doc }: { doc: DocumentData }) => {
 							colSpan={3}
 							className="pt-4 font-black text-right uppercase text-xs tracking-widest"
 						>
-							Total
+							{t("Total", lang)}
 						</td>
 						<td className="pt-4 text-right font-black text-lg">
 							{doc.defaultCurrency} {total.toLocaleString()}

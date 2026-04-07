@@ -1,4 +1,4 @@
-import { DocumentData } from "./types";
+import { DocumentData, PricingTier } from "./types";
 
 export const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -10,6 +10,11 @@ export const initialDocumentState: DocumentData = {
 	aiIntro: "",
 	scopeOfWork: "",
 	pricingPackage: "standard",
+	pricingTiers: [
+		{ id: "tier-basic", name: "basic", price: "", description: "", isPopular: false },
+		{ id: "tier-standard", name: "standard", price: "", description: "", isPopular: true },
+		{ id: "tier-premium", name: "premium", price: "", description: "", isPopular: false },
+	] as PricingTier[],
 	timeline: "",
 	defaultCurrency: "USD",
 	totalPrice: "",

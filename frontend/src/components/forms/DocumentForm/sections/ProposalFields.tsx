@@ -40,7 +40,8 @@ export const ProposalFields = () => {
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 				<FormField label="Pricing Package">
-					<div className="grid grid-cols-3 gap-2 p-1.5 bg-white border border-slate-300 rounded-2xl">
+					{/* Tier selector */}
+					<div className="grid grid-cols-3 gap-2 p-1.5 bg-white border border-slate-300 rounded-2xl mb-3">
 						{["basic", "standard", "premium"].map((pkg) => (
 							<button
 								key={pkg}
@@ -53,6 +54,59 @@ export const ProposalFields = () => {
 							>
 								{pkg}
 							</button>
+						))}
+					</div>
+					{/* Per-tier details */}
+					<div className="space-y-3">
+						{(document.pricingTiers ?? []).map((tier) => (
+							<div key={tier.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+								<p className={`text-[10px] font-black uppercase tracking-widest ${document.pricingPackage === tier.name ? "text-primary" : "text-slate-400"}`}>
+									{tier.name} {document.pricingPackage === tier.name ? "(selected)" : ""}
+								</p>
+								<div className="grid grid-cols-2 gap-3">
+									<input
+										type="text"
+										className={inputClass}
+										placeholder="Price (e.g. 999)"
+										value={tier.price}
+										onChange={(e) =>
+											updateDocument({
+												pricingTiers: document.pricingTiers.map((t) =>
+													t.id === tier.id ? { ...t, price: e.target.value } : t
+												),
+											})
+										}
+									/>
+									<label className="flex items-center gap-2 cursor-pointer">
+										<input
+											type="checkbox"
+											className="checkbox checkbox-primary checkbox-sm"
+											checked={tier.isPopular}
+											onChange={(e) =>
+												updateDocument({
+													pricingTiers: document.pricingTiers.map((t) =>
+														t.id === tier.id ? { ...t, isPopular: e.target.checked } : t
+													),
+												})
+											}
+										/>
+										<span className="text-[10px] font-black uppercase text-slate-500">Popular</span>
+									</label>
+								</div>
+								<input
+									type="text"
+									className={inputClass}
+									placeholder="Short description"
+									value={tier.description}
+									onChange={(e) =>
+										updateDocument({
+											pricingTiers: document.pricingTiers.map((t) =>
+												t.id === tier.id ? { ...t, description: e.target.value } : t
+											),
+										})
+									}
+								/>
+							</div>
 						))}
 					</div>
 				</FormField>

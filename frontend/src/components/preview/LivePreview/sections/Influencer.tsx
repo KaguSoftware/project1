@@ -1,6 +1,7 @@
 import type { DocumentData } from "@/src/store";
+import { t } from "@/src/lib/translations";
 
-export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
+export const KPIGridPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
 	const kpis = doc.influencerKPIs;
 	if (!Object.values(kpis).some(Boolean)) return null;
 
@@ -15,7 +16,7 @@ export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-6 font-black">
-				Campaign KPIs
+				{t("Campaign KPIs", lang)}
 			</h3>
 			<div className="grid grid-cols-5 gap-4">
 				{entries.map((k) => (
@@ -24,7 +25,7 @@ export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
 						className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100"
 					>
 						<p className="text-[9px] font-black uppercase text-slate-400 mb-1">
-							{k.label}
+							{t(k.label, lang)}
 						</p>
 						<p className="text-xl font-black text-slate-900">{k.val || "—"}</p>
 					</div>
@@ -34,28 +35,28 @@ export const KPIGridPreview = ({ doc }: { doc: DocumentData }) => {
 	);
 };
 
-export const InfluencerRosterPreview = ({ doc }: { doc: DocumentData }) => {
+export const InfluencerRosterPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
 	const filtered = doc.influencers.filter((i) => i.name);
 	if (filtered.length === 0) return null;
 
 	return (
 		<section>
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
-				Influencer Roster
+				{t("Influencer Roster", lang)}
 			</h3>
 			<table className="w-full text-left">
 				<thead>
 					<tr className="border-b border-slate-900">
-						<th className="py-3 text-[10px] uppercase font-black">Name</th>
-						<th className="py-3 text-[10px] uppercase font-black">Platform</th>
+						<th className="py-3 text-[10px] uppercase font-black">{t("Name", lang)}</th>
+						<th className="py-3 text-[10px] uppercase font-black">{t("Platform", lang)}</th>
 						<th className="py-3 text-[10px] uppercase font-black text-center">
-							Followers
+							{t("Followers", lang)}
 						</th>
 						<th className="py-3 text-[10px] uppercase font-black text-right">
-							Rate
+							{t("Fee", lang)}
 						</th>
 						<th className="py-3 text-[10px] uppercase font-black text-right">
-							Status
+							{t("Status", lang)}
 						</th>
 					</tr>
 				</thead>

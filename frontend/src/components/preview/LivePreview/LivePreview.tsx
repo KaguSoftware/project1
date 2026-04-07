@@ -5,6 +5,7 @@ import { useAppStore } from "@/src/store";
 import { exportToPDF } from "@/src/lib/pdf";
 import type { CustomSectionType, CustomSection } from "@/src/store";
 import { generateId } from "@/src/store/initialState";
+import { t } from "@/src/lib/translations";
 import type { LivePreviewProps } from "./types";
 
 import { DocHeader } from "./sections/DocHeader";
@@ -76,45 +77,45 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		built.push({ id, label, node });
 
 	if (doc.type === "proposal") {
-		if (doc.aiIntro) push("executiveSummary", "Executive Summary",
-			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" />);
-		push("engagementOverview", "Engagement Overview", <EngagementOverviewPreview doc={doc} />);
-		if (doc.scopeOfWork) push("scopeOfWork", "Scope of Work",
-			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Work" />);
-		push("deliverables", "Deliverables", <DeliverablesPreview rows={doc.deliverables} />);
-		push("terms", "Terms & Conditions", <TermsPreview doc={doc} label="Terms & Conditions" />);
+		if (doc.aiIntro) push("executiveSummary", t("Executive Summary", language),
+			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" lang={language} />);
+		push("engagementOverview", t("Engagement Overview", language), <EngagementOverviewPreview doc={doc} lang={language} />);
+		if (doc.scopeOfWork) push("scopeOfWork", t("Scope of Work", language),
+			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Work" lang={language} />);
+		push("deliverables", t("Deliverables", language), <DeliverablesPreview rows={doc.deliverables} lang={language} />);
+		push("terms", t("Terms & Conditions", language), <TermsPreview doc={doc} label="Terms & Conditions" lang={language} />);
 	}
 	if (doc.type === "contract") {
-		if (doc.agreementOverview) push("agreementOverview", "Agreement Overview",
-			<TextSectionPreview text={doc.agreementOverview} label="Agreement Overview" />);
-		if (doc.scopeOfWork) push("scopeOfServices", "Scope of Services",
-			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Services" />);
-		push("deliverables", "Deliverables", <DeliverablesPreview rows={doc.deliverables} />);
+		if (doc.agreementOverview) push("agreementOverview", t("Agreement Overview", language),
+			<TextSectionPreview text={doc.agreementOverview} label="Agreement Overview" lang={language} />);
+		if (doc.scopeOfWork) push("scopeOfServices", t("Scope of Services", language),
+			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Services" lang={language} />);
+		push("deliverables", t("Deliverables", language), <DeliverablesPreview rows={doc.deliverables} lang={language} />);
 	}
 	if (doc.type === "invoice") {
-		push("invoice", "Invoice", <InvoicePreview doc={doc} />);
-		push("paymentTerms", "Payment Terms", <TermsPreview doc={doc} label="Payment Terms" />);
+		push("invoice", "Invoice", <InvoicePreview doc={doc} lang={language} />);
+		push("paymentTerms", t("Payment Terms", language), <TermsPreview doc={doc} label="Payment Terms" lang={language} />);
 	}
 	if (doc.type === "letter" && doc.body) {
-		push("message", "Message", <TextSectionPreview text={doc.body} label="Message" />);
+		push("message", t("Message", language), <TextSectionPreview text={doc.body} label="Message" lang={language} />);
 	}
 	if (doc.type === "social_media_report") {
-		if (doc.aiIntro) push("executiveSummary", "Executive Summary",
-			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" />);
-		push("performanceMetrics", "Performance Metrics", <PerformanceMetricsPreview doc={doc} />);
-		push("topPosts", "Top Posts", <TopPostsPreview doc={doc} />);
+		if (doc.aiIntro) push("executiveSummary", t("Executive Summary", language),
+			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" lang={language} />);
+		push("performanceMetrics", t("Performance Metrics", language), <PerformanceMetricsPreview doc={doc} lang={language} />);
+		push("topPosts", t("Top Posts", language), <TopPostsPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "weekly_sales_report") {
-		if (doc.aiIntro) push("weeklySummary", "Weekly Summary",
-			<TextSectionPreview text={doc.aiIntro} label="Weekly Summary" />);
-		push("salesMetrics", "Sales Metrics", <SalesMetricsPreview doc={doc} />);
-		push("dealBreakdown", "Deal Breakdown", <DealBreakdownPreview doc={doc} />);
+		if (doc.aiIntro) push("weeklySummary", t("Weekly Summary", language),
+			<TextSectionPreview text={doc.aiIntro} label="Weekly Summary" lang={language} />);
+		push("salesMetrics", t("Sales Metrics", language), <SalesMetricsPreview doc={doc} lang={language} />);
+		push("dealBreakdown", t("Deal Breakdown", language), <DealBreakdownPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "influencer_campaign") {
-		if (doc.campaignOverview) push("campaignOverview", "Campaign Overview",
-			<TextSectionPreview text={doc.campaignOverview} label="Campaign Overview" />);
-		push("kpiGrid", "Campaign KPIs", <KPIGridPreview doc={doc} />);
-		push("influencerRoster", "Influencer Roster", <InfluencerRosterPreview doc={doc} />);
+		if (doc.campaignOverview) push("campaignOverview", t("Campaign Overview", language),
+			<TextSectionPreview text={doc.campaignOverview} label="Campaign Overview" lang={language} />);
+		push("kpiGrid", t("Campaign KPIs", language), <KPIGridPreview doc={doc} lang={language} />);
+		push("influencerRoster", t("Influencer Roster", language), <InfluencerRosterPreview doc={doc} lang={language} />);
 	}
 
 	// Custom sections (use their id directly)
@@ -210,7 +211,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 						id="document-page"
 						className="bg-white w-198.5 min-h-280.75 px-16 py-20 relative flex flex-col text-slate-800 pdf-safe-mode"
 					>
-						<DocHeader doc={doc} today={today} />
+						<DocHeader doc={doc} today={today} lang={language} />
 
 						<div className="w-full h-1 bg-slate-900 mb-12" />
 
@@ -218,15 +219,15 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 						<div className="grid grid-cols-2 gap-8 mb-16">
 							<div>
 								<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
-									Prepared For
+									{t("Prepared For", language)}
 								</p>
 								<p className="text-2xl font-bold text-slate-900">
-									{doc.clientName || "Client Name"}
+									{doc.clientName || t("Client Name", language)}
 								</p>
 							</div>
 							<div className="text-right">
 								<p className="text-2xl font-bold text-slate-900">
-									{doc.projectTitle || "Project Description"}
+									{doc.projectTitle || t("Project Description", language)}
 								</p>
 							</div>
 						</div>
@@ -244,7 +245,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 								GENBUZZ INTERNAL SYSTEMS
 							</p>
 							<p className="text-[10px] tracking-widest uppercase font-bold">
-								Confidential • {new Date().getFullYear()}
+								{t("Confidential", language)} • {new Date().getFullYear()}
 							</p>
 						</div>
 					</div>
@@ -253,7 +254,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				</div>
 
 				{/* ── ADD SECTION BAR — outside pdf-safe-mode ───── */}
-				<div className="w-full max-w-198.5 px-2 mb-20">
+				<div className="hidden lg:block w-full max-w-198.5 px-2 mb-20">
 					<AddSectionBar onAdd={addCustomSection} />
 				</div>
 			</div>

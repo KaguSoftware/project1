@@ -66,6 +66,14 @@ export interface CustomSection {
 	deliverablesRows?: DeliverableRow[];
 }
 
+export interface PricingTier {
+	id: string;
+	name: "basic" | "standard" | "premium";
+	price: string;
+	description: string;
+	isPopular: boolean;
+}
+
 export interface DocumentData {
 	type: DocType;
 	title: string; // The "Document Title" (e.g., "SOW", "Proposal")
@@ -74,6 +82,7 @@ export interface DocumentData {
 	aiIntro: string;
 	scopeOfWork: string;
 	pricingPackage: "basic" | "standard" | "premium";
+	pricingTiers: PricingTier[];
 	timeline: string;
 	defaultCurrency: string;
 	totalPrice: string;
