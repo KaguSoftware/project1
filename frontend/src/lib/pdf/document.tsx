@@ -193,6 +193,6 @@ export async function generatePDFBlob(
     data: DocumentData,
     lang: Lang = "en"
 ): Promise<Blob> {
-    if (lang === "ar") await ensureArabicFonts();
+    if (lang === "ar") ensureArabicFonts();
     return pdf(<PDFDocument data={data} lang={lang} />).toBlob();
 }
