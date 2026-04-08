@@ -26,9 +26,9 @@ export const EngagementOverview = ({
             </Text>
 
             {/* Pricing tier cards — mirrors the preview layout */}
-            {hasAnyTierData && (
+            {tiers.length > 0 && hasAnyTierData && (
                 <View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", marginBottom: hasOverviewData ? 10 : 0 }}>
-                    {tiers.map((tier, i) => {
+                    {tiers.filter(tier => tier.name || tier.price || tier.description).map((tier, i) => {
                         const isPopular = tier.isPopular;
                         const isLast = i === tiers.length - 1;
                         const descLines = tier.description

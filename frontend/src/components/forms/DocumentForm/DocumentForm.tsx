@@ -66,6 +66,15 @@ export const DocumentForm = () => {
 			if (ai.influencerKPIs) update.influencerKPIs = ai.influencerKPIs;
 
 			// Array fields — attach a generated id to each item
+			if (Array.isArray(ai.pricingTiers) && ai.pricingTiers.length > 0)
+				update.pricingTiers = ai.pricingTiers.map((tier: any) => ({
+					id: genId(),
+					name: tier.name ?? "",
+					price: tier.price ?? "",
+					description: tier.description ?? "",
+					isPopular: tier.isPopular ?? false,
+				}));
+
 			if (Array.isArray(ai.deliverables) && ai.deliverables.length > 0)
 				update.deliverables = ai.deliverables.map((d: any) => ({
 					id: genId(),

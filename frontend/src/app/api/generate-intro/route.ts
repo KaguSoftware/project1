@@ -5,10 +5,14 @@ import { NextResponse } from "next/server";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 function buildPrompt(doc: any, providedData: string) {
-	const baseRules = `
+    const baseRules = `
         Act as a senior business consultant and document specialist.
+        
+        
 
-        Generate professional content for a ${doc.type?.replace(/_/g, " ") || "document"} for project "${doc.projectTitle || "the project"}"
+        Generate professional content for a ${
+            doc.type?.replace(/_/g, " ") || "document"
+        } for project "${doc.projectTitle || "the project"}"
         for client "${doc.clientName || "the client"}".
 
         Here is the current data already filled by the user:
@@ -20,12 +24,16 @@ function buildPrompt(doc: any, providedData: string) {
         3. If a field already has a non-empty user value, preserve it exactly.
         4. The written paragraphs must explicitly reference provided fields (projectTitle, clientName, etc).
         5. Return ONLY valid JSON — no markdown, no code fences, no explanation.
-        ${doc.additionalInstructions ? `6. ADDITIONAL INSTRUCTIONS (highest priority — follow these exactly):\n        ${doc.additionalInstructions}` : ""}
+        ${
+            doc.additionalInstructions
+                ? `6. ADDITIONAL INSTRUCTIONS (highest priority — follow these exactly){if a price is given here disregard and remove the price tiers}:\n        ${doc.additionalInstructions}`
+                : ""
+        }
     `;
 
-	switch (doc.type) {
-		case "proposal":
-			return `
+    switch (doc.type) {
+        case "proposal":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -34,6 +42,9 @@ function buildPrompt(doc: any, providedData: string) {
           "aiIntro": "2 paragraphs of executive summary referencing project title, client, package, price, timeline",
           "scopeOfWork": "Detailed project scope based on the provided data",
           "pricingPackage": "Name of the recommended pricing tier (match one of the tier names if provided)",
+          "pricingTiers": [
+            { "name": "Package name", "price": "Price string e.g. 999", "description": "Feature 1, Feature 2, Feature 3", "isPopular": false }
+          ],
           "defaultCurrency": "Use the user's provided currency or infer from context",
           "totalPrice": "Professional price string",
           "timeline": "Project timeline string",
@@ -42,10 +53,16 @@ function buildPrompt(doc: any, providedData: string) {
             { "deliverable": "Task name", "timeline": "e.g. Week 1-2", "status": "Pending" }
           ]
         }
+
+        PRICING TIERS RULES:
+        - If the user's input or additional instructions mention a specific price (e.g. "$500", "1000 USD", "budget of 2000"), populate pricingTiers with that price reflected in the appropriate tier(s). You may create 1-3 tiers that make sense given the context.
+        - If the user explicitly requests only 1 package (e.g. "one package", "single tier", "just one plan"), return exactly 1 tier and discard the rest.
+        - If no price is mentioned anywhere and no specific package count is requested, do NOT return pricingTiers at all (omit the key entirely) so existing tiers are preserved.
+        - If the user already has pricingTiers filled and no price or package count is mentioned, omit pricingTiers from the response entirely.
         `;
 
-		case "contract":
-			return `
+        case "contract":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -60,8 +77,8 @@ function buildPrompt(doc: any, providedData: string) {
         }
         `;
 
-		case "invoice":
-			return `
+        case "invoice":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -78,8 +95,8 @@ function buildPrompt(doc: any, providedData: string) {
         Generate realistic line items based on the project context. Include 3-5 standard payment term clauses.
         `;
 
-		case "letter":
-			return `
+        case "letter":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -89,8 +106,8 @@ function buildPrompt(doc: any, providedData: string) {
         }
         `;
 
-		case "social_media_report":
-			return `
+        case "social_media_report":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -109,8 +126,8 @@ function buildPrompt(doc: any, providedData: string) {
         Use realistic social media numbers. Deltas can be positive or negative.
         `;
 
-		case "weekly_sales_report":
-			return `
+        case "weekly_sales_report":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -128,8 +145,8 @@ function buildPrompt(doc: any, providedData: string) {
         Generate 5-6 realistic sales metrics and 4-6 deals in various pipeline stages (Prospecting, Proposal Sent, Negotiation, Closed Won, Closed Lost).
         `;
 
-		case "influencer_campaign":
-			return `
+        case "influencer_campaign":
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -153,8 +170,8 @@ function buildPrompt(doc: any, providedData: string) {
         Statuses can be: Confirmed, Pending, Negotiating.
         `;
 
-		default:
-			return `
+        default:
+            return `
         ${baseRules}
 
         Return ONLY a JSON object with this exact structure:
@@ -163,30 +180,30 @@ function buildPrompt(doc: any, providedData: string) {
           "aiIntro": "Professional summary based on the provided data"
         }
         `;
-	}
+    }
 }
 
 export async function POST(req: Request) {
-	try {
-		const doc = await req.json();
+    try {
+        const doc = await req.json();
 
-		const model = genAI.getGenerativeModel({
-			model: "gemini-2.5-flash",
-			generationConfig: { responseMimeType: "application/json" },
-		});
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash",
+            generationConfig: { responseMimeType: "application/json" },
+        });
 
-		const providedData = JSON.stringify(doc, null, 2);
-		const prompt = buildPrompt(doc, providedData);
+        const providedData = JSON.stringify(doc, null, 2);
+        const prompt = buildPrompt(doc, providedData);
 
-		const result = await model.generateContent(prompt);
-		const text = result.response.text();
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
 
-		return NextResponse.json(JSON.parse(text));
-	} catch (error) {
-		console.error("AI Generation Error:", error);
-		return NextResponse.json(
-			{ error: "AI Failed to generate valid data" },
-			{ status: 500 },
-		);
-	}
+        return NextResponse.json(JSON.parse(text));
+    } catch (error) {
+        console.error("AI Generation Error:", error);
+        return NextResponse.json(
+            { error: "AI Failed to generate valid data" },
+            { status: 500 }
+        );
+    }
 }
