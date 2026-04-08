@@ -17,16 +17,9 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 </h3>
 
 			{/* Pricing Tiers — 3-column card row */}
-			{(hasAnyTierData || doc.pricingPackage) && (
-				<div className="grid gap-3 mb-4" style={{ gridTemplateColumns: `repeat(${tiers.length || 3}, 1fr)` }}>
-					{(tiers.length > 0
-						? tiers
-						: [
-								{ id: "t1", name: t("Basic", lang), price: "", description: "", isPopular: false },
-								{ id: "t2", name: t("Standard", lang), price: "", description: "", isPopular: true },
-								{ id: "t3", name: t("Premium", lang), price: "", description: "", isPopular: false },
-						  ]
-					).map((tier) => {
+			{tiers.length > 0 && (
+				<div className="grid gap-3 mb-4" style={{ gridTemplateColumns: `repeat(${tiers.filter(t => t.name || t.price || t.description).length || tiers.length}, 1fr)` }}>
+					{tiers.filter(tier => tier.name || tier.price || tier.description).map((tier) => {
 						const descLines = tier.description
 							? tier.description.split(/[,،\n]+/).map((s) => s.trim()).filter(Boolean)
 							: [];
