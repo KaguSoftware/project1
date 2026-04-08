@@ -6,31 +6,14 @@ Font.registerHyphenationCallback((word) => [word]);
 
 let arabicFontsRegistered = false;
 
-function blobToDataURL(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    });
-}
-
-export async function ensureArabicFonts(): Promise<void> {
+export function ensureArabicFonts(): void {
     if (arabicFontsRegistered) return;
     const base = typeof window !== "undefined" ? window.location.origin : "";
-    const [regularBlob, boldBlob] = await Promise.all([
-        fetch(`${base}/fonts/IBMPlexSansArabic-regular.ttf`).then((r) => r.blob()),
-        fetch(`${base}/fonts/IBMPlexSansArabic-bold.ttf`).then((r) => r.blob()),
-    ]);
-    const [regularSrc, boldSrc] = await Promise.all([
-        blobToDataURL(regularBlob),
-        blobToDataURL(boldBlob),
-    ]);
     Font.register({
         family: "IBMPlexSansArabic",
         fonts: [
-            { src: regularSrc, fontWeight: 400 },
-            { src: boldSrc, fontWeight: 700 },
+            { src: `${base}/fonts/IBMPlexSansArabic-regular.ttf`, fontWeight: 400 },
+            { src: `${base}/fonts/IBMPlexSansArabic-bold.ttf`, fontWeight: 700 },
         ],
     });
     arabicFontsRegistered = true;
