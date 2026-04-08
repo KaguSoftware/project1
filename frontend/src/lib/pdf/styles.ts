@@ -1,15 +1,16 @@
 import { StyleSheet, Font } from "@react-pdf/renderer";
 import type { Style } from "@react-pdf/types";
+import { NOTO_SANS_ARABIC_REGULAR, NOTO_SANS_ARABIC_BOLD } from "./arabicFontData";
 
 // Prevent word hyphenation
 Font.registerHyphenationCallback((word) => [word]);
 
-// IBM Plex Sans Arabic is highly legible and robust for PDF generation
+// Use inline base64 fonts so no network fetch is needed (critical for mobile)
 Font.register({
     family: "IBMPlexSansArabic",
     fonts: [
-        { src: "/fonts/IBMPlexSansArabic-regular.ttf", fontWeight: 400 },
-        { src: "/fonts/IBMPlexSansArabic-bold.ttf", fontWeight: 700 },
+        { src: NOTO_SANS_ARABIC_REGULAR, fontWeight: 400 },
+        { src: NOTO_SANS_ARABIC_BOLD, fontWeight: 700 },
     ],
 });
 
