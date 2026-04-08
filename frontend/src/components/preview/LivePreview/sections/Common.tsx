@@ -47,7 +47,7 @@ export const TermsPreview = ({
 						<span className="w-5 h-5 shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-500 mt-0.5">
 							{idx + 1}
 						</span>
-						{clause.text}
+						{t(clause.text, lang)}
 					</li>
 				))}
 			</ol>

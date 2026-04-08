@@ -70,6 +70,7 @@ export const Header = ({
                 <Text
                     style={[
                         styles.brandSub,
+                        af(lang),
                         lang === "ar" ? { textAlign: "left" } : {},
                     ]}
                 >
@@ -197,7 +198,7 @@ export const TermsList = ({
                         <Text style={styles.termNumber}>{idx + 1}</Text>
                     </View>
                     <Text style={[styles.termText, af(lang)]}>
-                        {fixArabic(clause.text, lang)}
+                        {fixArabic(t(clause.text, lang), lang)}
                     </Text>
                 </View>
             ))}
