@@ -12,8 +12,8 @@ export function ensureArabicFonts(): void {
     Font.register({
         family: "IBMPlexSansArabic",
         fonts: [
-            { src: `${base}/fonts/IBMPlexSansArabic-regular.ttf`, fontWeight: 400 },
-            { src: `${base}/fonts/IBMPlexSansArabic-bold.ttf`, fontWeight: 700 },
+            { src: `${base}/fonts/IBMPlexSansArabic-Regular.ttf`, fontWeight: 400 },
+            { src: `${base}/fonts/IBMPlexSansArabic-Bold.ttf`, fontWeight: 700 },
         ],
     });
     arabicFontsRegistered = true;
