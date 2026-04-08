@@ -39,7 +39,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			await exportToPDF(doc, filename, language);
 		} catch (err) {
 			console.error("PDF export failed:", err);
-			alert("Failed to generate PDF. Please try again.");
+			alert(`PDF error: ${err instanceof Error ? err.message : String(err)}`);
 		} finally {
 			setIsExporting(false);
 		}

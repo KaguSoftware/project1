@@ -6,27 +6,18 @@ Font.registerHyphenationCallback((word) => [word]);
 
 let arabicFontsRegistered = false;
 
-function bufferToDataURI(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return `data:font/truetype;base64,${btoa(binary)}`;
-}
-
 export async function ensureArabicFonts(): Promise<void> {
     if (arabicFontsRegistered) return;
     const base = typeof window !== "undefined" ? window.location.origin : "";
-    const [regular, bold] = await Promise.all([
-        fetch(`${base}/fonts/IBMPlexSansArabic-regular.ttf`).then((r) => r.arrayBuffer()),
-        fetch(`${base}/fonts/IBMPlexSansArabic-bold.ttf`).then((r) => r.arrayBuffer()),
+    const [regularBlob, boldBlob] = await Promise.all([
+        fetch(`${base}/fonts/IBMPlexSansArabic-regular.ttf`).then((r) => r.blob()),
+        fetch(`${base}/fonts/IBMPlexSansArabic-bold.ttf`).then((r) => r.blob()),
     ]);
     Font.register({
         family: "IBMPlexSansArabic",
         fonts: [
-            { src: bufferToDataURI(regular), fontWeight: 400 },
-            { src: bufferToDataURI(bold), fontWeight: 700 },
+            { src: URL.createObjectURL(regularBlob), fontWeight: 400 },
+            { src: URL.createObjectURL(boldBlob), fontWeight: 700 },
         ],
     });
     arabicFontsRegistered = true;
