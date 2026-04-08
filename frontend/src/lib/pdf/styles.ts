@@ -1,18 +1,36 @@
 import { StyleSheet, Font } from "@react-pdf/renderer";
 import type { Style } from "@react-pdf/types";
-import { NOTO_SANS_ARABIC_REGULAR, NOTO_SANS_ARABIC_BOLD } from "./arabicFontData";
 
 // Prevent word hyphenation
 Font.registerHyphenationCallback((word) => [word]);
 
-// Use inline base64 fonts so no network fetch is needed (critical for mobile)
-Font.register({
-    family: "IBMPlexSansArabic",
-    fonts: [
-        { src: NOTO_SANS_ARABIC_REGULAR, fontWeight: 400 },
-        { src: NOTO_SANS_ARABIC_BOLD, fontWeight: 700 },
-    ],
-});
+let arabicFontsRegistered = false;
+
+function bufferToDataURI(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return `data:font/truetype;base64,${btoa(binary)}`;
+}
+
+export async function ensureArabicFonts(): Promise<void> {
+    if (arabicFontsRegistered) return;
+    const base = typeof window !== "undefined" ? window.location.origin : "";
+    const [regular, bold] = await Promise.all([
+        fetch(`${base}/fonts/IBMPlexSansArabic-regular.ttf`).then((r) => r.arrayBuffer()),
+        fetch(`${base}/fonts/IBMPlexSansArabic-bold.ttf`).then((r) => r.arrayBuffer()),
+    ]);
+    Font.register({
+        family: "IBMPlexSansArabic",
+        fonts: [
+            { src: bufferToDataURI(regular), fontWeight: 400 },
+            { src: bufferToDataURI(bold), fontWeight: 700 },
+        ],
+    });
+    arabicFontsRegistered = true;
+}
 
 type Lang = "en" | "ar";
 
