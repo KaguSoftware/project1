@@ -1,5 +1,5 @@
 import { Document, Page, pdf } from "@react-pdf/renderer";
-import { styles } from "./styles";
+import { styles, ensureArabicFonts } from "./styles";
 import type { DocumentData, CustomSection } from "@/src/store/types";
 import { View } from "@react-pdf/renderer";
 
@@ -193,5 +193,6 @@ export async function generatePDFBlob(
     data: DocumentData,
     lang: Lang = "en"
 ): Promise<Blob> {
+    if (lang === "ar") await ensureArabicFonts();
     return pdf(<PDFDocument data={data} lang={lang} />).toBlob();
 }
