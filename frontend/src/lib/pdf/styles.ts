@@ -8,8 +8,8 @@ Font.registerHyphenationCallback((word) => [word]);
 Font.register({
     family: "IBMPlexSansArabic",
     fonts: [
-        { src: "/fonts/ibm-plex-sans-arabic-regular.ttf", fontWeight: 400 },
-        { src: "/fonts/ibm-plex-sans-arabic-bold.ttf", fontWeight: 700 },
+        { src: "/fonts/IBMPlexSansArabic-regular.ttf", fontWeight: 400 },
+        { src: "/fonts/IBMPlexSansArabic-bold.ttf", fontWeight: 700 },
     ],
 });
 

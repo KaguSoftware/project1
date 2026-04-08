@@ -99,28 +99,6 @@ export const ProposalFields = () => {
 					</button>
 				</div>
 
-				{/* Highlighted package selector */}
-				<div className="flex items-center gap-2 px-1">
-					<span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
-						{tr("Highlight")}:
-					</span>
-					<div className="flex gap-2 flex-wrap">
-						{document.pricingTiers.map((tier) => (
-							<button
-								key={tier.id}
-								onClick={() => updateDocument({ pricingPackage: tier.name })}
-								className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all border ${
-									document.pricingPackage === tier.name
-										? "bg-primary text-white border-primary"
-										: "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
-								}`}
-							>
-								{tier.name}
-							</button>
-						))}
-					</div>
-				</div>
-
 				<div
 					className="grid gap-4"
 					style={{ gridTemplateColumns: `repeat(${Math.max(document.pricingTiers.length, 1)}, 1fr)` }}

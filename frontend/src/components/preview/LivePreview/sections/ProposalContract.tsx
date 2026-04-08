@@ -22,20 +22,20 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 					{(tiers.length > 0
 						? tiers
 						: [
-								{ id: "t1", name: "Basic", price: "", description: "", isPopular: false },
-								{ id: "t2", name: "Standard", price: "", description: "", isPopular: true },
-								{ id: "t3", name: "Premium", price: "", description: "", isPopular: false },
+								{ id: "t1", name: t("Basic", lang), price: "", description: "", isPopular: false },
+								{ id: "t2", name: t("Standard", lang), price: "", description: "", isPopular: true },
+								{ id: "t3", name: t("Premium", lang), price: "", description: "", isPopular: false },
 						  ]
 					).map((tier) => {
-						const selected = tier.name.toLowerCase() === (doc.pricingPackage || "").toLowerCase();
+						const descLines = tier.description
+							? tier.description.split(/[,،\n]+/).map((s) => s.trim()).filter(Boolean)
+							: [];
 						return (
 							<div
 								key={tier.id}
 								className={`rounded-xl p-4 border-2 flex flex-col gap-3 relative overflow-hidden ${
-									selected
+									tier.isPopular
 										? "border-primary bg-primary/5"
-										: tier.isPopular
-										? "border-primary bg-white"
 										: "border-slate-100 bg-slate-50"
 								}`}
 							>
@@ -46,8 +46,8 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 									</div>
 								)}
 								{/* Name */}
-								<div className={`rounded-lg px-3 py-2 text-center text-sm font-black capitalize ${selected ? "bg-white text-primary" : "bg-white text-slate-700"}`}>
-									{tier.name}
+								<div className={`rounded-lg px-3 py-2 text-center text-sm font-black capitalize ${tier.isPopular ? "bg-white text-primary" : "bg-white text-slate-700"}`}>
+									{t(tier.name, lang)}
 								</div>
 								{/* Price */}
 								{tier.price && (
@@ -55,12 +55,21 @@ export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentD
 										{doc.defaultCurrency} {tier.price}
 									</div>
 								)}
-								{/* Description */}
-								{tier.description && (
-									<div className="rounded-lg px-3 py-2 text-center text-xs text-slate-600 bg-white leading-snug">
-										{tier.description}
+								{/* Description as tick bullet points */}
+								{descLines.length > 0 ? (
+									<div className="rounded-lg px-3 py-2 bg-white flex flex-col gap-1.5">
+										{descLines.map((line, idx) => (
+											<div key={idx} className="flex items-start gap-1.5 text-xs text-slate-600">
+												<span className="text-emerald-500 font-black shrink-0">✓</span>
+												<span>{t(line, lang)}</span>
+											</div>
+										))}
 									</div>
-								)}
+								) : tier.description ? (
+									<div className="rounded-lg px-3 py-2 text-center text-xs text-slate-600 bg-white leading-snug">
+										{t(tier.description, lang)}
+									</div>
+								) : null}
 							</div>
 						);
 					})}
