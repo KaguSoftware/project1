@@ -1,7 +1,7 @@
 import type { DocumentData } from "@/src/store";
 import { t } from "@/src/lib/translations";
 
-export const InvoicePreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const InvoicePreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const items = doc.lineItems.filter((i) => i.description);
 	if (items.length === 0) return null;
 

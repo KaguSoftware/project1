@@ -3,7 +3,7 @@ import { t } from "@/src/lib/translations";
 
 // ── PROPOSAL ────────────────────────────────────────────────────────────────
 
-export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const EngagementOverviewPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const tiers = doc.pricingTiers ?? [];
 	const hasAnyTierData = tiers.some((t) => t.price || t.description);
 	const hasOverviewData = doc.timeline || doc.totalPrice || doc.validUntil;

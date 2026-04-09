@@ -1,7 +1,7 @@
 import type { DocumentData } from "@/src/store";
 import { t } from "@/src/lib/translations";
 
-export const KPIGridPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const KPIGridPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const kpis = doc.influencerKPIs;
 	if (!Object.values(kpis).some(Boolean)) return null;
 
@@ -35,7 +35,7 @@ export const KPIGridPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?:
 	);
 };
 
-export const InfluencerRosterPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const InfluencerRosterPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const filtered = doc.influencers.filter((i) => i.name);
 	if (filtered.length === 0) return null;
 

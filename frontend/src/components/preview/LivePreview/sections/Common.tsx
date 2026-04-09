@@ -1,7 +1,7 @@
 import type { DocumentData, CustomSection } from "@/src/store";
 import { t } from "@/src/lib/translations";
 
-type Lang = "en" | "ar";
+type Lang = "en" | "ar" | "tr";
 
 /** Generic plain-text section with a label above it */
 export const TextSectionPreview = ({
