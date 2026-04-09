@@ -4,7 +4,7 @@ import { t } from "@/src/lib/translations";
 import type { DocumentData } from "@/src/store/types";
 import * as arabicReshaper from "arabic-reshaper";
 
-type Lang = "en" | "ar";
+type Lang = "en" | "ar" | "tr";
 
 /** * Fixes Arabic rendering for react-pdf by:
  * 1. Reshaping (joining letters)
@@ -47,7 +47,7 @@ export const Header = ({
         <View style={[styles.headerRow, rowDir(lang)]}>
             <View>
                 <Text style={[styles.docType, af(lang)]}>
-                    {fixArabic(data.type.replace(/_/g, " "), lang)}
+                    {fixArabic(t(data.type.replace(/_/g, " "), lang), lang)}
                 </Text>
                 <Text style={[styles.refLine, af(lang)]}>
                     {fixArabic(
@@ -139,6 +139,8 @@ export const ExecutiveSummary = ({
                           paddingLeft: 0,
                           paddingRight: 16,
                       }
+                    : lang === "tr"
+                    ? { fontFamily: "GoogleSansFlex" }
                     : {},
             ]}
         >

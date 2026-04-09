@@ -3,8 +3,8 @@ import { DocumentData, DocType } from "./types";
 import { initialDocumentState, generateId } from "./initialState";
 
 interface AppState {
-	language: "en" | "ar";
-	setLanguage: (lang: "en" | "ar") => void;
+	language: "en" | "ar" | "tr";
+	setLanguage: (lang: "en" | "ar" | "tr") => void;
 	document: DocumentData;
 	updateDocument: (data: Partial<DocumentData>) => void;
 	// Dynamic Array Actions

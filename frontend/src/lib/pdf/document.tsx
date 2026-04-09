@@ -1,5 +1,5 @@
 import { Document, Page, pdf } from "@react-pdf/renderer";
-import { styles, ensureArabicFonts } from "./styles";
+import { styles, ensureArabicFonts, ensureTurkishFonts } from "./styles";
 import type { DocumentData, CustomSection } from "@/src/store/types";
 import { View } from "@react-pdf/renderer";
 
@@ -20,7 +20,7 @@ import { PerformanceMetrics, TopPostsTable } from "./sections/social-media";
 import { SalesMetrics, DealBreakdownTable } from "./sections/sales";
 import { KPIGrid, InfluencerRoster } from "./sections/influencer";
 
-type Lang = "en" | "ar";
+type Lang = "en" | "ar" | "tr";
 
 export const PDFDocument = ({
     data,
@@ -194,5 +194,6 @@ export async function generatePDFBlob(
     lang: Lang = "en"
 ): Promise<Blob> {
     if (lang === "ar") ensureArabicFonts();
+    if (lang === "tr") ensureTurkishFonts();
     return pdf(<PDFDocument data={data} lang={lang} />).toBlob();
 }

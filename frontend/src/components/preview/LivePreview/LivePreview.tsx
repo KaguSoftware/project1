@@ -318,6 +318,12 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 						>
 							AR
 						</button>
+						<button
+							onClick={() => setLanguage("tr")}
+							className={`px-2.5 py-0.5 text-[10px] font-bold rounded-md transition-all ${language === "tr" ? "bg-white shadow-sm text-primary" : "text-slate-500"}`}
+						>
+							TR
+						</button>
 					</div>
 					{/* Vertical axis line */}
 					<div className="absolute left-4 top-12 bottom-4 w-px bg-linear-to-b from-transparent via-slate-300 to-transparent" />

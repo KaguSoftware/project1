@@ -5,6 +5,7 @@ import type { Style } from "@react-pdf/types";
 Font.registerHyphenationCallback((word) => [word]);
 
 let arabicFontsRegistered = false;
+let turkishFontsRegistered = false;
 
 export function ensureArabicFonts(): void {
     if (arabicFontsRegistered) return;
@@ -19,9 +20,23 @@ export function ensureArabicFonts(): void {
     arabicFontsRegistered = true;
 }
 
-type Lang = "en" | "ar";
+export function ensureTurkishFonts(): void {
+    if (turkishFontsRegistered) return;
+    const base = typeof window !== "undefined" ? window.location.origin : "";
+    Font.register({
+        family: "GoogleSansFlex",
+        fonts: [
+            { src: `${base}/fonts/GoogleSansFlex_36pt-Regular.ttf`, fontWeight: 400 },
+            { src: `${base}/fonts/GoogleSansFlex_36pt-Bold.ttf`, fontWeight: 700 },
+            { src: `${base}/fonts/GoogleSansFlex_120pt-Medium.ttf`, fontWeight: 500 },
+        ],
+    });
+    turkishFontsRegistered = true;
+}
 
-/** Apply to any <Text> that should render in Arabic. */
+type Lang = "en" | "ar" | "tr";
+
+/** Apply to any <Text> that should render in Arabic or Turkish. */
 export const af = (lang: Lang): Style =>
     lang === "ar"
         ? {
@@ -32,9 +47,11 @@ export const af = (lang: Lang): Style =>
               // @ts-ignore — @react-pdf/renderer supports this prop at runtime
               writingDirection: "rtl",
           }
+        : lang === "tr"
+        ? { fontFamily: "GoogleSansFlex", letterSpacing: 0 }
         : {};
 
-/** Bold variant for Arabic text. */
+/** Bold variant for Arabic or Turkish text. */
 export const afB = (lang: Lang): Style =>
     lang === "ar"
         ? {
@@ -46,6 +63,8 @@ export const afB = (lang: Lang): Style =>
               // @ts-ignore
               writingDirection: "rtl",
           }
+        : lang === "tr"
+        ? { fontFamily: "GoogleSansFlex", fontWeight: 700, letterSpacing: 0 }
         : {};
 
 /** Reverse a flex row for RTL. */
