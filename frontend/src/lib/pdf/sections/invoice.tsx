@@ -4,7 +4,7 @@ import { t } from "@/src/lib/translations";
 import { fixArabic } from "./common";
 import type { DocumentData } from "@/src/store";
 
-type Lang = "en" | "ar";
+type Lang = "en" | "ar" | "tr";
 
 export const InvoiceTable = ({
     data,

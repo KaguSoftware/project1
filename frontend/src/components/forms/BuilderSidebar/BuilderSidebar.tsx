@@ -33,6 +33,12 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 					>
 						AR
 					</button>
+					<button
+						onClick={() => setLanguage("tr")}
+						className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${language === "tr" ? "bg-white shadow-sm text-primary" : "text-slate-500"}`}
+					>
+						TR
+					</button>
 				</div>
 			</div>
 

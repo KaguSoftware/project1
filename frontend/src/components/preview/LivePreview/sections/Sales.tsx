@@ -1,7 +1,7 @@
 import type { DocumentData } from "@/src/store";
 import { t } from "@/src/lib/translations";
 
-export const SalesMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const SalesMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const filtered = doc.salesMetrics.filter((m) => m.title);
 	if (filtered.length === 0) return null;
 
@@ -38,7 +38,7 @@ export const SalesMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; l
 	);
 };
 
-export const DealBreakdownPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const DealBreakdownPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const filtered = doc.dealBreakdown.filter((d) => d.client);
 	if (filtered.length === 0) return null;
 

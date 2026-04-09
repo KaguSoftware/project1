@@ -8,7 +8,7 @@ export const DocHeader = ({
 }: {
 	doc: DocumentData;
 	today: string;
-	lang?: "en" | "ar";
+	lang?: "en" | "ar" | "tr";
 }) => (
 	<div className="flex justify-between items-start mb-8">
 		<div>

@@ -1,7 +1,7 @@
 import type { DocumentData } from "@/src/store";
 import { t } from "@/src/lib/translations";
 
-export const PerformanceMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const PerformanceMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const filtered = doc.performanceMetrics.filter((m) => m.metric);
 	if (filtered.length === 0) return null;
 
@@ -38,7 +38,7 @@ export const PerformanceMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentD
 	);
 };
 
-export const TopPostsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" }) => {
+export const TopPostsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: "en" | "ar" | "tr" }) => {
 	const filtered = doc.topPosts.filter((p) => p.post);
 	if (filtered.length === 0) return null;
 

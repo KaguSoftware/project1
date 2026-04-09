@@ -1,6 +1,6 @@
-/** Arabic translations for the document preview and form. */
+/** Arabic and Turkish translations for the document preview and form. */
 
-type Lang = "en" | "ar";
+type Lang = "en" | "ar" | "tr";
 
 const ar: Record<string, string> = {
     // Section headings
@@ -182,7 +182,187 @@ const ar: Record<string, string> = {
     Clauses: "البنود",
 };
 
+const tr: Record<string, string> = {
+    // Section headings
+    "Executive Summary": "Yönetici Özeti",
+    "Engagement Overview": "İşbirliğine Genel Bakış",
+    "Scope of Work": "İş Kapsamı",
+    "Scope of Services": "Hizmet Kapsamı",
+    Deliverables: "Teslim Edilecekler",
+    "Terms & Conditions": "Şartlar ve Koşullar",
+    "Payment Terms": "Ödeme Koşulları",
+    "Agreement Overview": "Anlaşmaya Genel Bakış",
+    Message: "Mesaj",
+    "Billing Details": "Fatura Detayları",
+    "Performance Metrics": "Performans Metrikleri",
+    "Top Posts": "Öne Çıkan Paylaşımlar",
+    "Weekly Summary": "Haftalık Özet",
+    "Sales Metrics": "Satış Metrikleri",
+    "Deal Breakdown": "Anlaşma Dökümü",
+    "Campaign Overview": "Kampanyaya Genel Bakış",
+    "Campaign KPIs": "Kampanya KPI'ları",
+    "Influencer Roster": "Influencer Listesi",
+    "Additional Notes": "Ek Notlar",
+
+    // Table columns / labels
+    Deliverable: "Teslim Edilecek",
+    Timeline: "Zaman Çizelgesi",
+    Status: "Durum",
+    Pending: "Beklemede",
+    Description: "Açıklama",
+    Qty: "Miktar",
+    Rate: "Fiyat",
+    Total: "Toplam",
+    Metric: "Metrik",
+    Number: "Numara",
+    Change: "Değişim",
+    Post: "Paylaşım",
+    Likes: "Beğeniler",
+    Comments: "Yorumlar",
+    Shares: "Paylaşımlar",
+    Client: "Müşteri",
+    "Deal Value": "Anlaşma Değeri",
+    Stage: "Aşama",
+    Influencer: "Influencer",
+    Platform: "Platform",
+    Followers: "Takipçiler",
+    Fee: "Ücret",
+    Name: "İsim",
+
+    // Engagement overview labels
+    Package: "Paket",
+    "Valid Until": "Geçerlilik Tarihi",
+    Popular: "Popüler",
+    "Payment is due within 30 days of invoice date.": "Ödeme, fatura tarihinden itibaren 30 gün içinde yapılmalıdır.",
+    "This proposal is valid for 30 days from the date of issue.": "Bu teklif, düzenlenme tarihinden itibaren 30 gün geçerlidir.",
+    Basic: "Temel",
+    Standard: "Standart",
+    Premium: "Premium",
+    Professional: "Profesyonel",
+    Enterprise: "Kurumsal",
+    "Social media management": "Sosyal medya yönetimi",
+    "monthly report": "aylık rapor",
+    "Everything in Standard": "Standart'taki her şey",
+    "content creation": "içerik üretimi",
+    "ad management": "reklam yönetimi",
+    "Everything in Professional": "Profesyonel'deki her şey",
+    "dedicated manager": "özel yönetici",
+    "custom strategy": "özel strateji",
+
+    // Header / footer
+    Reference: "Referans",
+    "Untitled Project": "Adsız Proje",
+    "Official Document": "Resmi Belge",
+    "Prepared For": "Hazırlanan",
+    "Client Name": "Müşteri Adı",
+    "Project Description": "Proje Açıklaması",
+    Confidential: "Gizli",
+
+    // Doc types
+    proposal: "Teklif",
+    contract: "Sözleşme",
+    invoice: "Fatura",
+    letter: "Mektup",
+    "social media report": "Sosyal Medya Raporu",
+    "weekly sales report": "Haftalık Satış Raporu",
+    "influencer campaign": "Influencer Kampanyası",
+
+    // Section order panel
+    "Section Order": "Bölüm Sırası",
+    "Add Section": "Bölüm Ekle",
+    Empty: "Boş",
+
+    // KPI labels
+    Views: "Görüntülemeler",
+    Engagement: "Etkileşim",
+    Clicks: "Tıklamalar",
+    Conversions: "Dönüşümler",
+    ROI: "Yatırım Getirisi",
+
+    // Form labels
+    "Document Builder": "Belge Oluşturucu",
+    "Select Document Category": "Belge Kategorisi Seçin",
+    "Project Title": "Proje Başlığı",
+    "e.g. Q4 Growth Phase": "örn. Q4 Büyüme Aşaması",
+    "e.g. Acme Corp": "örn. Acme Corp",
+    Generate: "Oluştur",
+    "Synthesizing...": "İşleniyor...",
+
+    // Document type labels
+    Proposal: "Teklif",
+    Contract: "Sözleşme",
+    Invoice: "Fatura",
+    Letter: "Mektup",
+    Social: "Sosyal Medya",
+    Sales: "Satış",
+    "Influencer Type": "Influencer",
+
+    // Proposal form
+    "Proposal Details": "Teklif Detayları",
+    "Executive Introduction": "Yönetici Girişi",
+    "AI will help refine this...": "Yapay zeka bunu geliştirmenize yardımcı olacak...",
+    "Pricing Package": "Fiyatlandırma Paketi",
+    basic: "temel",
+    standard: "standart",
+    premium: "premium",
+    "(selected)": "(seçili)",
+    "Price (e.g. 999)": "Fiyat (örn. 999)",
+    "Short description": "Kısa açıklama",
+    Currency: "Para Birimi",
+    "Total Price": "Toplam Fiyat",
+    "+ Add Deliverable": "+ Teslim Edilecek Ekle",
+    "+ Add Clause": "+ Madde Ekle",
+
+    // Contract form
+    "Agreement Details": "Anlaşma Detayları",
+    "Deliverables Table": "Teslim Edilecekler Tablosu",
+    "+ Add Row": "+ Satır Ekle",
+
+    // Invoice form
+    "Billing Items": "Fatura Kalemleri",
+    QTY: "Miktar",
+    Amount: "Tutar",
+    "+ Add Item": "+ Kalem Ekle",
+    "+ Add Term": "+ Şart Ekle",
+
+    // Letter form
+    "Letter Content": "Mektup İçeriği",
+    "Message Body": "Mesaj Gövdesi",
+    "Type your content here...": "İçeriğinizi buraya yazın...",
+
+    // Social Media form
+    "Performance Overview": "Performansa Genel Bakış",
+    Value: "Değer",
+    Delta: "Değişim",
+    "e.g. Engagement": "örn. Etkileşim",
+    "+ Add Metric": "+ Metrik Ekle",
+    "Top Performing Posts": "En İyi Performans Gösteren Paylaşımlar",
+    "Comm.": "Yorum",
+    "+ Add Post": "+ Paylaşım Ekle",
+
+    // Sales form
+    "Weekly Sales Metrics": "Haftalık Satış Metrikleri",
+    "+ Add Deal": "+ Anlaşma Ekle",
+
+    // Influencer form
+    "Influencer List": "Influencer Listesi",
+    "Full Name": "Tam Ad",
+    "e.g. 50K": "örn. 50B",
+    "e.g. $500": "örn. $500",
+    "e.g. Confirmed": "örn. Onaylandı",
+    "+ Add Influencer": "+ Influencer Ekle",
+
+    // Custom sections form
+    "Custom Sections": "Özel Bölümler",
+    "Section Header": "Bölüm Başlığı",
+    "Section header": "Bölüm başlığı",
+    Content: "İçerik",
+    "Write your content here…": "İçeriğinizi buraya yazın…",
+    Clauses: "Maddeler",
+};
+
 export function t(key: string, lang: Lang): string {
     if (lang === "ar") return ar[key] ?? key;
+    if (lang === "tr") return tr[key] ?? key;
     return key;
 }
