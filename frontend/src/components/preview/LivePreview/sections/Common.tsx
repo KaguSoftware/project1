@@ -66,40 +66,35 @@ export const DeliverablesPreview = ({
 	const filtered = rows.filter((d) => d.deliverable);
 	if (filtered.length === 0) return null;
 
+	const isRtl = lang === "ar";
+
 	return (
 		<section>
-			<h3 className="text-xs text-indigo-400 uppercase tracking-[0.2em] mb-4 font-black">
+			<h3 className="text-xs text-indigo-400 uppercase tracking-[0.2em] mb-3 font-black">
 				{t("Deliverables", lang)}
 			</h3>
-			<div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100">
+			<div className="w-full rounded-xl overflow-hidden border border-slate-200">
+				{/* Header */}
+				<div className={`grid grid-cols-[2rem_1fr_7rem_6rem] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
+					<span>#</span>
+					<span>{t("Deliverable", lang)}</span>
+					<span>{t("Timeline", lang)}</span>
+					<span>{t("Status", lang)}</span>
+				</div>
+				{/* Rows */}
 				{filtered.map((item, idx) => (
-					<div key={item.id} className="flex gap-4 items-start px-4 py-3">
-						<div className="w-6 h-6 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center shrink-0 mt-0.5">
-							<span className="text-[9px] font-black text-indigo-500">{idx + 1}</span>
-						</div>
-						<div className="flex-1 min-w-0">
-							<p className="font-semibold text-slate-800 text-sm leading-snug mb-1.5">
-								{item.deliverable}
-							</p>
-							<div className="flex items-center gap-4 text-xs">
-								{item.timeline && (
-									<span>
-										<span className="font-black uppercase tracking-wider text-amber-500 mr-1">
-											{t("Timeline", lang)}
-										</span>
-										<span className="text-slate-500">{item.timeline}</span>
-									</span>
-								)}
-								<span>
-									<span className="font-black uppercase tracking-wider text-emerald-500 mr-1">
-										{t("Status", lang)}
-									</span>
-									<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
-										{item.status || t("Pending", lang)}
-									</span>
-								</span>
-							</div>
-						</div>
+					<div
+						key={item.id}
+						className={`grid grid-cols-[2rem_1fr_7rem_6rem] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
+					>
+						<span className="text-[11px] font-black text-slate-300">{idx + 1}</span>
+						<span className="font-semibold text-slate-800 leading-snug pr-3">{item.deliverable}</span>
+						<span className="text-slate-500 text-xs">{item.timeline || "—"}</span>
+						<span>
+							<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-50 text-indigo-500 border border-indigo-100">
+								{item.status || t("Pending", lang)}
+							</span>
+						</span>
 					</div>
 				))}
 			</div>

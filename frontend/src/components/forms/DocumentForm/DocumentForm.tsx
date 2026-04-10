@@ -37,7 +37,7 @@ export const DocumentForm = () => {
 			const response = await fetch("/api/generate-intro", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(document),
+				body: JSON.stringify({ ...document, language }),
 			});
 
 			const ai = await response.json();

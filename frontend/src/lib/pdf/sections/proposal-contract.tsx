@@ -134,172 +134,56 @@ export const DeliverablesTable = ({
     const filtered = rows.filter((d) => d.deliverable);
     if (filtered.length === 0) return <View />;
 
+    const isRtl = lang === "ar";
+    const dir = isRtl ? "row-reverse" : "row";
+
     return (
         <View style={styles.section}>
-            <Text
-                style={[
-                    styles.sectionTitle,
-                    af(lang),
-                    { color: colors.indigo500 },
-                ]}
-            >
+            <Text style={[styles.sectionTitle, af(lang), { color: colors.indigo500 }]}>
                 {fixArabic(t("Deliverables", lang), lang)}
             </Text>
-            <View
-                style={{
-                    borderWidth: 0.5,
-                    borderColor: colors.slate200,
-                    borderRadius: 8,
-                    overflow: "hidden",
-                }}
-            >
+            <View style={{ borderWidth: 0.5, borderColor: colors.slate200, borderRadius: 8, overflow: "hidden" }}>
+                {/* Header row */}
+                <View style={{ flexDirection: dir, backgroundColor: colors.slate50, borderBottomWidth: 0.5, borderBottomColor: colors.slate200, paddingHorizontal: 12, paddingVertical: 7 }}>
+                    <Text style={{ width: 20, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }}>#</Text>
+                    <Text style={[{ flex: 1, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
+                        {fixArabic(t("Deliverable", lang), lang)}
+                    </Text>
+                    <Text style={[{ width: 70, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
+                        {fixArabic(t("Timeline", lang), lang)}
+                    </Text>
+                    <Text style={[{ width: 55, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
+                        {fixArabic(t("Status", lang), lang)}
+                    </Text>
+                </View>
+                {/* Data rows */}
                 {filtered.map((item, idx) => (
                     <View
                         key={item.id}
-                        style={[
-                            {
-                                flexDirection:
-                                    lang === "ar" ? "row-reverse" : "row",
-                                alignItems: "flex-start",
-                                paddingHorizontal: 12,
-                                paddingVertical: 10,
-                                borderBottomWidth:
-                                    idx < filtered.length - 1 ? 0.5 : 0,
-                                borderBottomColor: colors.slate100,
-                                gap: 10,
-                            },
-                        ]}
+                        style={{
+                            flexDirection: dir,
+                            alignItems: "center",
+                            paddingHorizontal: 12,
+                            paddingVertical: 9,
+                            borderBottomWidth: idx < filtered.length - 1 ? 0.5 : 0,
+                            borderBottomColor: colors.slate100,
+                        }}
                         wrap={false}
                     >
-                        <View
-                            style={{
-                                width: 18,
-                                height: 18,
-                                borderRadius: 9,
-                                backgroundColor: colors.indigo100,
-                                borderWidth: 0.5,
-                                borderColor: colors.indigo200,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                marginTop: 1,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 7,
-                                    fontFamily: "Helvetica-Bold",
-                                    color: colors.indigo500,
-                                }}
-                            >
-                                {idx + 1}
-                            </Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text
-                                style={[
-                                    styles.tableCellBold,
-                                    { marginBottom: 4 },
-                                    afB(lang),
-                                ]}
-                            >
-                                {fixArabic(item.deliverable, lang)}
-                            </Text>
-                            <View
-                                style={{
-                                    flexDirection:
-                                        lang === "ar" ? "row-reverse" : "row",
-                                    gap: 14,
-                                }}
-                            >
-                                {item.timeline ? (
-                                    <View
-                                        style={{
-                                            flexDirection:
-                                                lang === "ar"
-                                                    ? "row-reverse"
-                                                    : "row",
-                                            gap: 3,
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                fontSize: 6.5,
-                                                fontFamily: "Helvetica-Bold",
-                                                textTransform: "uppercase",
-                                                letterSpacing: 0.5,
-                                                color: colors.amber500,
-                                            }}
-                                        >
-                                            {fixArabic(
-                                                t("Timeline", lang),
-                                                lang
-                                            )}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                {
-                                                    fontSize: 8,
-                                                    color: colors.slate500,
-                                                },
-                                                af(lang),
-                                            ]}
-                                        >
-                                            {fixArabic(item.timeline, lang)}
-                                        </Text>
-                                    </View>
-                                ) : null}
-                                <View
-                                    style={{
-                                        flexDirection:
-                                            lang === "ar"
-                                                ? "row-reverse"
-                                                : "row",
-                                        gap: 3,
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            fontSize: 6.5,
-                                            fontFamily: "Helvetica-Bold",
-                                            textTransform: "uppercase",
-                                            letterSpacing: 0.5,
-                                            color: colors.emerald600,
-                                        }}
-                                    >
-                                        {fixArabic(t("Status", lang), lang)}
-                                    </Text>
-                                    <View
-                                        style={{
-                                            backgroundColor: colors.emerald50,
-                                            borderWidth: 0.5,
-                                            borderColor: colors.emerald100,
-                                            borderRadius: 8,
-                                            paddingHorizontal: 6,
-                                            paddingVertical: 1,
-                                        }}
-                                    >
-                                        <Text
-                                            style={[
-                                                {
-                                                    fontSize: 7,
-                                                    fontFamily:
-                                                        "Helvetica-Bold",
-                                                    textTransform: "uppercase",
-                                                    color: colors.emerald600,
-                                                },
-                                                af(lang),
-                                            ]}
-                                        >
-                                            {fixArabic(
-                                                item.status ||
-                                                    t("Pending", lang),
-                                                lang
-                                            )}
-                                        </Text>
-                                    </View>
-                                </View>
+                        <Text style={{ width: 20, fontSize: 8, fontFamily: "Helvetica-Bold", color: colors.slate300 }}>
+                            {idx + 1}
+                        </Text>
+                        <Text style={[{ flex: 1, fontSize: 9, fontFamily: "Helvetica-Bold", color: colors.slate800, paddingRight: isRtl ? 0 : 8, paddingLeft: isRtl ? 8 : 0 }, afB(lang)]}>
+                            {fixArabic(item.deliverable, lang)}
+                        </Text>
+                        <Text style={[{ width: 70, fontSize: 8.5, color: colors.slate500 }, af(lang)]}>
+                            {fixArabic(item.timeline || "—", lang)}
+                        </Text>
+                        <View style={{ width: 55 }}>
+                            <View style={{ backgroundColor: colors.indigo100, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, alignSelf: isRtl ? "flex-end" : "flex-start" }}>
+                                <Text style={[{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", color: colors.indigo500 }, af(lang)]}>
+                                    {fixArabic(item.status || t("Pending", lang), lang)}
+                                </Text>
                             </View>
                         </View>
                     </View>
