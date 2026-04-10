@@ -79,33 +79,18 @@ export const ContractFields = () => {
 										updateArrayItem("deliverables", row.id, { deliverable: e.target.value })
 									}
 								/>
-								<div className="grid grid-cols-2 gap-3">
-									<div className="space-y-1">
-										<label className="text-[9px] font-black uppercase tracking-[0.15em] text-amber-500">
-											{tr("Timeline")}
-										</label>
-										<input
-											className={inputClass}
-											placeholder={tr("e.g. Week 2")}
-											value={row.timeline}
-											onChange={(e) =>
-												updateArrayItem("deliverables", row.id, { timeline: e.target.value })
-											}
-										/>
-									</div>
-									<div className="space-y-1">
-										<label className="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-500">
-											{tr("Status")}
-										</label>
-										<input
-											className={inputClass}
-											placeholder={tr("Pending")}
-											value={row.status}
-											onChange={(e) =>
-												updateArrayItem("deliverables", row.id, { status: e.target.value })
-											}
-										/>
-									</div>
+								<div className="space-y-1">
+									<label className="text-[9px] font-black uppercase tracking-[0.15em] text-amber-500">
+										{tr("Timeline")}
+									</label>
+									<input
+										className={inputClass}
+										placeholder={tr("e.g. Week 2")}
+										value={row.timeline}
+										onChange={(e) =>
+											updateArrayItem("deliverables", row.id, { timeline: e.target.value })
+										}
+									/>
 								</div>
 							</div>
 							<button
@@ -124,7 +109,7 @@ export const ContractFields = () => {
 					)}
 				</div>
 				<button
-					onClick={() => addArrayItem("deliverables", { deliverable: "", timeline: "", status: "Pending" })}
+					onClick={() => addArrayItem("deliverables", { deliverable: "", timeline: "" })}
 					className="btn btn-ghost btn-sm text-indigo-500 font-bold"
 				>
 					{tr("+ Add Row")}

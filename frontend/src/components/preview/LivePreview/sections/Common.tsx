@@ -75,26 +75,20 @@ export const DeliverablesPreview = ({
 			</h3>
 			<div className="w-full rounded-xl overflow-hidden border border-slate-200">
 				{/* Header */}
-				<div className={`grid grid-cols-[2rem_1fr_7rem_6rem] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
+				<div className={`grid grid-cols-[2rem_1fr_7rem] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
 					<span>#</span>
 					<span>{t("Deliverable", lang)}</span>
 					<span>{t("Timeline", lang)}</span>
-					<span>{t("Status", lang)}</span>
 				</div>
 				{/* Rows */}
 				{filtered.map((item, idx) => (
 					<div
 						key={item.id}
-						className={`grid grid-cols-[2rem_1fr_7rem_6rem] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
+						className={`grid grid-cols-[2rem_1fr_7rem] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
 					>
 						<span className="text-[11px] font-black text-slate-300">{idx + 1}</span>
 						<span className="font-semibold text-slate-800 leading-snug pr-3">{item.deliverable}</span>
 						<span className="text-slate-500 text-xs">{item.timeline || "—"}</span>
-						<span>
-							<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-50 text-indigo-500 border border-indigo-100">
-								{item.status || t("Pending", lang)}
-							</span>
-						</span>
 					</div>
 				))}
 			</div>
@@ -206,7 +200,6 @@ export const CustomSectionPreview = ({
 						<tr className="border-b border-slate-900">
 							<th className="py-3 text-[10px] uppercase font-black">Deliverable</th>
 							<th className="py-3 text-[10px] uppercase font-black">Timeline</th>
-							<th className="py-3 text-[10px] uppercase font-black text-right">Status</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-slate-100">
@@ -214,11 +207,6 @@ export const CustomSectionPreview = ({
 							<tr key={item.id}>
 								<td className="py-3 font-medium text-slate-700">{item.deliverable}</td>
 								<td className="py-3 text-slate-500 text-sm">{item.timeline}</td>
-								<td className="py-3 text-right">
-									<span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-slate-100 text-slate-500">
-										{item.status || "Pending"}
-									</span>
-								</td>
 							</tr>
 						))}
 					</tbody>

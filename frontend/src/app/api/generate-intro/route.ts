@@ -5,17 +5,10 @@ import { NextResponse } from "next/server";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 function buildPrompt(doc: any, providedData: string) {
-    const languageInstruction =
-        doc.language === "ar"
-            ? "IMPORTANT: Generate ALL text content in Arabic (العربية). Every word, sentence, and phrase in the response values must be in Arabic."
-            : doc.language === "tr"
-            ? "IMPORTANT: Generate ALL text content in Turkish (Türkçe). Every word, sentence, and phrase in the response values must be in Turkish."
-            : "";
-
     const baseRules = `
         Act as a senior business consultant and document specialist.
-
-        ${languageInstruction}
+        
+        
 
         Generate professional content for a ${
             doc.type?.replace(/_/g, " ") || "document"
@@ -33,7 +26,7 @@ function buildPrompt(doc: any, providedData: string) {
         5. Return ONLY valid JSON — no markdown, no code fences, no explanation.
         ${
             doc.additionalInstructions
-                ? `6. ADDITIONAL INSTRUCTIONS (highest priority — follow these exactly){if a price is given here disregard and remove the price tiers}:\n        ${doc.additionalInstructions}`
+                ? `6. ADDITIONAL INSTRUCTIONS (highest priority — follow these exactly)\n        ${doc.additionalInstructions}`
                 : ""
         }
     `;
@@ -203,13 +196,11 @@ export async function POST(req: Request) {
         const prompt = buildPrompt(doc, providedData);
 
         const result = await model.generateContent(prompt);
-        const raw = result.response.text();
-        // Strip markdown code fences if the model wraps its response
-        const text = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+        const text = result.response.text();
 
         return NextResponse.json(JSON.parse(text));
     } catch (error) {
-        console.error("AI Generation Error:", error instanceof Error ? error.message : error);
+        console.error("AI Generation Error:", error);
         return NextResponse.json(
             { error: "AI Failed to generate valid data" },
             { status: 500 }
