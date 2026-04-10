@@ -1,8 +1,13 @@
-import { View, Text } from "@react-pdf/renderer";
+import { View, Text, Image } from "@react-pdf/renderer";
 import { styles, colors, af, afB, rowDir } from "../styles";
 import { t } from "@/src/lib/translations";
 import type { DocumentData } from "@/src/store/types";
 import * as arabicReshaper from "arabic-reshaper";
+
+const LOGO_URL =
+    typeof window !== "undefined"
+        ? `${window.location.origin}/logo-main-genbuzz.png`
+        : "/logo-main-genbuzz.png";
 
 type Lang = "en" | "ar" | "tr";
 
@@ -64,9 +69,10 @@ export const Header = ({
                     alignItems: lang === "ar" ? "flex-start" : "flex-end",
                 }}
             >
-                <View style={styles.brandBox}>
-                    <Text style={styles.brandText}>GENBUZZ</Text>
-                </View>
+                <Image
+                    src={LOGO_URL}
+                    style={{ width: 100, height: 30, objectFit: "contain", marginBottom: 4 }}
+                />
                 <Text
                     style={[
                         styles.brandSub,
