@@ -149,9 +149,6 @@ export const DeliverablesTable = ({
                     <Text style={[{ flex: 1, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
                         {fixArabic(t("Deliverable", lang), lang)}
                     </Text>
-                    <Text style={[{ width: 70, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
-                        {fixArabic(t("Timeline", lang), lang)}
-                    </Text>
                     <Text style={[{ width: 55, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
                         {fixArabic(t("Status", lang), lang)}
                     </Text>
@@ -175,9 +172,6 @@ export const DeliverablesTable = ({
                         </Text>
                         <Text style={[{ flex: 1, fontSize: 9, fontFamily: "Helvetica-Bold", color: colors.slate800, paddingRight: isRtl ? 0 : 8, paddingLeft: isRtl ? 8 : 0 }, afB(lang)]}>
                             {fixArabic(item.deliverable, lang)}
-                        </Text>
-                        <Text style={[{ width: 70, fontSize: 8.5, color: colors.slate500 }, af(lang)]}>
-                            {fixArabic(item.timeline || "—", lang)}
                         </Text>
                         <View style={{ width: 55 }}>
                             <View style={{ backgroundColor: colors.indigo100, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, alignSelf: isRtl ? "flex-end" : "flex-start" }}>

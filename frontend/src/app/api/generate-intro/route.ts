@@ -5,10 +5,17 @@ import { NextResponse } from "next/server";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 function buildPrompt(doc: any, providedData: string) {
+    const languageInstruction =
+        doc.language === "tr"
+            ? "IMPORTANT: Generate ALL text content in Turkish (Türkçe). Every paragraph, sentence, and field value must be written in Turkish."
+            : doc.language === "ar"
+            ? "IMPORTANT: Generate ALL text content in Arabic (العربية). Every paragraph, sentence, and field value must be written in Arabic."
+            : "Generate all text content in English.";
+
     const baseRules = `
         Act as a senior business consultant and document specialist.
-        
-        
+
+        ${languageInstruction}
 
         Generate professional content for a ${
             doc.type?.replace(/_/g, " ") || "document"
