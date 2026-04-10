@@ -50,12 +50,13 @@ function buildPrompt(doc: any, providedData: string) {
           "timeline": "Project timeline string",
           "validUntil": "Validity date string",
           "deliverables": [
-            { "deliverable": "Task name", "timeline": "e.g. Week 1-2", "status": "Pending" }
+            { "deliverable": "Task name", "timeline": "e.g. Week 1-2" }
           ]
         }
 
         PRICING TIERS RULES:
-        - If the user's input or additional instructions mention a specific price (e.g. "$500", "1000 USD", "budget of 2000"), populate pricingTiers with that price reflected in the appropriate tier(s). You may create 1-3 tiers that make sense given the context.
+        - If the user's additionalInstructions describe explicit pricing tiers with package names, prices, and features (e.g. "package 1 2000 6 posts, package 2 3000 12 posts"), parse those EXACTLY into pricingTiers. Each package becomes one tier with the name, price, and features as its description. Do not invent or modify the user's packages.
+        - If the user's input or additional instructions mention a specific price (e.g. "$500", "1000 USD", "budget of 2000") but no explicit tier breakdown, populate pricingTiers with that price reflected in the appropriate tier(s). You may create 1-3 tiers that make sense given the context.
         - If the user explicitly requests only 1 package (e.g. "one package", "single tier", "just one plan"), return exactly 1 tier and discard the rest.
         - If no price is mentioned anywhere and no specific package count is requested, do NOT return pricingTiers at all (omit the key entirely) so existing tiers are preserved.
         - If the user already has pricingTiers filled and no price or package count is mentioned, omit pricingTiers from the response entirely.
@@ -72,7 +73,7 @@ function buildPrompt(doc: any, providedData: string) {
           "agreementOverview": "A concise overview describing the nature and purpose of this contract",
           "scopeOfWork": "Clear scope of services to be provided",
           "deliverables": [
-            { "deliverable": "Task name", "timeline": "e.g. Phase 1", "status": "Pending" }
+            { "deliverable": "Task name", "timeline": "e.g. Phase 1" }
           ]
         }
         `;
