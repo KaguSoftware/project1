@@ -30,6 +30,7 @@ const rowId = () => Math.random().toString(36).substring(2, 11);
 export const DocumentForm = () => {
 	const { document, updateDocument, language, hiddenFields, hideField, showAllFields } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
+	const [packageCount, setPackageCount] = useState<1 | 2 | 3>(1);
 
 	const handleGenerate = async () => {
 		setIsGenerating(true);
@@ -37,7 +38,7 @@ export const DocumentForm = () => {
 			const response = await fetch("/api/generate-intro", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ ...document, language }),
+				body: JSON.stringify({ ...document, language, packageCount }),
 			});
 
 			const ai = await response.json();
@@ -237,6 +238,28 @@ export const DocumentForm = () => {
 							}
 						/>
 					</FormField>
+				)}
+				{document.type === "proposal" && (
+					<div className="flex items-center gap-3">
+						<span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 shrink-0">
+							{t("Packages", language)}
+						</span>
+						<div className="flex gap-1">
+							{([1, 2, 3] as const).map((n) => (
+								<button
+									key={n}
+									onClick={() => setPackageCount(n)}
+									className={`w-8 h-8 rounded-lg text-xs font-black border transition-all ${
+										packageCount === n
+											? "bg-primary text-white border-primary"
+											: "bg-white text-slate-400 border-slate-200 hover:border-primary/40"
+									}`}
+								>
+									{n}
+								</button>
+							))}
+						</div>
+					</div>
 				)}
 				{!hiddenFields.includes("projectTitle") && (
 					<FormField label="Project Title" onDelete={() => hideField("projectTitle")}>

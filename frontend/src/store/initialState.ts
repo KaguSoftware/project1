@@ -65,7 +65,7 @@ export const initialDocumentState: DocumentData = {
         },
     ],
     deliverables: [
-        { id: generateId(), deliverable: "", timeline: "", status: "" },
+        { id: generateId(), deliverable: "", timeline: "" },
     ],
     lineItems: [
         { id: generateId(), description: "", qty: 1, rate: 0, amount: 0 },

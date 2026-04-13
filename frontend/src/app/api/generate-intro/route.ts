@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "" });
 
-function buildProposalPrompt(doc: any, providedData: string) {
+function buildProposalPrompt(doc: any, providedData: string, packageCount: number) {
     const lang = doc.language ?? "en";
     const languageInstruction =
         lang === "ar"
@@ -29,18 +29,19 @@ STRICT RULES:
 1. Write like a real agency proposal, not a marketing article.
 2. Keep every section concise. No hype, no filler, no vague statements.
 3. The intro must be 2-4 sentences maximum.
-4. Deliverables must be concrete and specific to this project.
+4. Deliverables must be final tangible outputs (e.g. "Brand Identity Kit", "Website", "Campaign Report") — NOT process steps or tasks (never use words like "designing", "developing", "creating", "setting up").
 5. If the user already filled a field, keep it exactly as-is.
 6. Only return valid JSON. No markdown. No extra fields.
-7. scopeOfWork must always include at minimum these 3 sections: Marketing, Branding, and Software. You may add more sections if the project context warrants it.
-8. Use the 3 sections as a structural reference — write items that are specific and relevant to this project and client. Do NOT copy-paste the reference items verbatim. Adapt them to the actual context.
-9. The style of items should match the reference (concise, bullet-ready, agency-professional) but the content must be tailored to this project.
+7. Each pricing package must include its own independent "scopeOfWork" array with at minimum 3 sections: Marketing, Branding, and Software. Items must be tailored to that specific package tier and this project.
+8. Scope items must be specific to this project and client — do NOT use generic placeholder text.
+9. The style of scope items should be concise and agency-professional.
+
+PACKAGE COUNT: Generate exactly ${packageCount} pricing package(s). No more, no less.
 
 PRICING RULES (strict — never invent a price):
 - NEVER make up, estimate, or guess any price, rate, or cost.
 - If no price was given by the user, omit all price-related fields entirely.
 - If additionalInstructions describe explicit tiers (e.g. "package 1 2000 6 posts"), parse them EXACTLY. Use only the user's numbers.
-- If only 1 package is requested, return exactly 1 tier.
 - If pricingTiers are already filled and no new price is mentioned, omit pricingTiers from the response.
 ${
     doc.additionalInstructions
@@ -52,17 +53,22 @@ RETURN ONLY THIS JSON STRUCTURE:
 
 {
   "aiIntro": "2-4 sentences max. Direct and factual. In the required language.",
-  "scopeOfWork": [
-    { "section": "Marketing", "items": ["Tailored item for this project", "..."] },
-    { "section": "Branding", "items": ["Tailored item for this project", "..."] },
-    { "section": "Software", "items": ["Tailored item for this project", "..."] }
-  ],
   "pricingTiers": [
-    { "name": "Package name", "price": "Only user-provided price", "description": "Feature 1, Feature 2", "isPopular": false }
+    {
+      "name": "Package name",
+      "price": "Only user-provided price",
+      "description": "Feature 1, Feature 2",
+      "isPopular": false,
+      "scopeOfWork": [
+        { "section": "Marketing", "items": ["Tailored item", "..."] },
+        { "section": "Branding", "items": ["Tailored item", "..."] },
+        { "section": "Software", "items": ["Tailored item", "..."] }
+      ]
+    }
   ],
   "defaultCurrency": "Use user-provided currency or omit",
   "deliverables": [
-    { "deliverable": "Specific deliverable name", "timeline": "Phase / Month / Week" }
+    { "deliverable": "Final tangible output name", "timeline": "Phase / Month / Week" }
   ],
   "contractPeriod": "Short contract period text",
   "investmentOverview": { "totalInvestment": "Only if user explicitly provided a total" },
@@ -71,7 +77,7 @@ RETURN ONLY THIS JSON STRUCTURE:
 `;
 }
 
-function buildPrompt(doc: any, providedData: string) {
+function buildPrompt(doc: any, providedData: string, packageCount: number) {
     const lang = doc.language ?? "en";
     const languageInstruction =
         lang === "ar"
@@ -115,7 +121,7 @@ function buildPrompt(doc: any, providedData: string) {
 
     switch (doc.type) {
         case "proposal":
-            return buildProposalPrompt(doc, providedData);
+            return buildProposalPrompt(doc, providedData, packageCount);
 
         case "contract":
             return `
@@ -218,12 +224,11 @@ function buildPrompt(doc: any, providedData: string) {
             "roi": "e.g. 3.2x"
           },
           "influencers": [
-            { "name": "Influencer Name", "platform": "Instagram", "followers": "120K", "rate": "$800", "status": "Confirmed" }
+            { "name": "Influencer Name", "platform": "Instagram", "followers": "120K", "rate": "$800" }
           ]
         }
 
         Generate 3-5 realistic influencers with varied platforms (Instagram, TikTok, YouTube, Twitter/X).
-        Statuses can be: Confirmed, Pending, Negotiating.
         `;
 
         default:
@@ -244,7 +249,8 @@ export async function POST(req: Request) {
         const doc = await req.json();
 
         const providedData = JSON.stringify(doc, null, 2);
-        const prompt = buildPrompt(doc, providedData);
+        const packageCount = Number(doc.packageCount) || 1;
+        const prompt = buildPrompt(doc, providedData, packageCount);
 
         const completion = await groq.chat.completions.create({
             model: "llama-3.3-70b-versatile",
@@ -256,16 +262,21 @@ export async function POST(req: Request) {
 
         // Normalize proposal-specific fields so the existing store/preview stays intact
         if (doc.type === "proposal") {
-            // scopeOfWork: [{section, items}] → formatted string
-            if (Array.isArray(data.scopeOfWork)) {
-                data.scopeOfWork = data.scopeOfWork
-                    .map(
-                        (s: { section: string; items: string[] }) =>
-                            `${s.section}:\n${s.items
-                                .map((i) => `• ${i}`)
-                                .join("\n")}`
-                    )
-                    .join("\n\n");
+            // per-tier scopeOfWork: flatten items into tier.description
+            if (Array.isArray(data.pricingTiers)) {
+                data.pricingTiers = data.pricingTiers.map(
+                    (tier: { scopeOfWork?: unknown; description?: string; [key: string]: unknown }) => {
+                        if (Array.isArray(tier.scopeOfWork)) {
+                            const sections = tier.scopeOfWork as { section: string; items: string[] }[];
+                            const formatted = sections
+                                .flatMap((s) => s.items)
+                                .join(", ");
+                            tier.description = formatted;
+                        }
+                        delete tier.scopeOfWork;
+                        return tier;
+                    }
+                );
             }
             // additionalNotes: string[] → joined string
             if (Array.isArray(data.additionalNotes)) {

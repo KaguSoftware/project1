@@ -12,7 +12,6 @@ export interface DeliverableRow {
 	id: string;
 	deliverable: string;
 	timeline: string;
-	status: string;
 }
 export interface InvoiceLineItem {
 	id: string;

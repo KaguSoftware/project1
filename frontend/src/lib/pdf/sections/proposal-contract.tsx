@@ -511,21 +511,6 @@ export const DeliverablesTable = ({
                     >
                         {fixArabic(t("Deliverable", lang), lang)}
                     </Text>
-                    <Text
-                        style={[
-                            {
-                                width: 55,
-                                fontSize: 6.5,
-                                fontFamily: "Helvetica-Bold",
-                                color: colors.slate400,
-                                textTransform: "uppercase",
-                                letterSpacing: 1,
-                            },
-                            af(lang),
-                        ]}
-                    >
-                        {fixArabic(t("Status", lang), lang)}
-                    </Text>
                 </View>
                 {/* Data rows */}
                 {filtered.map((item, idx) => (
