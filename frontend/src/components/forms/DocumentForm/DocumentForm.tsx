@@ -514,29 +514,7 @@ export const DocumentForm = () => {
 															})
 														}
 													/>
-													<input
-														className={`${inputClass} col-span-3 py-2`}
-														placeholder="Pending"
-														value={row.status}
-														onChange={(e) =>
-															patch({
-																deliverablesRows:
-																	rows.map(
-																		(r) =>
-																			r.id ===
-																			row.id
-																				? {
-																						...r,
-																						status: e
-																							.target
-																							.value,
-																					}
-																				: r,
-																	),
-															})
-														}
-													/>
-													<button
+																				<button
 														onClick={() =>
 															patch({
 																deliverablesRows:
@@ -562,7 +540,6 @@ export const DocumentForm = () => {
 																id: rowId(),
 																deliverable: "",
 																timeline: "",
-																status: "Pending",
 															},
 														],
 													})
