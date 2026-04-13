@@ -42,7 +42,11 @@ PRICING RULES (strict — never invent a price):
 - If additionalInstructions describe explicit tiers (e.g. "package 1 2000 6 posts"), parse them EXACTLY. Use only the user's numbers.
 - If only 1 package is requested, return exactly 1 tier.
 - If pricingTiers are already filled and no new price is mentioned, omit pricingTiers from the response.
-${doc.additionalInstructions ? `\nADDITIONAL INSTRUCTIONS (highest priority):\n${doc.additionalInstructions}` : ""}
+${
+    doc.additionalInstructions
+        ? `\nADDITIONAL INSTRUCTIONS (highest priority):\n${doc.additionalInstructions}`
+        : ""
+}
 
 RETURN ONLY THIS JSON STRUCTURE:
 
@@ -255,8 +259,11 @@ export async function POST(req: Request) {
             // scopeOfWork: [{section, items}] → formatted string
             if (Array.isArray(data.scopeOfWork)) {
                 data.scopeOfWork = data.scopeOfWork
-                    .map((s: { section: string; items: string[] }) =>
-                        `${s.section}:\n${s.items.map((i) => `• ${i}`).join("\n")}`
+                    .map(
+                        (s: { section: string; items: string[] }) =>
+                            `${s.section}:\n${s.items
+                                .map((i) => `• ${i}`)
+                                .join("\n")}`
                     )
                     .join("\n\n");
             }
@@ -265,8 +272,13 @@ export async function POST(req: Request) {
                 data.additionalNotes = data.additionalNotes.join("\n");
             }
             // investmentOverview.totalInvestment → totalPrice (only if user provided a price)
-            const userMentionedPrice = doc.totalPrice || doc.additionalInstructions?.match(/\d/);
-            if (data.investmentOverview?.totalInvestment && userMentionedPrice && !data.totalPrice) {
+            const userMentionedPrice =
+                doc.totalPrice || doc.additionalInstructions?.match(/\d/);
+            if (
+                data.investmentOverview?.totalInvestment &&
+                userMentionedPrice &&
+                !data.totalPrice
+            ) {
                 data.totalPrice = data.investmentOverview.totalInvestment;
             }
             delete data.investmentOverview;

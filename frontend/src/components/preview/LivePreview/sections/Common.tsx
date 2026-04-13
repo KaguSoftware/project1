@@ -140,6 +140,7 @@ export const DeliverablesPreview = ({
 			<div className="w-full rounded-xl overflow-hidden border border-slate-200">
 				{/* Header */}
 				<div className={`grid grid-cols-[2rem_1fr] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
+				<div className={`grid grid-cols-[2rem_1fr] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
 					<span>#</span>
 					<span>{t("Deliverable", lang)}</span>
 				</div>
@@ -147,6 +148,7 @@ export const DeliverablesPreview = ({
 				{filtered.map((item, idx) => (
 					<div
 						key={item.id}
+						className={`grid grid-cols-[2rem_1fr] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
 						className={`grid grid-cols-[2rem_1fr] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
 					>
 						<span className="text-[11px] font-black text-slate-300">{idx + 1}</span>

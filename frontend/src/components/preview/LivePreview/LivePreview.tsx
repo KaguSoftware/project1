@@ -22,7 +22,7 @@ type SectionEntry = { id: string; label: string; node: ReactNode };
 export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 	const { document: doc, updateDocument, language, setLanguage } = useAppStore();
 	const [isExporting, setIsExporting] = useState(false);
-	const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+	const [orderPanelOpen, setOrderPanelOpen] = useState(true);
 
 	const today = new Date().toLocaleDateString("en-US", {
 		year: "numeric",
@@ -163,10 +163,10 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 
 	return (
 		<div className={`flex-1 relative overflow-y-auto ${className}`}>
-			{/* Mobile toggle button */}
+			{/* Toggle button — mobile & desktop */}
 			<button
 				onClick={() => setOrderPanelOpen((v) => !v)}
-				className={`lg:hidden fixed top-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center transition-all duration-300 ${language === "ar" ? "left-4" : "right-4"}`}
+				className={`fixed top-4 z-60 bg-slate-900 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center transition-all duration-300 ${language === "ar" ? "left-4" : "right-4"}`}
 				title="Section order"
 			>
 				<svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -283,7 +283,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			</div>
 
 			{/* ── ORDER PANEL (overlay, right side) ─────────── */}
-			{/* Mobile backdrop */}
+			{/* Backdrop (mobile only) */}
 			{orderPanelOpen && (
 				<div
 					onClick={() => setOrderPanelOpen(false)}
@@ -291,12 +291,12 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 				/>
 			)}
 			<aside
-				className={`fixed top-1/2 -translate-y-1/2 z-50 max-h-[90vh] overflow-y-auto
+				className={`fixed top-20 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto
 					transition-all duration-300 ease-out
 					${language === "ar" ? "left-3" : "right-3"}
 					${orderPanelOpen
 						? "opacity-100 scale-100 pointer-events-auto"
-						: "opacity-0 scale-95 pointer-events-none lg:opacity-100 lg:scale-100 lg:pointer-events-auto"
+						: "opacity-0 scale-95 pointer-events-none"
 					}`}
 			>
 				<div className="relative pl-7 pr-4 py-5 w-76 lg:w-64 rounded-2xl bg-white/80 backdrop-blur-xl border border-slate-200/70 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.3)]">
