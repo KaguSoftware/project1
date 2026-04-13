@@ -124,6 +124,75 @@ export const EngagementOverview = ({
     );
 };
 
+export const ScopeOfWork = ({
+    text,
+    lang = "en",
+}: {
+    text: string;
+    lang?: Lang;
+}) => {
+    if (!text) return <View />;
+
+    // Parse "Section:\n• item" into sections
+    const sections: { title: string; items: string[] }[] = [];
+    let current: { title: string; items: string[] } | null = null;
+    for (const raw of text.split("\n")) {
+        const line = raw.trim();
+        if (!line) continue;
+        if (line.endsWith(":")) {
+            if (current) sections.push(current);
+            current = { title: line.slice(0, -1), items: [] };
+        } else if (current) {
+            current.items.push(line.replace(/^[•\-–]\s*/, ""));
+        }
+    }
+    if (current) sections.push(current);
+
+    if (sections.length === 0) return <View />;
+
+    const isRtl = lang === "ar";
+
+    return (
+        <View style={styles.section}>
+            <Text style={[styles.sectionTitle, af(lang)]}>
+                {fixArabic(t("Scope of Work", lang), lang)}
+            </Text>
+            <View style={{ flexDirection: isRtl ? "row-reverse" : "row", gap: 8 }}>
+                {sections.map((sec, i) => (
+                    <View
+                        key={i}
+                        style={{
+                            flex: 1,
+                            borderRadius: 8,
+                            overflow: "hidden",
+                            borderWidth: 0.5,
+                            borderColor: colors.slate200,
+                        }}
+                    >
+                        {/* Section header */}
+                        <View style={{ backgroundColor: colors.slate700, paddingHorizontal: 10, paddingVertical: 6 }}>
+                            <Text style={[{ fontSize: 7, fontFamily: "Helvetica-Bold", color: colors.white, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
+                                {fixArabic(sec.title, lang)}
+                            </Text>
+                        </View>
+                        {/* Items */}
+                        <View style={{ backgroundColor: colors.slate50, padding: 8, gap: 4 }}>
+                            {sec.items.map((item, j) => (
+                                <View key={j} style={{ flexDirection: isRtl ? "row-reverse" : "row", gap: 5, alignItems: "flex-start" }}>
+                                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#22c55e", marginTop: 2, flexShrink: 0 }} />
+                                    <Text style={[{ flex: 1, fontSize: 7.5, color: colors.slate600, lineHeight: 1.4 }, af(lang)]}>
+                                        {fixArabic(item, lang)}
+                                    </Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                ))}
+            </View>
+        </View>
+    );
+};
+
 export const DeliverablesTable = ({
     rows,
     lang = "en",
@@ -149,12 +218,6 @@ export const DeliverablesTable = ({
                     <Text style={[{ flex: 1, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
                         {fixArabic(t("Deliverable", lang), lang)}
                     </Text>
-                    <Text style={[{ width: 70, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
-                        {fixArabic(t("Timeline", lang), lang)}
-                    </Text>
-                    <Text style={[{ width: 55, fontSize: 6.5, fontFamily: "Helvetica-Bold", color: colors.slate400, textTransform: "uppercase", letterSpacing: 1 }, af(lang)]}>
-                        {fixArabic(t("Status", lang), lang)}
-                    </Text>
                 </View>
                 {/* Data rows */}
                 {filtered.map((item, idx) => (
@@ -173,19 +236,9 @@ export const DeliverablesTable = ({
                         <Text style={{ width: 20, fontSize: 8, fontFamily: "Helvetica-Bold", color: colors.slate300 }}>
                             {idx + 1}
                         </Text>
-                        <Text style={[{ flex: 1, fontSize: 9, fontFamily: "Helvetica-Bold", color: colors.slate800, paddingRight: isRtl ? 0 : 8, paddingLeft: isRtl ? 8 : 0 }, afB(lang)]}>
+                        <Text style={[{ flex: 1, fontSize: 9, fontFamily: "Helvetica-Bold", color: colors.slate800 }, afB(lang)]}>
                             {fixArabic(item.deliverable, lang)}
                         </Text>
-                        <Text style={[{ width: 70, fontSize: 8.5, color: colors.slate500 }, af(lang)]}>
-                            {fixArabic(item.timeline || "—", lang)}
-                        </Text>
-                        <View style={{ width: 55 }}>
-                            <View style={{ backgroundColor: colors.indigo100, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, alignSelf: isRtl ? "flex-end" : "flex-start" }}>
-                                <Text style={[{ fontSize: 6.5, fontFamily: "Helvetica-Bold", textTransform: "uppercase", color: colors.indigo500 }, af(lang)]}>
-                                    {fixArabic(item.status || t("Pending", lang), lang)}
-                                </Text>
-                            </View>
-                        </View>
                     </View>
                 ))}
             </View>

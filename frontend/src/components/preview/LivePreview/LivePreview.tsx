@@ -9,7 +9,7 @@ import { t } from "@/src/lib/translations";
 import type { LivePreviewProps } from "./types";
 
 import { DocHeader } from "./sections/DocHeader";
-import { TextSectionPreview, TermsPreview, DeliverablesPreview, CustomSectionPreview } from "./sections/Common";
+import { TextSectionPreview, ScopeOfWorkPreview, TermsPreview, DeliverablesPreview, CustomSectionPreview } from "./sections/Common";
 import { EngagementOverviewPreview } from "./sections/ProposalContract";
 import { InvoicePreview } from "./sections/Invoice";
 import { PerformanceMetricsPreview, TopPostsPreview } from "./sections/SocialMedia";
@@ -82,7 +82,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" lang={language} />);
 		push("engagementOverview", t("Engagement Overview", language), <EngagementOverviewPreview doc={doc} lang={language} />);
 		if (doc.scopeOfWork) push("scopeOfWork", t("Scope of Work", language),
-			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Work" lang={language} />);
+			<ScopeOfWorkPreview text={doc.scopeOfWork} lang={language} />);
 		push("deliverables", t("Deliverables", language), <DeliverablesPreview rows={doc.deliverables} lang={language} />);
 		push("terms", t("Terms & Conditions", language), <TermsPreview doc={doc} label="Terms & Conditions" lang={language} />);
 	}
@@ -90,7 +90,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		if (doc.agreementOverview) push("agreementOverview", t("Agreement Overview", language),
 			<TextSectionPreview text={doc.agreementOverview} label="Agreement Overview" lang={language} />);
 		if (doc.scopeOfWork) push("scopeOfServices", t("Scope of Services", language),
-			<TextSectionPreview text={doc.scopeOfWork} label="Scope of Services" lang={language} />);
+			<ScopeOfWorkPreview text={doc.scopeOfWork} lang={language} />);
 		push("deliverables", t("Deliverables", language), <DeliverablesPreview rows={doc.deliverables} lang={language} />);
 	}
 	if (doc.type === "invoice") {

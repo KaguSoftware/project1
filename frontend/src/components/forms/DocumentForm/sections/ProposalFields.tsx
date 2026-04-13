@@ -166,11 +166,11 @@ export const ProposalFields = () => {
                                 }
                             />
 
-                            <input
-                                type="text"
+                            <textarea
                                 className={inputClass}
                                 placeholder={tr("Short description")}
                                 value={tier.description}
+                                rows={3}
                                 onChange={(e) =>
                                     updateTier(tier.id, {
                                         description: e.target.value,

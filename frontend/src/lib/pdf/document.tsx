@@ -14,6 +14,7 @@ import {
 import {
     EngagementOverview,
     DeliverablesTable,
+    ScopeOfWork,
 } from "./sections/proposal-contract";
 import { InvoiceTable } from "./sections/invoice";
 import { PerformanceMetrics, TopPostsTable } from "./sections/social-media";
@@ -59,11 +60,7 @@ export const PDFDocument = ({
                         <View />
                     )}
                     {data.scopeOfWork ? (
-                        <TextSection
-                            text={data.scopeOfWork}
-                            label="Scope of Work"
-                            lang={lang}
-                        />
+                        <ScopeOfWork text={data.scopeOfWork} lang={lang} />
                     ) : (
                         <View />
                     )}

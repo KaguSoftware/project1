@@ -3,6 +3,70 @@ import { t } from "@/src/lib/translations";
 
 type Lang = "en" | "ar" | "tr";
 
+/** Parses "Section:\n• item" formatted string into styled cards */
+export const ScopeOfWorkPreview = ({
+	text,
+	lang = "en",
+}: {
+	text: string;
+	lang?: Lang;
+}) => {
+	if (!text) return null;
+
+	// Parse into sections: split on lines that end with ":"
+	const sections: { title: string; items: string[] }[] = [];
+	let current: { title: string; items: string[] } | null = null;
+
+	for (const raw of text.split("\n")) {
+		const line = raw.trim();
+		if (!line) continue;
+		if (line.endsWith(":")) {
+			if (current) sections.push(current);
+			current = { title: line.slice(0, -1), items: [] };
+		} else if (current) {
+			current.items.push(line.replace(/^[•\-–]\s*/, ""));
+		}
+	}
+	if (current) sections.push(current);
+
+	if (sections.length === 0) {
+		// Fallback: plain text
+		return (
+			<section>
+				<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+					{t("Scope of Work", lang)}
+				</h3>
+				<div className="whitespace-pre-wrap text-slate-700 leading-relaxed text-sm">{text}</div>
+			</section>
+		);
+	}
+
+	return (
+		<section>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+				{t("Scope of Work", lang)}
+			</h3>
+			<div className="grid grid-cols-3 gap-3">
+				{sections.map((sec) => (
+					<div key={sec.title} className="rounded-xl border border-slate-100 bg-slate-50 overflow-hidden">
+						<div className="bg-slate-700 px-4 py-2">
+							<p className="text-white text-[10px] font-black uppercase tracking-widest">{sec.title}</p>
+						</div>
+						<ul className="px-4 py-3 space-y-2">
+							{sec.items.map((item, i) => (
+								<li key={i} className="flex items-start gap-2 text-xs text-slate-600">
+									<span className="w-2 h-2 rounded-full bg-green-500 shrink-0 mt-1" />
+									<span>{item}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</div>
+		</section>
+	);
+};
+
 /** Generic plain-text section with a label above it */
 export const TextSectionPreview = ({
 	text,
@@ -75,20 +139,18 @@ export const DeliverablesPreview = ({
 			</h3>
 			<div className="w-full rounded-xl overflow-hidden border border-slate-200">
 				{/* Header */}
-				<div className={`grid grid-cols-[2rem_1fr_7rem] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
+				<div className={`grid grid-cols-[2rem_1fr] bg-slate-50 border-b border-slate-200 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 ${isRtl ? "direction-rtl" : ""}`}>
 					<span>#</span>
 					<span>{t("Deliverable", lang)}</span>
-					<span>{t("Timeline", lang)}</span>
 				</div>
 				{/* Rows */}
 				{filtered.map((item, idx) => (
 					<div
 						key={item.id}
-						className={`grid grid-cols-[2rem_1fr_7rem] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
+						className={`grid grid-cols-[2rem_1fr] items-center px-4 py-3 text-sm ${idx < filtered.length - 1 ? "border-b border-slate-100" : ""} ${isRtl ? "direction-rtl" : ""}`}
 					>
 						<span className="text-[11px] font-black text-slate-300">{idx + 1}</span>
-						<span className="font-semibold text-slate-800 leading-snug pr-3">{item.deliverable}</span>
-						<span className="text-slate-500 text-xs">{item.timeline || "—"}</span>
+						<span className="font-semibold text-slate-800 leading-snug">{item.deliverable}</span>
 					</div>
 				))}
 			</div>
@@ -199,14 +261,12 @@ export const CustomSectionPreview = ({
 					<thead>
 						<tr className="border-b border-slate-900">
 							<th className="py-3 text-[10px] uppercase font-black">Deliverable</th>
-							<th className="py-3 text-[10px] uppercase font-black">Timeline</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-slate-100">
 						{rows.map((item) => (
 							<tr key={item.id}>
 								<td className="py-3 font-medium text-slate-700">{item.deliverable}</td>
-								<td className="py-3 text-slate-500 text-sm">{item.timeline}</td>
 							</tr>
 						))}
 					</tbody>
