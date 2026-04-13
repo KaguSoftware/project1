@@ -165,19 +165,6 @@ export const InfluencerRoster = ({
                         >
                             {fixArabic(inf.rate, lang)}
                         </Text>
-                        <View
-                            style={{
-                                flex: 1,
-                                alignItems:
-                                    lang === "ar" ? "flex-start" : "flex-end",
-                            }}
-                        >
-                            <View style={styles.badge}>
-                                <Text style={[styles.badgeText, af(lang)]}>
-                                    {fixArabic(inf.status, lang)}
-                                </Text>
-                            </View>
-                        </View>
                     </View>
                 ))}
             </View>

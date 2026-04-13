@@ -565,36 +565,6 @@ export const DeliverablesTable = ({
                         >
                             {fixArabic(item.deliverable, lang)}
                         </Text>
-                        <View style={{ width: 55 }}>
-                            <View
-                                style={{
-                                    backgroundColor: colors.indigo100,
-                                    borderRadius: 6,
-                                    paddingHorizontal: 6,
-                                    paddingVertical: 2,
-                                    alignSelf: isRtl
-                                        ? "flex-end"
-                                        : "flex-start",
-                                }}
-                            >
-                                <Text
-                                    style={[
-                                        {
-                                            fontSize: 6.5,
-                                            fontFamily: "Helvetica-Bold",
-                                            textTransform: "uppercase",
-                                            color: colors.indigo500,
-                                        },
-                                        af(lang),
-                                    ]}
-                                >
-                                    {fixArabic(
-                                        item.status || t("Pending", lang),
-                                        lang
-                                    )}
-                                </Text>
-                            </View>
-                        </View>
                     </View>
                 ))}
             </View>
