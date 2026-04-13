@@ -36,13 +36,13 @@ STRICT RULES:
 8. Scope items must be specific to this project and client — do NOT use generic placeholder text.
 9. The style of scope items should be concise and agency-professional.
 
-PACKAGE COUNT: Generate exactly ${packageCount} pricing package(s). No more, no less.
+PACKAGE COUNT: Always return exactly ${packageCount} pricing package(s) in the pricingTiers array. No more, no less. Even if no pricing info was provided, still return ${packageCount} package object(s) with empty price fields.
 
 PRICING RULES (strict — never invent a price):
 - NEVER make up, estimate, or guess any price, rate, or cost.
-- If no price was given by the user, omit all price-related fields entirely.
+- If no price was given by the user, leave the price field as an empty string "".
 - If additionalInstructions describe explicit tiers (e.g. "package 1 2000 6 posts"), parse them EXACTLY. Use only the user's numbers.
-- If pricingTiers are already filled and no new price is mentioned, omit pricingTiers from the response.
+- Always include pricingTiers in the response with exactly ${packageCount} item(s).
 ${
     doc.additionalInstructions
         ? `\nADDITIONAL INSTRUCTIONS (highest priority):\n${doc.additionalInstructions}`
@@ -293,9 +293,12 @@ export async function POST(req: Request) {
                 data.totalPrice = data.investmentOverview.totalInvestment;
             }
             delete data.investmentOverview;
-            // Strip fabricated pricingTier prices if the user never provided any price
+            // Strip fabricated prices from tiers if user never provided any price, but keep the tiers themselves
             if (!userMentionedPrice && Array.isArray(data.pricingTiers)) {
-                delete data.pricingTiers;
+                data.pricingTiers = data.pricingTiers.map((tier: any) => ({
+                    ...tier,
+                    price: "",
+                }));
             }
             // contractPeriod → timeline if not already set
             if (data.contractPeriod && !data.timeline) {
