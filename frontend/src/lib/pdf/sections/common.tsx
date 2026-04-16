@@ -88,38 +88,43 @@ export const Header = ({
     </View>
 );
 
+const HIDE_CLIENT_INFO_TYPES = ["invoice", "social_media_report", "weekly_sales_report", "influencer_campaign"];
+
 export const ClientInfo = ({
     data,
     lang = "en",
 }: {
     data: DocumentData;
     lang?: Lang;
-}) => (
-    <View style={[styles.clientRow, rowDir(lang)]}>
-        <View>
-            <Text style={[styles.labelSmall, af(lang)]}>
-                {fixArabic(t("Prepared For", lang), lang)}
-            </Text>
-            <Text style={[styles.clientName, afB(lang)]}>
-                {fixArabic(data.clientName || t("Client Name", lang), lang)}
-            </Text>
+}) => {
+    if (HIDE_CLIENT_INFO_TYPES.includes(data.type)) return <View />;
+    return (
+        <View style={[styles.clientRow, rowDir(lang)]}>
+            <View>
+                <Text style={[styles.labelSmall, af(lang)]}>
+                    {fixArabic(t("Prepared For", lang), lang)}
+                </Text>
+                <Text style={[styles.clientName, afB(lang)]}>
+                    {fixArabic(data.clientName || t("Client Name", lang), lang)}
+                </Text>
+            </View>
+            <View>
+                <Text
+                    style={[
+                        styles.projectTitle,
+                        afB(lang),
+                        lang === "ar" ? { textAlign: "left" } : {},
+                    ]}
+                >
+                    {fixArabic(
+                        data.projectTitle || t("Project Description", lang),
+                        lang
+                    )}
+                </Text>
+            </View>
         </View>
-        <View>
-            <Text
-                style={[
-                    styles.projectTitle,
-                    afB(lang),
-                    lang === "ar" ? { textAlign: "left" } : {},
-                ]}
-            >
-                {fixArabic(
-                    data.projectTitle || t("Project Description", lang),
-                    lang
-                )}
-            </Text>
-        </View>
-    </View>
-);
+    );
+};
 
 export const ExecutiveSummary = ({
     text,

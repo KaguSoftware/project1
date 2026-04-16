@@ -251,8 +251,8 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 
 						<div className="w-full h-1 bg-slate-900 mb-12" />
 
-						{/* CLIENT / PROJECT ROW */}
-						<div className="grid grid-cols-2 gap-8 mb-16">
+						{/* CLIENT / PROJECT ROW — hidden for report/campaign types */}
+						{!["invoice", "social_media_report", "weekly_sales_report", "influencer_campaign"].includes(doc.type) && <div className="grid grid-cols-2 gap-8 mb-16">
 							<div>
 								<p className="text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-black">
 									{t("Prepared For", language)}
@@ -266,7 +266,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 									{doc.projectTitle || t("Project Description", language)}
 								</p>
 							</div>
-						</div>
+						</div>}
 
 						<div className="flex-1 space-y-12">
 							{ordered.map((s) => (
