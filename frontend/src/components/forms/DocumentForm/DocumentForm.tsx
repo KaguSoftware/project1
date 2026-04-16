@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useAppStore, DocType } from "@/src/store";
+import { usePermissions } from "@/src/lib/permissions";
 import { t } from "@/src/lib/translations";
 import {
 	SparklesIcon,
@@ -31,6 +32,10 @@ export const DocumentForm = () => {
 	const { document, updateDocument, language, hiddenFields, hideField, showAllFields } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [packageCount, setPackageCount] = useState<1 | 2 | 3>(1);
+	const { canEdit } = usePermissions();
+	// isReadonly: true when a doc is loaded and the user only has viewer access
+	const currentDocumentId = useAppStore((s) => s.currentDocumentId);
+	const isReadonly = !!currentDocumentId && !canEdit;
 
 	const handleGenerate = async () => {
 		setIsGenerating(true);
@@ -177,6 +182,23 @@ export const DocumentForm = () => {
 
 	return (
 		<div className="w-full max-w-4xl mx-auto space-y-12 pb-40">
+			{/* Readonly banner — shown when viewer opens a shared doc */}
+			{isReadonly && (
+				<div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+					<svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+							d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+							d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+					</svg>
+					<span className="text-xs font-semibold text-amber-700">
+						You have view-only access to this document.
+					</span>
+				</div>
+			)}
+
+			{/* Overlay to block all interaction when readonly */}
+			<div className={`space-y-12 ${isReadonly ? "pointer-events-none select-none opacity-75" : ""}`}>
 			{/* 1. Category Selector */}
 			<section>
 				<label className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 px-1">
@@ -559,26 +581,30 @@ export const DocumentForm = () => {
 				</section>
 			)}
 
-			<div className={`fixed bottom-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none ${language === "ar" ? "right-0" : "left-0"}`}>
-				<div className="h-10 bg-linear-to-t from-white to-transparent" />
-				<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
-					<button
-						onClick={handleGenerate}
-						disabled={isGenerating}
-						className="btn btn-primary w-full h-14 rounded-2xl shadow-lg shadow-primary/20 gap-3 text-base font-black uppercase tracking-widest transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:bg-slate-400"
-					>
-						<SparklesIcon
-							size={20}
-							className={
-								isGenerating ? "animate-spin" : "animate-pulse"
-							}
-						/>
-						{isGenerating
-							? tr("Synthesizing...")
-							: `${tr("Generate")} ${document.type.replace(/_/g, " ")}`}
-					</button>
+			</div>{/* end readonly overlay div */}
+
+			{!isReadonly && (
+				<div className={`fixed bottom-0 w-full lg:w-150 xl:w-162.5 z-50 pointer-events-none ${language === "ar" ? "right-0" : "left-0"}`}>
+					<div className="h-10 bg-linear-to-t from-white to-transparent" />
+					<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
+						<button
+							onClick={handleGenerate}
+							disabled={isGenerating}
+							className="btn btn-primary w-full h-14 rounded-2xl shadow-lg shadow-primary/20 gap-3 text-base font-black uppercase tracking-widest transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:bg-slate-400"
+						>
+							<SparklesIcon
+								size={20}
+								className={
+									isGenerating ? "animate-spin" : "animate-pulse"
+								}
+							/>
+							{isGenerating
+								? tr("Synthesizing...")
+								: `${tr("Generate")} ${document.type.replace(/_/g, " ")}`}
+						</button>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

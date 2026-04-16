@@ -73,6 +73,39 @@ export interface PricingTier {
 	isPopular: boolean;
 }
 
+// ── Cloud / Auth types ────────────────────────────────────────────────────────
+
+/** Minimal user shape synced from Supabase auth */
+export interface UserProfile {
+  id: string
+  email: string
+  /** app_role from the profiles table — fetched separately after sign-in */
+  app_role?: "admin" | "member" | "client"
+}
+
+/**
+ * The effective role the current user has on the currently-loaded document.
+ * - "owner"  : user.id === document.owner_id
+ * - "editor" : has a document_access row with role='editor'
+ * - "viewer" : has a document_access row with role='viewer'
+ * - null     : no document loaded, or anonymous
+ */
+export type DocumentRole = "owner" | "editor" | "viewer"
+
+/** Lightweight document listing (no heavy content blob) */
+export interface SavedDocumentMeta {
+  id: string
+  owner_id: string
+  title: string
+  doc_type: string
+  created_at: string
+  updated_at: string
+  /** Populated in the "shared with me" section of MyDocumentsPanel */
+  shared_role?: "editor" | "viewer"
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface DocumentData {
 	type: DocType;
 	title: string; // The "Document Title" (e.g., "SOW", "Proposal")
