@@ -142,6 +142,36 @@ export const DocumentForm = () => {
 					...inf,
 				}));
 
+			// Weekly sales report
+			if (ai.weeklySales) {
+				const ws = ai.weeklySales;
+				update.weeklySales = {
+					...document.weeklySales,
+					...(ws.salesPersonName !== undefined && { salesPersonName: ws.salesPersonName }),
+					...(ws.department !== undefined && { department: ws.department }),
+					...(ws.weekStart !== undefined && { weekStart: ws.weekStart }),
+					...(ws.weekEnd !== undefined && { weekEnd: ws.weekEnd }),
+					...(ws.weekSummary !== undefined && { weekSummary: ws.weekSummary }),
+					...(ws.challenges !== undefined && { challenges: ws.challenges }),
+					...(ws.nextWeekGoals !== undefined && { nextWeekGoals: ws.nextWeekGoals }),
+					...(ws.additionalNotes !== undefined && { additionalNotes: ws.additionalNotes }),
+					...(Array.isArray(ws.leads) && ws.leads.length > 0 && {
+						leads: ws.leads.map((lead: any) => ({
+							id: lead.id || genId(),
+							clientName: lead.clientName ?? "",
+							contactPerson: lead.contactPerson ?? "",
+							email: lead.email ?? "",
+							phone: lead.phone ?? "",
+							leadSource: lead.leadSource ?? "",
+							status: lead.status ?? "",
+							meetingDate: lead.meetingDate ?? "",
+							dealValue: lead.dealValue ?? "",
+							notes: lead.notes ?? "",
+						})),
+					}),
+				};
+			}
+
 			updateDocument(update);
 		} catch (error) {
 			console.error("Generation failed:", error);
