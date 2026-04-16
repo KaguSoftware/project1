@@ -18,7 +18,9 @@
       "Bash(curl -L \"https://fonts.gstatic.com/s/notosansarabic/v33/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfL2uvuw.ttf\" -o \"c:/Users/MnS/Kagu/project1/frontend/public/fonts/NotoSansArabic-Bold.ttf\")",
       "Bash(grep -rn \"export.*Style\" c:/Users/MnS/Kagu/project1/frontend/node_modules/@react-pdf/types/*.d.ts)",
       "Bash(xargs grep:*)",
-      "Bash(echo \"EXIT: $?\")"
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(npm run *)",
+      "Bash(npx eslint *)"
     ]
   }
 }
