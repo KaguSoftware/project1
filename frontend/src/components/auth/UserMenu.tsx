@@ -13,6 +13,7 @@ import { AuthModal } from "./AuthModal";
 export function UserMenu() {
   const user = useAppStore((s) => s.user);
   const setUser = useAppStore((s) => s.setUser);
+  const resetDocument = useAppStore((s) => s.resetDocument);
   const [showModal, setShowModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -20,6 +21,7 @@ export function UserMenu() {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
+    resetDocument();
     setMenuOpen(false);
   }
 

@@ -120,7 +120,7 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
                     {user && (
                         <button
                             onClick={() => setDocsOpen(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
+                            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
                         >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -134,7 +134,7 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
                     {canShare && (
                         <button
                             onClick={() => setShareOpen(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
+                            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
                         >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -146,14 +146,20 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 
                     {/* Delete button — only owner/admin on a loaded doc */}
                     {canDelete && currentDocumentId && (
-                        <DeleteDocButton documentId={currentDocumentId} />
+                        <div className="hidden lg:block">
+                            <DeleteDocButton documentId={currentDocumentId} />
+                        </div>
                     )}
 
-                    {/* Save button */}
-                    <SaveButton />
+                    {/* Save button — desktop only */}
+                    <div className="hidden lg:block">
+                        <SaveButton />
+                    </div>
 
-                    {/* User menu (sign-in or avatar+dropdown) */}
-                    <UserMenu />
+                    {/* User menu — desktop only */}
+                    <div className="hidden lg:block">
+                        <UserMenu />
+                    </div>
                 </div>
             </div>
 

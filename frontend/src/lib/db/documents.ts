@@ -302,36 +302,15 @@ export async function adminListDocuments(): Promise<DocumentWithOwner[]> {
 
   const { data, error } = await supabase
     .from('documents')
-    .select('id, owner_id, title, doc_type, created_at, updated_at, profiles!owner_id(email)')
+    .select('id, owner_id, title, doc_type, created_at, updated_at')
     .order('created_at', { ascending: false })
 
   if (error) throw error
 
-  type JoinedRow = {
-    id: string
-    owner_id: string
-    title: string
-    doc_type: string
-    created_at: string
-    updated_at: string
-    // Supabase returns a 1-element array for a !inner foreign-key join
-    profiles: Array<{ email: string }> | { email: string } | null
-  }
-
-  return ((data ?? []) as unknown as JoinedRow[]).map((row) => {
-    const profileEmail = Array.isArray(row.profiles)
-      ? row.profiles[0]?.email
-      : row.profiles?.email
-    return {
-      id: row.id,
-      owner_id: row.owner_id,
-      title: row.title,
-      doc_type: row.doc_type,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-      owner_email: profileEmail,
-    }
-  })
+  return ((data ?? []) as DocumentWithOwner[]).map((row) => ({
+    ...row,
+    owner_email: undefined,
+  }))
 }
 
 /**
@@ -341,38 +320,30 @@ export async function adminListDocuments(): Promise<DocumentWithOwner[]> {
 export async function listSharedWithMe(): Promise<SavedDocumentMeta[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  // Fetch access grants for the current user
+  const { data: accessRows, error: accessError } = await supabase
     .from('document_access')
-    .select('role, documents(id, owner_id, title, doc_type, created_at, updated_at)')
+    .select('document_id, role')
     .order('created_at', { ascending: false })
 
-  if (error) throw error
+  if (accessError) throw accessError
+  if (!accessRows || accessRows.length === 0) return []
 
-  type SharedRow = {
-    role: "editor" | "viewer"
-    // Supabase returns arrays for joined relations
-    documents: Array<{
-      id: string
-      owner_id: string
-      title: string
-      doc_type: string
-      created_at: string
-      updated_at: string
-    }> | {
-      id: string
-      owner_id: string
-      title: string
-      doc_type: string
-      created_at: string
-      updated_at: string
-    } | null
-  }
+  type AccessRow = { document_id: string; role: "editor" | "viewer" }
+  const rows = accessRows as AccessRow[]
+  const ids = rows.map((r) => r.document_id)
 
-  return ((data ?? []) as unknown as SharedRow[])
-    .map((row) => {
-      const doc = Array.isArray(row.documents) ? row.documents[0] : row.documents
-      if (!doc) return null
-      return { ...doc, shared_role: row.role } as SavedDocumentMeta
-    })
-    .filter((d): d is SavedDocumentMeta => d !== null)
+  // Fetch the document meta separately — no cross-table join
+  const { data: docs, error: docsError } = await supabase
+    .from('documents')
+    .select('id, owner_id, title, doc_type, created_at, updated_at')
+    .in('id', ids)
+
+  if (docsError) throw docsError
+
+  const roleByDocId = new Map(rows.map((r) => [r.document_id, r.role]))
+  return ((docs ?? []) as SavedDocumentMeta[]).map((doc) => ({
+    ...doc,
+    shared_role: roleByDocId.get(doc.id),
+  }))
 }

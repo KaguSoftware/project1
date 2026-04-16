@@ -32,12 +32,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${siteUrl}${next}`);
     }
   } else if (token_hash && type) {
-    // OTP / magic-link flow
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await supabase.auth.verifyOtp({
       token_hash,
       type: type as "email",
-    } as any);
+    });
     if (!error) {
       return NextResponse.redirect(`${siteUrl}${next}`);
     }

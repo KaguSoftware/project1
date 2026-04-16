@@ -7,6 +7,10 @@ import type { CustomSectionType, CustomSection } from "@/src/store";
 import { generateId } from "@/src/store/initialState";
 import { t } from "@/src/lib/translations";
 import type { LivePreviewProps } from "./types";
+import { createClient } from "@/src/lib/supabase/client";
+import { AuthModal } from "@/src/components/auth/AuthModal";
+import { SaveButton } from "@/src/components/documents/SaveButton";
+import { MyDocumentsPanel } from "@/src/components/documents/MyDocumentsPanel";
 
 import { DocHeader } from "./sections/DocHeader";
 import { TextSectionPreview, ScopeOfWorkPreview, TermsPreview, DeliverablesPreview, CustomSectionPreview } from "./sections/Common";
@@ -21,8 +25,20 @@ type SectionEntry = { id: string; label: string; node: ReactNode };
 
 export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 	const { document: doc, updateDocument, language, setLanguage } = useAppStore();
+	const user = useAppStore((s) => s.user);
+	const setUser = useAppStore((s) => s.setUser);
+	const resetDocument = useAppStore((s) => s.resetDocument);
 	const [isExporting, setIsExporting] = useState(false);
-	const [orderPanelOpen, setOrderPanelOpen] = useState(true);
+	const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [docsOpen, setDocsOpen] = useState(false);
+
+	async function handleMobileSignOut() {
+		const supabase = createClient();
+		await supabase.auth.signOut();
+		setUser(null);
+		resetDocument();
+	}
 
 	const today = new Date().toLocaleDateString("en-US", {
 		year: "numeric",
@@ -304,6 +320,41 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 						Section Order
 					</p>
 
+					{/* Auth controls — mobile only */}
+					<div className="lg:hidden mb-4 ml-1 space-y-2">
+						{user ? (
+							<>
+								<p className="text-[10px] text-slate-500 truncate max-w-[180px]">{user.email}</p>
+								<div className="flex items-center gap-2">
+									<SaveButton />
+									<button
+										onClick={() => { setOrderPanelOpen(false); setDocsOpen(true); }}
+										className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
+									>
+										<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+												d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+										</svg>
+										My Docs
+									</button>
+									<button
+										onClick={handleMobileSignOut}
+										className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors border border-red-200"
+									>
+										Sign out
+									</button>
+								</div>
+							</>
+						) : (
+							<button
+								onClick={() => setShowAuthModal(true)}
+								className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-content hover:opacity-90 transition-opacity"
+							>
+								Sign in
+							</button>
+						)}
+					</div>
+
 					{/* Language toggle — mobile only (desktop has it in the sidebar) */}
 					<div className="lg:hidden flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200 mb-4 ml-1 w-fit">
 						<button
@@ -369,6 +420,12 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 					</div>
 				</div>
 			</aside>
+
+			{/* Auth modal — triggered from mobile panel */}
+			{showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+
+			{/* My Documents panel — triggered from mobile panel */}
+			<MyDocumentsPanel isOpen={docsOpen} onClose={() => setDocsOpen(false)} />
 		</div>
 	);
 };
