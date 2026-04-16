@@ -206,22 +206,32 @@ export async function listSharesForDocument(
 
   const { data, error } = await supabase
     .from('document_access')
-    .select('*, profiles!user_id(email, display_name)')
+    .select('*')
     .eq('document_id', documentId)
     .order('created_at', { ascending: true })
 
   if (error) throw error
 
-  type JoinedShare = DocumentShare & {
-    profiles: Array<{ email: string; display_name: string | null }> | { email: string; display_name: string | null } | null
-  }
+  const shares = (data ?? []) as DocumentShare[]
+  if (shares.length === 0) return shares
 
-  return ((data ?? []) as unknown as JoinedShare[]).map((row) => {
-    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+  // Fetch display names via SECURITY DEFINER RPC (profiles RLS blocks direct join)
+  const userIds = shares.map((s) => s.user_id)
+  const { data: profiles } = await supabase.rpc('get_profiles_for_users', {
+    user_ids: userIds,
+  })
+
+  type ProfileRow = { id: string; email: string; display_name: string | null }
+  const profileMap = new Map<string, ProfileRow>(
+    ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
+  )
+
+  return shares.map((share) => {
+    const p = profileMap.get(share.user_id)
     return {
-      ...row,
-      display_name: profile?.display_name ?? profile?.email ?? row.user_id,
-    } as DocumentShare
+      ...share,
+      display_name: p?.display_name ?? p?.email ?? share.user_id,
+    }
   })
 }
 
