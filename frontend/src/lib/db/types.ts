@@ -43,6 +43,8 @@ export interface DocumentShare {
   role: DocumentRole
   granted_by: string | null
   created_at: string
+  /** Populated by listSharesForDocument join — display name or email of the grantee */
+  display_name?: string
 }
 
 /** Return type of the find_user_by_email() RPC */

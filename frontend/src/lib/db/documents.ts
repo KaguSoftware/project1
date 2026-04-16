@@ -206,12 +206,23 @@ export async function listSharesForDocument(
 
   const { data, error } = await supabase
     .from('document_access')
-    .select('*')
+    .select('*, profiles!user_id(email, display_name)')
     .eq('document_id', documentId)
     .order('created_at', { ascending: true })
 
   if (error) throw error
-  return (data ?? []) as DocumentShare[]
+
+  type JoinedShare = DocumentShare & {
+    profiles: Array<{ email: string; display_name: string | null }> | { email: string; display_name: string | null } | null
+  }
+
+  return ((data ?? []) as unknown as JoinedShare[]).map((row) => {
+    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+    return {
+      ...row,
+      display_name: profile?.display_name ?? profile?.email ?? row.user_id,
+    } as DocumentShare
+  })
 }
 
 // ── Role resolution ───────────────────────────────────────────────────────────
