@@ -195,16 +195,28 @@ function buildPrompt(doc: any, providedData: string, packageCount: number) {
         Return ONLY a JSON object with this exact structure:
 
         {
-          "aiIntro": "2-paragraph weekly sales executive summary referencing key wins and metrics",
-          "salesMetrics": [
-            { "title": "Metric name e.g. Total Revenue", "money": "e.g. $48,200", "delta": "+12%" }
-          ],
-          "dealBreakdown": [
-            { "client": "Client name", "dealValue": "$10,000", "stage": "Closed Won" }
-          ]
+          "aiIntro": "2-paragraph weekly sales executive summary referencing key wins and pipeline highlights",
+          "weeklySales": {
+            "weekSummary": "2-3 sentence summary of the week's sales performance",
+            "challenges": "1-2 sentence description of key challenges or blockers faced this week",
+            "nextWeekGoals": "1-2 sentence description of priorities and targets for next week",
+            "leads": [
+              {
+                "clientName": "Company or client name",
+                "contactPerson": "Contact full name",
+                "email": "contact@example.com",
+                "phone": "+1 555 000 0000",
+                "leadSource": "one of: referral | instagram | facebook | linkedin | website | cold_call | email | other",
+                "status": "one of: new_lead | meeting_arranged | proposal_sent | closed_won | closed_lost | follow_up_needed",
+                "meetingDate": "ISO date string or empty string",
+                "dealValue": "e.g. $12,000 or empty string",
+                "notes": "Short note about this lead or empty string"
+              }
+            ]
+          }
         }
 
-        Generate 5-6 realistic sales metrics and 4-6 deals in various pipeline stages (Prospecting, Proposal Sent, Negotiation, Closed Won, Closed Lost).
+        Generate 4-7 realistic leads across a mix of statuses. Use varied lead sources. Only include meetingDate if status is meeting_arranged or later. Leave dealValue empty for new_lead status.
         `;
 
         case "influencer_campaign":
@@ -305,6 +317,14 @@ export async function POST(req: Request) {
                 data.timeline = data.contractPeriod;
             }
             delete data.contractPeriod;
+        }
+
+        // Normalize weekly_sales_report: add ids to leads
+        if (doc.type === "weekly_sales_report" && Array.isArray(data.weeklySales?.leads)) {
+            data.weeklySales.leads = data.weeklySales.leads.map((lead: any, i: number) => ({
+                ...lead,
+                id: lead.id || `ai-lead-${i}-${Date.now()}`,
+            }));
         }
 
         return NextResponse.json(data);

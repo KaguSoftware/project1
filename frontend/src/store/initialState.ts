@@ -1,4 +1,4 @@
-import { DocumentData, PricingTier } from "./types";
+import { DocumentData, PricingTier, LeadRow } from "./types";
 
 export const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -79,6 +79,30 @@ export const initialDocumentState: DocumentData = {
     salesMetrics: [{ id: generateId(), title: "", money: "", delta: "" }],
     dealBreakdown: [{ id: generateId(), client: "", dealValue: "", stage: "" }],
     customSections: [],
+    weeklySales: {
+        salesPersonName: "",
+        department: "",
+        weekStart: "",
+        weekEnd: "",
+        leads: [
+            {
+                id: generateId(),
+                clientName: "",
+                contactPerson: "",
+                email: "",
+                phone: "",
+                leadSource: "",
+                status: "",
+                meetingDate: "",
+                dealValue: "",
+                notes: "",
+            } as LeadRow,
+        ],
+        weekSummary: "",
+        challenges: "",
+        nextWeekGoals: "",
+        additionalNotes: "",
+    },
     influencers: [
         {
             id: generateId(),

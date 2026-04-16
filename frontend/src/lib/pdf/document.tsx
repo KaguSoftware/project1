@@ -18,7 +18,7 @@ import {
 } from "./sections/proposal-contract";
 import { InvoiceTable } from "./sections/invoice";
 import { PerformanceMetrics, TopPostsTable } from "./sections/social-media";
-import { SalesMetrics, DealBreakdownTable } from "./sections/sales";
+import { SalesMetrics, DealBreakdownTable, WeeklySalesPDF } from "./sections/sales";
 import { KPIGrid, InfluencerRoster } from "./sections/influencer";
 
 type Lang = "en" | "ar" | "tr";
@@ -103,11 +103,7 @@ export const PDFDocument = ({
 
             {data.type === "weekly_sales_report" && (
                 <View>
-                    <SalesMetrics metrics={data.salesMetrics} lang={lang} />
-                    <DealBreakdownTable
-                        deals={data.dealBreakdown}
-                        lang={lang}
-                    />
+                    <WeeklySalesPDF doc={data} lang={lang} />
                 </View>
             )}
 

@@ -17,7 +17,7 @@ import { TextSectionPreview, ScopeOfWorkPreview, TermsPreview, DeliverablesPrevi
 import { EngagementOverviewPreview } from "./sections/ProposalContract";
 import { InvoicePreview } from "./sections/Invoice";
 import { PerformanceMetricsPreview, TopPostsPreview } from "./sections/SocialMedia";
-import { SalesMetricsPreview, DealBreakdownPreview } from "./sections/Sales";
+import { SalesMetricsPreview, DealBreakdownPreview, WeeklySalesPreview } from "./sections/Sales";
 import { KPIGridPreview, InfluencerRosterPreview } from "./sections/Influencer";
 import { AddSectionBar } from "./AddSectionBar";
 
@@ -123,10 +123,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		push("topPosts", t("Top Posts", language), <TopPostsPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "weekly_sales_report") {
-		if (doc.aiIntro) push("weeklySummary", t("Weekly Summary", language),
-			<TextSectionPreview text={doc.aiIntro} label="Weekly Summary" lang={language} />);
-		push("salesMetrics", t("Sales Metrics", language), <SalesMetricsPreview doc={doc} lang={language} />);
-		push("dealBreakdown", t("Deal Breakdown", language), <DealBreakdownPreview doc={doc} lang={language} />);
+		push("weeklySales", "Weekly Sales Report", <WeeklySalesPreview doc={doc} />);
 	}
 	if (doc.type === "influencer_campaign") {
 		if (doc.campaignOverview) push("campaignOverview", t("Campaign Overview", language),

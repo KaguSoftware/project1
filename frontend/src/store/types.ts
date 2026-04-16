@@ -45,6 +45,49 @@ export interface DealRow {
 	dealValue: string;
 	stage: string;
 }
+
+export type LeadStatus =
+	| "new_lead"
+	| "meeting_arranged"
+	| "proposal_sent"
+	| "closed_won"
+	| "closed_lost"
+	| "follow_up_needed";
+
+export type LeadSource =
+	| "referral"
+	| "instagram"
+	| "facebook"
+	| "linkedin"
+	| "website"
+	| "cold_call"
+	| "email"
+	| "other";
+
+export interface LeadRow {
+	id: string;
+	clientName: string;
+	contactPerson: string;
+	email: string;
+	phone: string;
+	leadSource: LeadSource | "";
+	status: LeadStatus | "";
+	meetingDate: string;
+	dealValue: string;
+	notes: string;
+}
+
+export interface WeeklySalesData {
+	salesPersonName: string;
+	department: string;
+	weekStart: string;
+	weekEnd: string;
+	leads: LeadRow[];
+	weekSummary: string;
+	challenges: string;
+	nextWeekGoals: string;
+	additionalNotes: string;
+}
 export interface InfluencerRow {
 	id: string;
 	name: string;
@@ -146,4 +189,7 @@ export interface DocumentData {
 	influencers: InfluencerRow[];
 	customSections: CustomSection[];
 	sectionOrder?: string[];
+
+	// Weekly sales report structured data
+	weeklySales: WeeklySalesData;
 }
