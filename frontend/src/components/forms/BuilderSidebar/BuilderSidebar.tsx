@@ -11,7 +11,6 @@ import { usePermissions } from "@/src/lib/permissions";
 import { getMyRole, getMyProfile } from "@/src/lib/db/documents";
 
 export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
-    const { language, setLanguage } = useAppStore();
     const [docsOpen, setDocsOpen] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
     const user = useAppStore((s) => s.user);
@@ -80,42 +79,8 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
                     </div>
                 </div>
 
-                {/* Right side: language toggle + cloud controls */}
+                {/* Right side: cloud controls */}
                 <div className="flex items-center gap-2 flex-wrap justify-end">
-                    {/* Language Toggle */}
-                    <div className="hidden lg:flex items-center gap-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-                        <button
-                            onClick={() => setLanguage("en")}
-                            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
-                                language === "en"
-                                    ? "bg-white shadow-sm text-primary"
-                                    : "text-slate-500"
-                            }`}
-                        >
-                            EN
-                        </button>
-                        <button
-                            onClick={() => setLanguage("ar")}
-                            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
-                                language === "ar"
-                                    ? "bg-white shadow-sm text-primary"
-                                    : "text-slate-500"
-                            }`}
-                        >
-                            AR
-                        </button>
-                        <button
-                            onClick={() => setLanguage("tr")}
-                            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
-                                language === "tr"
-                                    ? "bg-white shadow-sm text-primary"
-                                    : "text-slate-500"
-                            }`}
-                        >
-                            TR
-                        </button>
-                    </div>
-
                     {/* My Documents button — only visible when signed in */}
                     {user && (
                         <button

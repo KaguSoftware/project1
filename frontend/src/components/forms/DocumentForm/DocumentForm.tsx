@@ -231,9 +231,26 @@ export const DocumentForm = () => {
 			<div className={`space-y-12 ${isReadonly ? "pointer-events-none select-none opacity-75" : ""}`}>
 			{/* 1. Category Selector */}
 			<section>
-				<label className="block text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 px-1">
-					{tr("Select Document Category")}
-				</label>
+				<div className="flex items-center justify-between mb-4 px-1">
+					<label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+						{tr("Select Document Category")}
+					</label>
+					<div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
+						{(["en", "ar", "tr"] as const).map((lang) => (
+							<button
+								key={lang}
+								onClick={() => useAppStore.getState().setLanguage(lang)}
+								className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all ${
+									language === lang
+										? "bg-white shadow-sm text-primary"
+										: "text-slate-500"
+								}`}
+							>
+								{lang.toUpperCase()}
+							</button>
+						))}
+					</div>
+				</div>
 				<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
 					{categories.map((item) => (
 						<button
