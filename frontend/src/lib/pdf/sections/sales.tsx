@@ -9,7 +9,7 @@ type Lang = "en" | "ar" | "tr";
 
 // ── Status label map ──────────────────────────────────────────────────────────
 
-const STATUS_LABELS: Record<LeadStatus, string> = {
+const STATUS_LABEL_KEYS: Record<LeadStatus, string> = {
     new_lead:         "New Lead",
     meeting_arranged: "Meeting Arranged",
     proposal_sent:    "Proposal Sent",
@@ -57,7 +57,7 @@ export const WeeklySalesPDF = ({
                         {ws.salesPersonName ? (
                             <View style={{ flex: 1 }}>
                                 <Text style={{ fontSize: 7, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 2 }}>
-                                    Sales Person
+                                    {t("Sales Person", lang)}
                                 </Text>
                                 <Text style={[styles.bodyText, afB(lang)]}>{ws.salesPersonName}</Text>
                             </View>
@@ -65,7 +65,7 @@ export const WeeklySalesPDF = ({
                         {ws.department ? (
                             <View style={{ flex: 1 }}>
                                 <Text style={{ fontSize: 7, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 2 }}>
-                                    Department
+                                    {t("Department", lang)}
                                 </Text>
                                 <Text style={[styles.bodyText, afB(lang)]}>{ws.department}</Text>
                             </View>
@@ -74,7 +74,7 @@ export const WeeklySalesPDF = ({
                     {(ws.weekStart || ws.weekEnd) ? (
                         <View style={{ marginTop: 8 }}>
                             <Text style={{ fontSize: 7, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 2 }}>
-                                Period
+                                {t("Period", lang)}
                             </Text>
                             <Text style={[styles.bodyText, afB(lang)]}>
                                 {formatDate(ws.weekStart)}{ws.weekStart && ws.weekEnd ? " – " : ""}{formatDate(ws.weekEnd)}
@@ -91,7 +91,7 @@ export const WeeklySalesPDF = ({
                     const s = l.status as LeadStatus;
                     counts[s] = (counts[s] ?? 0) + 1;
                 });
-                const entries = Object.keys(STATUS_LABELS) as LeadStatus[];
+                const entries = Object.keys(STATUS_LABEL_KEYS) as LeadStatus[];
                 const rows = [entries.slice(0, 3), entries.slice(3)];
                 return (
                     <View style={{ gap: 6, marginBottom: 16 }}>
@@ -107,7 +107,7 @@ export const WeeklySalesPDF = ({
                                 <View style={{ flexDirection: "row", alignItems: "center", gap: 3, marginBottom: 4 }}>
                                     <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: STATUS_COLORS[s] }} />
                                     <Text style={{ fontSize: 6, color: STATUS_COLORS[s], fontWeight: "bold", textTransform: "uppercase" }}>
-                                        {STATUS_LABELS[s]}
+                                        {t(STATUS_LABEL_KEYS[s], lang)}
                                     </Text>
                                 </View>
                                 <Text style={{ fontSize: 18, fontWeight: "bold", color: STATUS_COLORS[s], lineHeight: 1 }}>
@@ -124,10 +124,10 @@ export const WeeklySalesPDF = ({
             {/* Leads */}
             {hasLeads && (
                 <View style={{ marginBottom: 16 }}>
-                    <Text style={[styles.sectionTitle, af(lang)]}>Leads</Text>
+                    <Text style={[styles.sectionTitle, af(lang)]}>{t("Leads", lang)}</Text>
                     {ws.leads.filter((l) => l.clientName).map((lead) => {
                         const statusColor = lead.status ? STATUS_COLORS[lead.status as LeadStatus] : "#94a3b8";
-                        const statusLabel = lead.status ? STATUS_LABELS[lead.status as LeadStatus] : "";
+                        const statusLabel = lead.status ? t(STATUS_LABEL_KEYS[lead.status as LeadStatus], lang) : "";
                         return (
                             <View
                                 key={lead.id}
@@ -185,13 +185,13 @@ export const WeeklySalesPDF = ({
                                 <View style={{ flexDirection: "row", gap: 16, marginBottom: lead.notes ? 6 : 0 }}>
                                     {lead.meetingDate ? (
                                         <Text style={[styles.tableCell, af(lang)]}>
-                                            <Text style={{ color: "#94a3b8" }}>Meeting: </Text>
+                                            <Text style={{ color: "#94a3b8" }}>{t("Meeting Date", lang)}: </Text>
                                             {formatDate(lead.meetingDate)}
                                         </Text>
                                     ) : null}
                                     {lead.dealValue ? (
                                         <Text style={[styles.tableCell, afB(lang)]}>
-                                            <Text style={{ color: "#94a3b8", fontWeight: "normal" }}>Deal: </Text>
+                                            <Text style={{ color: "#94a3b8", fontWeight: "normal" }}>{t("Deal Value", lang)}: </Text>
                                             {fixArabic(lead.dealValue, lang)}
                                         </Text>
                                     ) : null}
@@ -211,7 +211,7 @@ export const WeeklySalesPDF = ({
             {/* Week summary */}
             {ws.weekSummary ? (
                 <View style={{ marginBottom: 12 }} wrap={false}>
-                    <Text style={[styles.sectionTitle, af(lang)]}>Week Summary</Text>
+                    <Text style={[styles.sectionTitle, af(lang)]}>{t("Week Summary", lang)}</Text>
                     <Text style={[styles.bodyText, af(lang)]}>{fixArabic(ws.weekSummary, lang)}</Text>
                 </View>
             ) : null}
@@ -219,7 +219,7 @@ export const WeeklySalesPDF = ({
             {/* Challenges */}
             {ws.challenges ? (
                 <View style={{ marginBottom: 12 }} wrap={false}>
-                    <Text style={[styles.sectionTitle, af(lang)]}>Challenges / Obstacles</Text>
+                    <Text style={[styles.sectionTitle, af(lang)]}>{t("Challenges / Obstacles", lang)}</Text>
                     <Text style={[styles.bodyText, af(lang)]}>{fixArabic(ws.challenges, lang)}</Text>
                 </View>
             ) : null}
@@ -227,7 +227,7 @@ export const WeeklySalesPDF = ({
             {/* Next week goals */}
             {ws.nextWeekGoals ? (
                 <View style={{ marginBottom: 12 }} wrap={false}>
-                    <Text style={[styles.sectionTitle, af(lang)]}>Next Week&apos;s Goals</Text>
+                    <Text style={[styles.sectionTitle, af(lang)]}>{t("Next Week's Goals", lang)}</Text>
                     <Text style={[styles.bodyText, af(lang)]}>{fixArabic(ws.nextWeekGoals, lang)}</Text>
                 </View>
             ) : null}
@@ -235,7 +235,7 @@ export const WeeklySalesPDF = ({
             {/* Additional notes */}
             {ws.additionalNotes ? (
                 <View style={{ marginBottom: 12 }} wrap={false}>
-                    <Text style={[styles.sectionTitle, af(lang)]}>Additional Notes</Text>
+                    <Text style={[styles.sectionTitle, af(lang)]}>{t("Additional Notes", lang)}</Text>
                     <Text style={[styles.bodyText, af(lang)]}>{fixArabic(ws.additionalNotes, lang)}</Text>
                 </View>
             ) : null}

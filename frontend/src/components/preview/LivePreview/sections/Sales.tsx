@@ -1,7 +1,10 @@
 import type { DocumentData } from "@/src/store";
 import type { LeadStatus } from "@/src/store/types";
+import { t } from "@/src/lib/translations";
 
-const STATUS_LABELS: Record<LeadStatus, string> = {
+type Lang = "en" | "ar" | "tr";
+
+const STATUS_LABEL_KEYS: Record<LeadStatus, string> = {
 	new_lead:         "New Lead",
 	meeting_arranged: "Meeting Arranged",
 	proposal_sent:    "Proposal Sent",
@@ -26,7 +29,7 @@ function formatDate(iso: string) {
 	});
 }
 
-export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
+export const WeeklySalesPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
 	const ws = doc.weeklySales;
 	if (!ws) return null;
 
@@ -39,19 +42,19 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 				<section className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm border-b border-slate-100 pb-6">
 					{ws.salesPersonName && (
 						<div>
-							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">Sales Person</p>
+							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Sales Person", lang)}</p>
 							<p className="font-semibold text-slate-800">{ws.salesPersonName}</p>
 						</div>
 					)}
 					{ws.department && (
 						<div>
-							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">Department</p>
+							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Department", lang)}</p>
 							<p className="font-semibold text-slate-800">{ws.department}</p>
 						</div>
 					)}
 					{(ws.weekStart || ws.weekEnd) && (
 						<div className="col-span-2">
-							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">Period</p>
+							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Period", lang)}</p>
 							<p className="font-semibold text-slate-800">
 								{formatDate(ws.weekStart)}{ws.weekStart && ws.weekEnd && " – "}{formatDate(ws.weekEnd)}
 							</p>
@@ -69,7 +72,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 						acc[s] = (acc[s] ?? 0) + 1;
 						return acc;
 					}, {});
-				const entries = Object.keys(STATUS_LABELS) as LeadStatus[];
+				const entries = Object.keys(STATUS_LABEL_KEYS) as LeadStatus[];
 				return (
 					<section className="grid grid-cols-3 gap-3" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
 						{entries.map((s) => {
@@ -78,7 +81,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 								<div key={s} className={`rounded-xl p-3 flex flex-col gap-1 ${sc.bg}`}>
 									<div className="flex items-center gap-1.5">
 										<span className={`w-2 h-2 rounded-full ${sc.dot}`} />
-										<span className={`text-[9px] uppercase tracking-widest font-black ${sc.text}`}>{STATUS_LABELS[s]}</span>
+										<span className={`text-[9px] uppercase tracking-widest font-black ${sc.text}`}>{t(STATUS_LABEL_KEYS[s], lang)}</span>
 									</div>
 									<p className={`text-2xl font-black leading-none ${sc.text}`}>{counts[s] ?? 0}</p>
 								</div>
@@ -91,7 +94,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 			{/* Leads */}
 			{hasLeads && (
 				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">Leads</h3>
+					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">{t("Leads", lang)}</h3>
 					<div className="space-y-4">
 						{ws.leads.filter((l) => l.clientName).map((lead) => {
 							const sc = lead.status ? STATUS_COLORS[lead.status as LeadStatus] : null;
@@ -108,7 +111,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 										{sc && lead.status && (
 											<span className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${sc.bg} ${sc.text}`}>
 												<span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-												{STATUS_LABELS[lead.status as LeadStatus]}
+												{t(STATUS_LABEL_KEYS[lead.status as LeadStatus], lang)}
 											</span>
 										)}
 									</div>
@@ -118,7 +121,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 										{lead.email && <span>{lead.email}</span>}
 										{lead.phone && <span>{lead.phone}</span>}
 										{lead.leadSource && (
-											<span className="capitalize">{lead.leadSource.replace(/_/g, " ")}</span>
+											<span className="capitalize">{t(lead.leadSource.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), lang)}</span>
 										)}
 									</div>
 
@@ -126,13 +129,13 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 									<div className="flex flex-wrap gap-4 text-xs">
 										{lead.meetingDate && (
 											<div>
-												<span className="text-slate-400">Meeting: </span>
+												<span className="text-slate-400">{t("Meeting Date", lang)}: </span>
 												<span className="font-medium text-slate-700">{formatDate(lead.meetingDate)}</span>
 											</div>
 										)}
 										{lead.dealValue && (
 											<div>
-												<span className="text-slate-400">Deal: </span>
+												<span className="text-slate-400">{t("Deal Value", lang)}: </span>
 												<span className="font-bold text-slate-800">{lead.dealValue}</span>
 											</div>
 										)}
@@ -151,7 +154,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 			{/* Week summary */}
 			{ws.weekSummary && (
 				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">Week Summary</h3>
+					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Week Summary", lang)}</h3>
 					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.weekSummary}</p>
 				</section>
 			)}
@@ -159,7 +162,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 			{/* Challenges */}
 			{ws.challenges && (
 				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">Challenges / Obstacles</h3>
+					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Challenges / Obstacles", lang)}</h3>
 					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.challenges}</p>
 				</section>
 			)}
@@ -167,7 +170,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 			{/* Next week goals */}
 			{ws.nextWeekGoals && (
 				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">Next Week's Goals</h3>
+					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Next Week's Goals", lang)}</h3>
 					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.nextWeekGoals}</p>
 				</section>
 			)}
@@ -175,7 +178,7 @@ export const WeeklySalesPreview = ({ doc }: { doc: DocumentData }) => {
 			{/* Additional notes */}
 			{ws.additionalNotes && (
 				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">Additional Notes</h3>
+					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Additional Notes", lang)}</h3>
 					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.additionalNotes}</p>
 				</section>
 			)}

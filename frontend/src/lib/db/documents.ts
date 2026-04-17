@@ -277,6 +277,21 @@ export async function getMyProfile(): Promise<ProfileRow | null> {
   return data as ProfileRow
 }
 
+// ── User picker ───────────────────────────────────────────────────────────────
+
+/**
+ * List all other users for the share picker.
+ * Uses the `list_shareable_users` SECURITY DEFINER RPC so RLS is bypassed.
+ * Returns id, email, display_name for every user except the caller.
+ */
+export async function listShareableUsers(): Promise<{ id: string; email: string; display_name: string | null }[]> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.rpc('list_shareable_users')
+  if (error) throw error
+  return (data ?? []) as { id: string; email: string; display_name: string | null }[]
+}
+
 // ── Admin helpers ─────────────────────────────────────────────────────────────
 
 /**

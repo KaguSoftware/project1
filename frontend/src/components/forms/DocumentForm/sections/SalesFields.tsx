@@ -6,27 +6,28 @@ import { SectionHeader } from "../ui/SectionHeader";
 import { BarChart3Icon } from "lucide-react";
 import { generateId } from "@/src/store/initialState";
 import type { LeadRow, LeadSource, LeadStatus } from "@/src/store/types";
+import { t } from "@/src/lib/translations";
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
-const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
-	{ value: "new_lead",          label: "New Lead",          color: "#6366f1" },
-	{ value: "meeting_arranged",  label: "Meeting Arranged",  color: "#f59e0b" },
-	{ value: "proposal_sent",     label: "Proposal Sent",     color: "#3b82f6" },
-	{ value: "closed_won",        label: "Closed Won",        color: "#22c55e" },
-	{ value: "closed_lost",       label: "Closed Lost",       color: "#ef4444" },
-	{ value: "follow_up_needed",  label: "Follow-up Needed",  color: "#8b5cf6" },
+const STATUS_OPTIONS: { value: LeadStatus; labelKey: string; color: string }[] = [
+	{ value: "new_lead",          labelKey: "New Lead",          color: "#6366f1" },
+	{ value: "meeting_arranged",  labelKey: "Meeting Arranged",  color: "#f59e0b" },
+	{ value: "proposal_sent",     labelKey: "Proposal Sent",     color: "#3b82f6" },
+	{ value: "closed_won",        labelKey: "Closed Won",        color: "#22c55e" },
+	{ value: "closed_lost",       labelKey: "Closed Lost",       color: "#ef4444" },
+	{ value: "follow_up_needed",  labelKey: "Follow-up Needed",  color: "#8b5cf6" },
 ];
 
-const SOURCE_OPTIONS: { value: LeadSource; label: string }[] = [
-	{ value: "referral",   label: "Referral"   },
-	{ value: "instagram",  label: "Instagram"  },
-	{ value: "facebook",   label: "Facebook"   },
-	{ value: "linkedin",   label: "LinkedIn"   },
-	{ value: "website",    label: "Website"    },
-	{ value: "cold_call",  label: "Cold Call"  },
-	{ value: "email",      label: "Email"      },
-	{ value: "other",      label: "Other"      },
+const SOURCE_OPTIONS: { value: LeadSource; labelKey: string }[] = [
+	{ value: "referral",   labelKey: "Referral"   },
+	{ value: "instagram",  labelKey: "Instagram"  },
+	{ value: "facebook",   labelKey: "Facebook"   },
+	{ value: "linkedin",   labelKey: "LinkedIn"   },
+	{ value: "website",    labelKey: "Website"    },
+	{ value: "cold_call",  labelKey: "Cold Call"  },
+	{ value: "email",      labelKey: "Email"      },
+	{ value: "other",      labelKey: "Other"      },
 ];
 
 function statusColor(value: string) {
@@ -46,7 +47,7 @@ function Label({ children }: { children: React.ReactNode }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export const SalesFields = () => {
-	const { document, updateDocument } = useAppStore();
+	const { document, updateDocument, language } = useAppStore();
 	const ws = document.weeklySales;
 
 	function updateWS(patch: Partial<typeof ws>) {
@@ -83,10 +84,10 @@ export const SalesFields = () => {
 		<div className="space-y-10">
 			{/* ── Header info ──────────────────────────────────────────── */}
 			<section>
-				<SectionHeader title="Weekly Sales Report" icon={BarChart3Icon} />
+				<SectionHeader title={t("Weekly Sales Report", language)} icon={BarChart3Icon} />
 				<div className="grid grid-cols-2 gap-4 mt-4">
 					<div>
-						<Label>Sales Person Name</Label>
+						<Label>{t("Sales Person Name", language)}</Label>
 						<input
 							className={inputClass}
 							value={ws.salesPersonName}
@@ -95,7 +96,7 @@ export const SalesFields = () => {
 						/>
 					</div>
 					<div>
-						<Label>Department / Team</Label>
+						<Label>{t("Department / Team", language)}</Label>
 						<input
 							className={inputClass}
 							value={ws.department}
@@ -104,7 +105,7 @@ export const SalesFields = () => {
 						/>
 					</div>
 					<div>
-						<Label>Week Start</Label>
+						<Label>{t("Week Start", language)}</Label>
 						<input
 							type="date"
 							className={inputClass}
@@ -113,7 +114,7 @@ export const SalesFields = () => {
 						/>
 					</div>
 					<div>
-						<Label>Week End</Label>
+						<Label>{t("Week End", language)}</Label>
 						<input
 							type="date"
 							className={inputClass}
@@ -128,14 +129,14 @@ export const SalesFields = () => {
 			<section className="space-y-4">
 				<div className="flex items-center justify-between">
 					<p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-						Leads
+						{t("Leads", language)}
 					</p>
 					<button
 						onClick={addLead}
 						className="flex items-center gap-1 text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
 					>
 						<PlusIcon size={13} />
-						Add Lead
+						{t("Add Lead", language)}
 					</button>
 				</div>
 
@@ -144,6 +145,7 @@ export const SalesFields = () => {
 						key={lead.id}
 						lead={lead}
 						index={idx}
+						lang={language}
 						onChange={(patch) => updateLead(lead.id, patch)}
 						onRemove={() => removeLead(lead.id)}
 						canRemove={ws.leads.length > 1}
@@ -153,7 +155,7 @@ export const SalesFields = () => {
 
 			{/* ── Week summary ─────────────────────────────────────────── */}
 			<section>
-				<Label>Week Summary</Label>
+				<Label>{t("Week Summary", language)}</Label>
 				<textarea
 					className={`${inputClass} h-24`}
 					value={ws.weekSummary}
@@ -164,7 +166,7 @@ export const SalesFields = () => {
 
 			{/* ── Challenges ───────────────────────────────────────────── */}
 			<section>
-				<Label>Challenges / Obstacles</Label>
+				<Label>{t("Challenges / Obstacles", language)}</Label>
 				<textarea
 					className={`${inputClass} h-20`}
 					value={ws.challenges}
@@ -175,7 +177,7 @@ export const SalesFields = () => {
 
 			{/* ── Next week goals ───────────────────────────────────────── */}
 			<section>
-				<Label>Next Week's Goals</Label>
+				<Label>{t("Next Week's Goals", language)}</Label>
 				<textarea
 					className={`${inputClass} h-20`}
 					value={ws.nextWeekGoals}
@@ -186,7 +188,7 @@ export const SalesFields = () => {
 
 			{/* ── Additional notes ─────────────────────────────────────── */}
 			<section>
-				<Label>Additional Notes</Label>
+				<Label>{t("Additional Notes", language)}</Label>
 				<textarea
 					className={`${inputClass} h-20`}
 					value={ws.additionalNotes}
@@ -203,19 +205,20 @@ export const SalesFields = () => {
 interface LeadCardProps {
 	lead: LeadRow;
 	index: number;
+	lang: "en" | "ar" | "tr";
 	onChange: (patch: Partial<LeadRow>) => void;
 	onRemove: () => void;
 	canRemove: boolean;
 }
 
-function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps) {
+function LeadCard({ lead, index, lang, onChange, onRemove, canRemove }: LeadCardProps) {
 	return (
 		<div className="border border-slate-200 rounded-xl p-4 space-y-4 bg-slate-50/50">
 			{/* Card header */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-						Lead {index + 1}
+						{t("Lead", lang)} {index + 1}
 					</span>
 					{lead.status && (
 						<span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
@@ -228,7 +231,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 								className="w-1.5 h-1.5 rounded-full inline-block"
 								style={{ backgroundColor: statusColor(lead.status) }}
 							/>
-							{STATUS_OPTIONS.find((s) => s.value === lead.status)?.label}
+							{t(STATUS_OPTIONS.find((s) => s.value === lead.status)?.labelKey ?? "", lang)}
 						</span>
 					)}
 				</div>
@@ -246,7 +249,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 			{/* Row 1: client + contact */}
 			<div className="grid grid-cols-2 gap-3">
 				<div>
-					<Label>Client Name</Label>
+					<Label>{t("Client Name", lang)}</Label>
 					<input
 						className={inputClass}
 						value={lead.clientName}
@@ -255,7 +258,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 					/>
 				</div>
 				<div>
-					<Label>Contact Person</Label>
+					<Label>{t("Contact Person", lang)}</Label>
 					<input
 						className={inputClass}
 						value={lead.contactPerson}
@@ -268,7 +271,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 			{/* Row 2: email + phone */}
 			<div className="grid grid-cols-2 gap-3">
 				<div>
-					<Label>Email</Label>
+					<Label>{t("Email", lang)}</Label>
 					<input
 						type="email"
 						className={inputClass}
@@ -278,7 +281,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 					/>
 				</div>
 				<div>
-					<Label>Phone</Label>
+					<Label>{t("Phone", lang)}</Label>
 					<input
 						type="tel"
 						className={inputClass}
@@ -292,23 +295,23 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 			{/* Row 3: source + status */}
 			<div className="grid grid-cols-2 gap-3">
 				<div>
-					<Label>Lead Source</Label>
+					<Label>{t("Lead Source", lang)}</Label>
 					<div className="relative">
 						<select
 							className={`${inputClass} appearance-none pr-7`}
 							value={lead.leadSource}
 							onChange={(e) => onChange({ leadSource: e.target.value as LeadSource })}
 						>
-							<option value="">Select source…</option>
+							<option value="">{t("Select source…", lang)}</option>
 							{SOURCE_OPTIONS.map((o) => (
-								<option key={o.value} value={o.value}>{o.label}</option>
+								<option key={o.value} value={o.value}>{t(o.labelKey, lang)}</option>
 							))}
 						</select>
 						<ChevronDownIcon size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
 					</div>
 				</div>
 				<div>
-					<Label>Status</Label>
+					<Label>{t("Status", lang)}</Label>
 					<div className="relative">
 						<select
 							className={`${inputClass} appearance-none pr-7`}
@@ -316,10 +319,10 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 							onChange={(e) => onChange({ status: e.target.value as LeadStatus })}
 							style={{ color: lead.status ? statusColor(lead.status) : undefined }}
 						>
-							<option value="">Select status…</option>
+							<option value="">{t("Select status…", lang)}</option>
 							{STATUS_OPTIONS.map((o) => (
 								<option key={o.value} value={o.value} style={{ color: o.color }}>
-									{o.label}
+									{t(o.labelKey, lang)}
 								</option>
 							))}
 						</select>
@@ -331,7 +334,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 			{/* Row 4: meeting date + deal value */}
 			<div className="grid grid-cols-2 gap-3">
 				<div>
-					<Label>Meeting Date</Label>
+					<Label>{t("Meeting Date", lang)}</Label>
 					<input
 						type="date"
 						className={inputClass}
@@ -340,7 +343,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 					/>
 				</div>
 				<div>
-					<Label>Deal Value</Label>
+					<Label>{t("Deal Value", lang)}</Label>
 					<input
 						className={inputClass}
 						value={lead.dealValue}
@@ -352,7 +355,7 @@ function LeadCard({ lead, index, onChange, onRemove, canRemove }: LeadCardProps)
 
 			{/* Notes */}
 			<div>
-				<Label>Notes</Label>
+				<Label>{t("Notes", lang)}</Label>
 				<textarea
 					className={`${inputClass} h-16`}
 					value={lead.notes}

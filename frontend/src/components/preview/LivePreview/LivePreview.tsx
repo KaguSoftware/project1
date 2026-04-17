@@ -123,7 +123,7 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		push("topPosts", t("Top Posts", language), <TopPostsPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "weekly_sales_report") {
-		push("weeklySales", "Weekly Sales Report", <WeeklySalesPreview doc={doc} />);
+		push("weeklySales", t("Weekly Sales Report", language), <WeeklySalesPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "influencer_campaign") {
 		if (doc.campaignOverview) push("campaignOverview", t("Campaign Overview", language),
