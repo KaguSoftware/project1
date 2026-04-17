@@ -123,13 +123,21 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		push("topPosts", t("Top Posts", language), <TopPostsPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "weekly_sales_report") {
-		push("wsHeader",       t("Report Header", language),         <WSHeaderPreview doc={doc} lang={language} />);
-		push("wsStatusGrid",   t("Status Overview", language),       <WSStatusGridPreview doc={doc} lang={language} />);
-		push("wsLeads",        t("Leads", language),                  <WSLeadsPreview doc={doc} lang={language} />);
-		push("wsWeekSummary",  t("Week Summary", language),           <WSWeekSummaryPreview doc={doc} lang={language} />);
-		push("wsChallenges",   t("Challenges / Obstacles", language), <WSChallengesPreview doc={doc} lang={language} />);
-		push("wsNextWeek",     t("Next Week's Goals", language),      <WSNextWeekGoalsPreview doc={doc} lang={language} />);
-		push("wsNotes",        t("Additional Notes", language),       <WSAdditionalNotesPreview doc={doc} lang={language} />);
+		const ws = doc.weeklySales;
+		if (ws && (ws.salesPersonName || ws.department || ws.weekStart || ws.weekEnd))
+			push("wsHeader",      t("Report Header", language),         <WSHeaderPreview doc={doc} lang={language} />);
+		if (ws)
+			push("wsStatusGrid",  t("Status Overview", language),       <WSStatusGridPreview doc={doc} lang={language} />);
+		if (ws && ws.leads.some((l) => l.clientName))
+			push("wsLeads",       t("Leads", language),                  <WSLeadsPreview doc={doc} lang={language} />);
+		if (ws?.weekSummary)
+			push("wsWeekSummary", t("Week Summary", language),           <WSWeekSummaryPreview doc={doc} lang={language} />);
+		if (ws?.challenges)
+			push("wsChallenges",  t("Challenges / Obstacles", language), <WSChallengesPreview doc={doc} lang={language} />);
+		if (ws?.nextWeekGoals)
+			push("wsNextWeek",    t("Next Week's Goals", language),      <WSNextWeekGoalsPreview doc={doc} lang={language} />);
+		if (ws?.additionalNotes)
+			push("wsNotes",       t("Additional Notes", language),       <WSAdditionalNotesPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "influencer_campaign") {
 		if (doc.campaignOverview) push("campaignOverview", t("Campaign Overview", language),
