@@ -167,6 +167,8 @@ const ar: Record<string, string> = {
 
     // Weekly sales report
     "Weekly Sales Report": "تقرير المبيعات الأسبوعي",
+    "Report Header": "رأس التقرير",
+    "Status Overview": "نظرة عامة على الحالات",
     "Sales Person": "مندوب المبيعات",
     "Sales Person Name": "اسم مندوب المبيعات",
     Department: "القسم",
@@ -385,6 +387,8 @@ const tr: Record<string, string> = {
 
     // Weekly sales report
     "Weekly Sales Report": "Haftalık Satış Raporu",
+    "Report Header": "Rapor Başlığı",
+    "Status Overview": "Durum Özeti",
     "Sales Person": "Satış Temsilcisi",
     "Sales Person Name": "Satış Temsilcisi Adı",
     Department: "Departman",

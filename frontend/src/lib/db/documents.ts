@@ -104,13 +104,58 @@ export async function loadDocument(id: string): Promise<SavedDocument> {
 export async function listMyDocuments(): Promise<SavedDocumentMeta[]> {
   const supabase = createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
   const { data, error } = await supabase
     .from('documents')
     .select('id, owner_id, title, doc_type, created_at, updated_at')
+    .eq('owner_id', user.id)
     .order('updated_at', { ascending: false })
 
   if (error) throw error
   return (data ?? []) as SavedDocumentMeta[]
+}
+
+/**
+ * Fetch shares for multiple documents at once, enriched with display names.
+ * Returns a map of document_id → DocumentShare[].
+ */
+export async function listSharesForDocuments(
+  documentIds: string[]
+): Promise<Map<string, DocumentShare[]>> {
+  if (documentIds.length === 0) return new Map()
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('document_access')
+    .select('*')
+    .in('document_id', documentIds)
+
+  if (error) throw error
+  const rows = (data ?? []) as DocumentShare[]
+  if (rows.length === 0) return new Map()
+
+  // Enrich with display names
+  const userIds = [...new Set(rows.map((r) => r.user_id))]
+  const { data: profiles } = await supabase.rpc('get_profiles_for_users', { user_ids: userIds })
+  type ProfileRow = { id: string; email: string; display_name: string | null }
+  const profileMap = new Map<string, ProfileRow>(
+    ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
+  )
+
+  const enriched = rows.map((share) => {
+    const p = profileMap.get(share.user_id)
+    return { ...share, display_name: p?.display_name ?? p?.email ?? share.user_id }
+  })
+
+  const result = new Map<string, DocumentShare[]>()
+  enriched.forEach((share) => {
+    const list = result.get(share.document_id) ?? []
+    list.push(share)
+    result.set(share.document_id, list)
+  })
+  return result
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
@@ -356,6 +401,9 @@ export async function adminListDocuments(): Promise<DocumentWithOwner[]> {
 export async function listSharedWithMe(): Promise<SavedDocumentMeta[]> {
   const supabase = createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
   // Fetch access grants for the current user
   const { data: accessRows, error: accessError } = await supabase
     .from('document_access')
@@ -378,8 +426,10 @@ export async function listSharedWithMe(): Promise<SavedDocumentMeta[]> {
   if (docsError) throw docsError
 
   const roleByDocId = new Map(rows.map((r) => [r.document_id, r.role]))
-  return ((docs ?? []) as SavedDocumentMeta[]).map((doc) => ({
-    ...doc,
-    shared_role: roleByDocId.get(doc.id),
-  }))
+  return ((docs ?? []) as SavedDocumentMeta[])
+    .filter((doc) => doc.owner_id !== user.id)  // exclude docs the user owns
+    .map((doc) => ({
+      ...doc,
+      shared_role: roleByDocId.get(doc.id),
+    }))
 }

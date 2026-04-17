@@ -18,8 +18,9 @@ import {
   loadDocument,
   deleteDocument,
   getMyRole,
+  listSharesForDocuments,
 } from "@/src/lib/db/documents";
-import type { SavedDocumentMeta } from "@/src/lib/db/types";
+import type { SavedDocumentMeta, DocumentShare } from "@/src/lib/db/types";
 import type { DocumentData } from "@/src/store/types";
 
 interface MyDocumentsPanelProps {
@@ -38,6 +39,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
   const currentDocumentId = useAppStore((s) => s.currentDocumentId);
 
   const [sharedDocs, setSharedDocs] = useState<SavedDocumentMeta[]>([]);
+  const [docShares, setDocShares] = useState<Map<string, DocumentShare[]>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -53,6 +55,10 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
       ]);
       setSavedDocuments(mine);
       setSharedDocs(shared);
+      if (mine.length > 0) {
+        const shares = await listSharesForDocuments(mine.map((d) => d.id));
+        setDocShares(shares);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load documents");
     } finally {
@@ -175,6 +181,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
                         onDelete={(e) => handleDelete(doc.id, e)}
                         showDelete
                         formatDate={formatDate}
+                        shares={docShares.get(doc.id) ?? []}
                       />
                     ))}
                   </ul>
@@ -225,12 +232,32 @@ interface DocRowProps {
   showDelete: boolean;
   formatDate: (iso: string) => string;
   sharedRole?: "editor" | "viewer";
+  shares?: DocumentShare[];
+}
+
+const AVATAR_COLORS = [
+  "bg-indigo-100 text-indigo-600",
+  "bg-emerald-100 text-emerald-600",
+  "bg-amber-100 text-amber-600",
+  "bg-rose-100 text-rose-600",
+  "bg-violet-100 text-violet-600",
+  "bg-sky-100 text-sky-600",
+];
+
+function avatarColor(str: string) {
+  let n = 0;
+  for (let i = 0; i < str.length; i++) n += str.charCodeAt(i);
+  return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
 function DocRow({
   doc, isCurrent, isLoading, isDeleting,
-  onLoad, onDelete, showDelete, formatDate, sharedRole,
+  onLoad, onDelete, showDelete, formatDate, sharedRole, shares = [],
 }: DocRowProps) {
+  const MAX_VISIBLE = 3;
+  const visible = shares.slice(0, MAX_VISIBLE);
+  const overflow = shares.length - MAX_VISIBLE;
+
   return (
     <li
       onClick={onLoad}
@@ -257,6 +284,33 @@ function DocRow({
             </span>
           )}
         </div>
+
+        {/* Shared-with avatars */}
+        {shares.length > 0 && (
+          <div className="flex items-center mt-1.5" title={shares.map((s) => s.display_name ?? s.user_id).join(", ")}>
+            <div className="flex -space-x-1.5">
+              {visible.map((share) => {
+                const label = share.display_name ?? share.user_id;
+                const initial = label[0].toUpperCase();
+                return (
+                  <span
+                    key={share.id}
+                    className={`w-4.5 h-4.5 rounded-full text-[8px] font-black flex items-center justify-center ring-1 ring-white ${avatarColor(share.user_id)}`}
+                    title={label}
+                  >
+                    {initial}
+                  </span>
+                );
+              })}
+              {overflow > 0 && (
+                <span className="w-4.5 h-4.5 rounded-full text-[8px] font-black flex items-center justify-center ring-1 ring-white bg-slate-100 text-slate-500">
+                  +{overflow}
+                </span>
+              )}
+            </div>
+            <span className="text-[9px] text-slate-400 ml-1.5">shared</span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-1 shrink-0">

@@ -29,159 +29,177 @@ function formatDate(iso: string) {
 	});
 }
 
-export const WeeklySalesPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+// ── Individual orderable sections ────────────────────────────────────────────
+
+export const WSHeaderPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+	const ws = doc.weeklySales;
+	if (!ws || (!ws.salesPersonName && !ws.department && !ws.weekStart && !ws.weekEnd)) return null;
+	return (
+		<section className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm border-b border-slate-100 pb-6">
+			{ws.salesPersonName && (
+				<div>
+					<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Sales Person", lang)}</p>
+					<p className="font-semibold text-slate-800">{ws.salesPersonName}</p>
+				</div>
+			)}
+			{ws.department && (
+				<div>
+					<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Department", lang)}</p>
+					<p className="font-semibold text-slate-800">{ws.department}</p>
+				</div>
+			)}
+			{(ws.weekStart || ws.weekEnd) && (
+				<div className="col-span-2">
+					<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Period", lang)}</p>
+					<p className="font-semibold text-slate-800">
+						{formatDate(ws.weekStart)}{ws.weekStart && ws.weekEnd && " – "}{formatDate(ws.weekEnd)}
+					</p>
+				</div>
+			)}
+		</section>
+	);
+};
+
+export const WSStatusGridPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
 	const ws = doc.weeklySales;
 	if (!ws) return null;
+	const counts = ws.leads
+		.filter((l) => l.clientName && l.status)
+		.reduce<Partial<Record<LeadStatus, number>>>((acc, l) => {
+			const s = l.status as LeadStatus;
+			acc[s] = (acc[s] ?? 0) + 1;
+			return acc;
+		}, {});
+	const entries = Object.keys(STATUS_LABEL_KEYS) as LeadStatus[];
+	return (
+		<section className="grid grid-cols-3 gap-3" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+			{entries.map((s) => {
+				const sc = STATUS_COLORS[s];
+				return (
+					<div key={s} className={`rounded-xl p-3 flex flex-col gap-1 ${sc.bg}`}>
+						<div className="flex items-center gap-1.5">
+							<span className={`w-2 h-2 rounded-full ${sc.dot}`} />
+							<span className={`text-[9px] uppercase tracking-widest font-black ${sc.text}`}>{t(STATUS_LABEL_KEYS[s], lang)}</span>
+						</div>
+						<p className={`text-2xl font-black leading-none ${sc.text}`}>{counts[s] ?? 0}</p>
+					</div>
+				);
+			})}
+		</section>
+	);
+};
 
-	const hasLeads = ws.leads.some((l) => l.clientName);
+export const WSLeadsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+	const ws = doc.weeklySales;
+	if (!ws) return null;
+	const leads = ws.leads.filter((l) => l.clientName);
+	if (leads.length === 0) return null;
+	return (
+		<section>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">{t("Leads", lang)}</h3>
+			<div className="space-y-4">
+				{leads.map((lead) => {
+					const sc = lead.status ? STATUS_COLORS[lead.status as LeadStatus] : null;
+					return (
+						<div key={lead.id} className="border border-slate-100 rounded-xl p-4 space-y-3">
+							<div className="flex items-start justify-between gap-2">
+								<div>
+									<p className="font-bold text-slate-800 text-sm">{lead.clientName}</p>
+									{lead.contactPerson && <p className="text-xs text-slate-500">{lead.contactPerson}</p>}
+								</div>
+								{sc && lead.status && (
+									<span className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${sc.bg} ${sc.text}`}>
+										<span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+										{t(STATUS_LABEL_KEYS[lead.status as LeadStatus], lang)}
+									</span>
+								)}
+							</div>
+							<div className="flex flex-wrap gap-4 text-xs text-slate-500">
+								{lead.email && <span>{lead.email}</span>}
+								{lead.phone && <span>{lead.phone}</span>}
+								{lead.leadSource && (
+									<span className="capitalize">{t(lead.leadSource.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), lang)}</span>
+								)}
+							</div>
+							<div className="flex flex-wrap gap-4 text-xs">
+								{lead.meetingDate && (
+									<div>
+										<span className="text-slate-400">{t("Meeting Date", lang)}: </span>
+										<span className="font-medium text-slate-700">{formatDate(lead.meetingDate)}</span>
+									</div>
+								)}
+								{lead.dealValue && (
+									<div>
+										<span className="text-slate-400">{t("Deal Value", lang)}: </span>
+										<span className="font-bold text-slate-800">{lead.dealValue}</span>
+									</div>
+								)}
+							</div>
+							{lead.notes && <p className="text-xs text-slate-500 italic border-t border-slate-50 pt-2">{lead.notes}</p>}
+						</div>
+					);
+				})}
+			</div>
+		</section>
+	);
+};
 
+export const WSWeekSummaryPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+	const ws = doc.weeklySales;
+	if (!ws?.weekSummary) return null;
+	return (
+		<section>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Week Summary", lang)}</h3>
+			<p className="text-sm text-slate-700 whitespace-pre-line">{ws.weekSummary}</p>
+		</section>
+	);
+};
+
+export const WSChallengesPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+	const ws = doc.weeklySales;
+	if (!ws?.challenges) return null;
+	return (
+		<section>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Challenges / Obstacles", lang)}</h3>
+			<p className="text-sm text-slate-700 whitespace-pre-line">{ws.challenges}</p>
+		</section>
+	);
+};
+
+export const WSNextWeekGoalsPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+	const ws = doc.weeklySales;
+	if (!ws?.nextWeekGoals) return null;
+	return (
+		<section>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Next Week's Goals", lang)}</h3>
+			<p className="text-sm text-slate-700 whitespace-pre-line">{ws.nextWeekGoals}</p>
+		</section>
+	);
+};
+
+export const WSAdditionalNotesPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
+	const ws = doc.weeklySales;
+	if (!ws?.additionalNotes) return null;
+	return (
+		<section>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Additional Notes", lang)}</h3>
+			<p className="text-sm text-slate-700 whitespace-pre-line">{ws.additionalNotes}</p>
+		</section>
+	);
+};
+
+// ── Legacy combined export (kept for compatibility) ───────────────────────────
+
+export const WeeklySalesPreview = ({ doc, lang = "en" }: { doc: DocumentData; lang?: Lang }) => {
 	return (
 		<div className="space-y-8">
-			{/* Header block */}
-			{(ws.salesPersonName || ws.department || ws.weekStart) && (
-				<section className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm border-b border-slate-100 pb-6">
-					{ws.salesPersonName && (
-						<div>
-							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Sales Person", lang)}</p>
-							<p className="font-semibold text-slate-800">{ws.salesPersonName}</p>
-						</div>
-					)}
-					{ws.department && (
-						<div>
-							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Department", lang)}</p>
-							<p className="font-semibold text-slate-800">{ws.department}</p>
-						</div>
-					)}
-					{(ws.weekStart || ws.weekEnd) && (
-						<div className="col-span-2">
-							<p className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-0.5">{t("Period", lang)}</p>
-							<p className="font-semibold text-slate-800">
-								{formatDate(ws.weekStart)}{ws.weekStart && ws.weekEnd && " – "}{formatDate(ws.weekEnd)}
-							</p>
-						</div>
-					)}
-				</section>
-			)}
-
-			{/* Status summary grid */}
-			{hasLeads && (() => {
-				const counts = ws.leads
-					.filter((l) => l.clientName && l.status)
-					.reduce<Partial<Record<LeadStatus, number>>>((acc, l) => {
-						const s = l.status as LeadStatus;
-						acc[s] = (acc[s] ?? 0) + 1;
-						return acc;
-					}, {});
-				const entries = Object.keys(STATUS_LABEL_KEYS) as LeadStatus[];
-				return (
-					<section className="grid grid-cols-3 gap-3" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-						{entries.map((s) => {
-							const sc = STATUS_COLORS[s];
-							return (
-								<div key={s} className={`rounded-xl p-3 flex flex-col gap-1 ${sc.bg}`}>
-									<div className="flex items-center gap-1.5">
-										<span className={`w-2 h-2 rounded-full ${sc.dot}`} />
-										<span className={`text-[9px] uppercase tracking-widest font-black ${sc.text}`}>{t(STATUS_LABEL_KEYS[s], lang)}</span>
-									</div>
-									<p className={`text-2xl font-black leading-none ${sc.text}`}>{counts[s] ?? 0}</p>
-								</div>
-							);
-						})}
-					</section>
-				);
-			})()}
-
-			{/* Leads */}
-			{hasLeads && (
-				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">{t("Leads", lang)}</h3>
-					<div className="space-y-4">
-						{ws.leads.filter((l) => l.clientName).map((lead) => {
-							const sc = lead.status ? STATUS_COLORS[lead.status as LeadStatus] : null;
-							return (
-								<div key={lead.id} className="border border-slate-100 rounded-xl p-4 space-y-3">
-									{/* Lead header */}
-									<div className="flex items-start justify-between gap-2">
-										<div>
-											<p className="font-bold text-slate-800 text-sm">{lead.clientName}</p>
-											{lead.contactPerson && (
-												<p className="text-xs text-slate-500">{lead.contactPerson}</p>
-											)}
-										</div>
-										{sc && lead.status && (
-											<span className={`flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${sc.bg} ${sc.text}`}>
-												<span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-												{t(STATUS_LABEL_KEYS[lead.status as LeadStatus], lang)}
-											</span>
-										)}
-									</div>
-
-									{/* Contact info */}
-									<div className="flex flex-wrap gap-4 text-xs text-slate-500">
-										{lead.email && <span>{lead.email}</span>}
-										{lead.phone && <span>{lead.phone}</span>}
-										{lead.leadSource && (
-											<span className="capitalize">{t(lead.leadSource.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), lang)}</span>
-										)}
-									</div>
-
-									{/* Meta row */}
-									<div className="flex flex-wrap gap-4 text-xs">
-										{lead.meetingDate && (
-											<div>
-												<span className="text-slate-400">{t("Meeting Date", lang)}: </span>
-												<span className="font-medium text-slate-700">{formatDate(lead.meetingDate)}</span>
-											</div>
-										)}
-										{lead.dealValue && (
-											<div>
-												<span className="text-slate-400">{t("Deal Value", lang)}: </span>
-												<span className="font-bold text-slate-800">{lead.dealValue}</span>
-											</div>
-										)}
-									</div>
-
-									{lead.notes && (
-										<p className="text-xs text-slate-500 italic border-t border-slate-50 pt-2">{lead.notes}</p>
-									)}
-								</div>
-							);
-						})}
-					</div>
-				</section>
-			)}
-
-			{/* Week summary */}
-			{ws.weekSummary && (
-				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Week Summary", lang)}</h3>
-					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.weekSummary}</p>
-				</section>
-			)}
-
-			{/* Challenges */}
-			{ws.challenges && (
-				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Challenges / Obstacles", lang)}</h3>
-					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.challenges}</p>
-				</section>
-			)}
-
-			{/* Next week goals */}
-			{ws.nextWeekGoals && (
-				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Next Week's Goals", lang)}</h3>
-					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.nextWeekGoals}</p>
-				</section>
-			)}
-
-			{/* Additional notes */}
-			{ws.additionalNotes && (
-				<section>
-					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-2 font-black">{t("Additional Notes", lang)}</h3>
-					<p className="text-sm text-slate-700 whitespace-pre-line">{ws.additionalNotes}</p>
-				</section>
-			)}
+			<WSHeaderPreview doc={doc} lang={lang} />
+			<WSStatusGridPreview doc={doc} lang={lang} />
+			<WSLeadsPreview doc={doc} lang={lang} />
+			<WSWeekSummaryPreview doc={doc} lang={lang} />
+			<WSChallengesPreview doc={doc} lang={lang} />
+			<WSNextWeekGoalsPreview doc={doc} lang={lang} />
+			<WSAdditionalNotesPreview doc={doc} lang={lang} />
 		</div>
 	);
 };

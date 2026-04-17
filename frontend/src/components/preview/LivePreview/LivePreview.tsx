@@ -17,7 +17,7 @@ import { TextSectionPreview, ScopeOfWorkPreview, TermsPreview, DeliverablesPrevi
 import { EngagementOverviewPreview } from "./sections/ProposalContract";
 import { InvoicePreview } from "./sections/Invoice";
 import { PerformanceMetricsPreview, TopPostsPreview } from "./sections/SocialMedia";
-import { SalesMetricsPreview, DealBreakdownPreview, WeeklySalesPreview } from "./sections/Sales";
+import { SalesMetricsPreview, DealBreakdownPreview, WeeklySalesPreview, WSHeaderPreview, WSStatusGridPreview, WSLeadsPreview, WSWeekSummaryPreview, WSChallengesPreview, WSNextWeekGoalsPreview, WSAdditionalNotesPreview } from "./sections/Sales";
 import { KPIGridPreview, InfluencerRosterPreview } from "./sections/Influencer";
 import { AddSectionBar } from "./AddSectionBar";
 
@@ -123,7 +123,13 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		push("topPosts", t("Top Posts", language), <TopPostsPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "weekly_sales_report") {
-		push("weeklySales", t("Weekly Sales Report", language), <WeeklySalesPreview doc={doc} lang={language} />);
+		push("wsHeader",       t("Report Header", language),         <WSHeaderPreview doc={doc} lang={language} />);
+		push("wsStatusGrid",   t("Status Overview", language),       <WSStatusGridPreview doc={doc} lang={language} />);
+		push("wsLeads",        t("Leads", language),                  <WSLeadsPreview doc={doc} lang={language} />);
+		push("wsWeekSummary",  t("Week Summary", language),           <WSWeekSummaryPreview doc={doc} lang={language} />);
+		push("wsChallenges",   t("Challenges / Obstacles", language), <WSChallengesPreview doc={doc} lang={language} />);
+		push("wsNextWeek",     t("Next Week's Goals", language),      <WSNextWeekGoalsPreview doc={doc} lang={language} />);
+		push("wsNotes",        t("Additional Notes", language),       <WSAdditionalNotesPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "influencer_campaign") {
 		if (doc.campaignOverview) push("campaignOverview", t("Campaign Overview", language),
