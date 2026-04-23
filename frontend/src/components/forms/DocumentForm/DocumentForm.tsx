@@ -23,8 +23,11 @@ import { InfluencerFields } from "./sections/InfluencerFields";
 import { FormField, inputClass } from "./ui/FormField";
 import { TrashIcon } from "lucide-react";
 import type { CustomSection, CustomSectionType, DeliverableRow } from "@/src/store";
-import { generateId } from "@/src/store/initialState";
+import { generateId, initialDocumentState } from "@/src/store/initialState";
 import { AddSectionBar } from "@/src/components/preview/LivePreview/AddSectionBar";
+import { GenerateChoiceModal } from "./GenerateChoiceModal";
+import { GenerateFieldsChecklistModal } from "./GenerateFieldsChecklistModal";
+import { docHasInput, getGeneratableFields } from "@/src/lib/generatableFields";
 
 const rowId = () => Math.random().toString(36).substring(2, 11);
 
@@ -32,18 +35,48 @@ export const DocumentForm = () => {
 	const { document, updateDocument, language, hiddenFields, hideField, showAllFields } = useAppStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [packageCount, setPackageCount] = useState<1 | 2 | 3>(1);
+	const [modalStage, setModalStage] = useState<"none" | "choice" | "checklist">("none");
 	const { canEdit } = usePermissions();
 	// isReadonly: true when a doc is loaded and the user only has viewer access
 	const currentDocumentId = useAppStore((s) => s.currentDocumentId);
 	const isReadonly = !!currentDocumentId && !canEdit;
 
-	const handleGenerate = async () => {
+	const runGenerate = async (opts: { onlyFields?: string[]; reset?: boolean } = {}) => {
+		setModalStage("none");
+
+		if (opts.reset) {
+			updateDocument({ ...initialDocumentState, type: document.type });
+		} else if (opts.onlyFields && opts.onlyFields.length > 0) {
+			// Clear checked-but-filled fields so AI treats them as empty
+			const fields = getGeneratableFields(document.type);
+			const clearPatch: Record<string, any> = {};
+			for (const key of opts.onlyFields) {
+				const field = fields.find((f) => f.key === key);
+				if (!field || field.isEmpty(document)) continue;
+				// nested keys like "weeklySales.weekSummary"
+				if (key.includes(".")) {
+					const [parent, child] = key.split(".");
+					clearPatch[parent] = { ...(document as any)[parent], [child]: "" };
+				} else {
+					const initial = (initialDocumentState as any)[key];
+					clearPatch[key] = Array.isArray(initial) ? [] : "";
+				}
+			}
+			if (Object.keys(clearPatch).length > 0) updateDocument(clearPatch);
+		}
+
 		setIsGenerating(true);
 		try {
+			const currentDoc = useAppStore.getState().document;
 			const response = await fetch("/api/generate-intro", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ ...document, language, packageCount }),
+				body: JSON.stringify({
+					...currentDoc,
+					language,
+					packageCount,
+					...(opts.onlyFields ? { onlyFields: opts.onlyFields } : {}),
+				}),
 			});
 
 			const ai = await response.json();
@@ -177,6 +210,14 @@ export const DocumentForm = () => {
 			console.error("Generation failed:", error);
 		} finally {
 			setIsGenerating(false);
+		}
+	};
+
+	const onGenerateClick = () => {
+		if (docHasInput(document)) {
+			setModalStage("choice");
+		} else {
+			runGenerate();
 		}
 	};
 
@@ -635,7 +676,7 @@ export const DocumentForm = () => {
 					<div className="h-10 bg-linear-to-t from-white to-transparent" />
 					<div className="bg-white/90 backdrop-blur-sm border-t border-slate-100 px-6 lg:px-10 py-5 shadow-[0_-6px_30px_-4px_rgba(0,0,0,0.08)] pointer-events-auto">
 						<button
-							onClick={handleGenerate}
+							onClick={onGenerateClick}
 							disabled={isGenerating}
 							className="btn btn-primary w-full h-14 rounded-2xl shadow-lg shadow-primary/20 gap-3 text-base font-black uppercase tracking-widest transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:bg-slate-400"
 						>
@@ -652,6 +693,28 @@ export const DocumentForm = () => {
 					</div>
 				</div>
 			)}
+		{modalStage === "choice" && (
+			<GenerateChoiceModal
+				docType={document.type}
+				onStartFresh={() => runGenerate({ reset: true })}
+				onKeepEntries={() => setModalStage("checklist")}
+				onClose={() => setModalStage("none")}
+			/>
+		)}
+
+		{modalStage === "checklist" && (() => {
+			const fields = getGeneratableFields(document.type);
+			const emptyKeys = new Set(fields.filter((f) => f.isEmpty(document)).map((f) => f.key));
+			return (
+				<GenerateFieldsChecklistModal
+					docType={document.type}
+					fields={fields}
+					emptyKeys={emptyKeys}
+					onGenerate={(selectedKeys) => runGenerate({ onlyFields: selectedKeys })}
+					onClose={() => setModalStage("none")}
+				/>
+			);
+		})()}
 		</div>
 	);
 };

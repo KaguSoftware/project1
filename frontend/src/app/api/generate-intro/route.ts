@@ -256,13 +256,21 @@ function buildPrompt(doc: any, providedData: string, packageCount: number) {
     }
 }
 
+function buildOnlyFieldsDirective(onlyFields: string[]): string {
+    if (!onlyFields || onlyFields.length === 0) return "";
+    const list = onlyFields.map((f) => `"${f}"`).join(", ");
+    return `\n\nFIELD SCOPE (strict): Only populate these fields in your JSON response: ${list}. Do NOT include any other fields in the JSON output. Leave them out entirely.`;
+}
+
 export async function POST(req: Request) {
     try {
         const doc = await req.json();
+        const onlyFields: string[] | undefined = Array.isArray(doc.onlyFields) ? doc.onlyFields : undefined;
 
         const providedData = JSON.stringify(doc, null, 2);
         const packageCount = Number(doc.packageCount) || 1;
-        const prompt = buildPrompt(doc, providedData, packageCount);
+        const basePrompt = buildPrompt(doc, providedData, packageCount);
+        const prompt = onlyFields ? basePrompt + buildOnlyFieldsDirective(onlyFields) : basePrompt;
 
         const completion = await groq.chat.completions.create({
             model: "llama-3.3-70b-versatile",
