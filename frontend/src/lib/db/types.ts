@@ -70,3 +70,31 @@ export interface ProfileRow {
 export interface DocumentWithOwner extends SavedDocumentMeta {
   owner_email?: string
 }
+
+/** Status of an access request */
+export type AccessRequestStatus = 'pending' | 'approved' | 'denied'
+
+/** Row shape for public.access_requests */
+export interface AccessRequest {
+  id: string
+  document_id: string
+  requester_id: string
+  status: AccessRequestStatus
+  message: string | null
+  reviewed_by: string | null
+  reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** Enriched request row returned by list_pending_requests_for_document RPC */
+export interface PendingAccessRequest {
+  id: string
+  document_id: string
+  requester_id: string
+  status: AccessRequestStatus
+  message: string | null
+  created_at: string
+  display_name: string
+  email: string
+}
