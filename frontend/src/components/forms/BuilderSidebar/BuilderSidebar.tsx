@@ -8,6 +8,7 @@ import { SaveButton } from "@/src/components/documents/SaveButton";
 import { MyDocumentsPanel } from "@/src/components/documents/MyDocumentsPanel";
 import { ShareModal } from "@/src/components/sharing/ShareModal";
 import { RequestAccessButton } from "@/src/components/sharing/RequestAccessButton";
+import { AccessRequestToast } from "@/src/components/sharing/AccessRequestToast";
 import { usePermissions } from "@/src/lib/permissions";
 import { getMyRole, getMyProfile, listPendingRequests } from "@/src/lib/db/documents";
 
@@ -164,6 +165,9 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 
             {/* ── Share modal ────────────────────────────────────── */}
             {shareOpen && <ShareModal onClose={() => setShareOpen(false)} />}
+
+            {/* ── Access request toasts (owners/admins only) ─────── */}
+            {canShare && <AccessRequestToast />}
         </div>
     );
 };

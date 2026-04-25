@@ -98,3 +98,8 @@ export interface PendingAccessRequest {
   display_name: string
   email: string
 }
+
+/** Enriched request row returned by list_all_pending_requests RPC — includes document title */
+export interface PendingAccessRequestWithDoc extends PendingAccessRequest {
+  document_title: string
+}

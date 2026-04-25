@@ -17,6 +17,7 @@ import type {
   DocumentWithOwner,
   AccessRequest,
   PendingAccessRequest,
+  PendingAccessRequestWithDoc,
 } from './types'
 
 // ── Save / Update ─────────────────────────────────────────────────────────────
@@ -369,6 +370,17 @@ export async function getMyRequestStatus(documentId: string): Promise<AccessRequ
   })
   if (error) throw error
   return (data as AccessRequest) ?? null
+}
+
+/**
+ * List all pending requests across every document the caller owns (or all if admin).
+ * Includes document title for display.
+ */
+export async function listAllPendingRequests(): Promise<PendingAccessRequestWithDoc[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('list_all_pending_requests')
+  if (error) throw error
+  return (data ?? []) as PendingAccessRequestWithDoc[]
 }
 
 /**

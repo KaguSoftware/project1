@@ -202,6 +202,38 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
+-- ── list_all_pending_requests() ───────────────────────────────────────────────
+-- Returns all pending requests across every document the caller owns (or all
+-- documents if the caller is a global admin). Also includes the document title
+-- so the UI can display it without a separate fetch.
+CREATE OR REPLACE FUNCTION public.list_all_pending_requests()
+RETURNS TABLE (
+  id            UUID,
+  document_id   UUID,
+  document_title TEXT,
+  requester_id  UUID,
+  status        TEXT,
+  message       TEXT,
+  created_at    TIMESTAMPTZ,
+  display_name  TEXT,
+  email         TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+    SELECT
+      ar.id, ar.document_id, d.title AS document_title,
+      ar.requester_id, ar.status, ar.message, ar.created_at,
+      COALESCE(p.display_name, p.email) AS display_name,
+      p.email
+    FROM public.access_requests ar
+    JOIN public.documents  d ON d.id  = ar.document_id
+    JOIN public.profiles   p ON p.id  = ar.requester_id
+    WHERE ar.status = 'pending'
+      AND (public.is_admin() OR d.owner_id = auth.uid())
+    ORDER BY ar.created_at ASC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
 -- ── get_my_request_status(doc_id) ─────────────────────────────────────────────
 -- Returns the current user's request row for a document (or NULL if none).
 CREATE OR REPLACE FUNCTION public.get_my_request_status(doc_id UUID)

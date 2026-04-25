@@ -19,8 +19,10 @@ import {
   deleteDocument,
   getMyRole,
   listSharesForDocuments,
+  listAllPendingRequests,
+  reviewAccessRequest,
 } from "@/src/lib/db/documents";
-import type { SavedDocumentMeta, DocumentShare } from "@/src/lib/db/types";
+import type { SavedDocumentMeta, DocumentShare, PendingAccessRequestWithDoc } from "@/src/lib/db/types";
 import type { DocumentData } from "@/src/store/types";
 
 interface MyDocumentsPanelProps {
@@ -40,6 +42,8 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
 
   const [sharedDocs, setSharedDocs] = useState<SavedDocumentMeta[]>([]);
   const [docShares, setDocShares] = useState<Map<string, DocumentShare[]>>(new Map());
+  const [pendingRequests, setPendingRequests] = useState<PendingAccessRequestWithDoc[]>([]);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -49,12 +53,14 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
     setIsLoadingDocs(true);
     setError(null);
     try {
-      const [mine, shared] = await Promise.all([
+      const [mine, shared, requests] = await Promise.all([
         listMyDocuments(),
         listSharedWithMe(),
+        listAllPendingRequests().catch(() => []),
       ]);
       setSavedDocuments(mine);
       setSharedDocs(shared);
+      setPendingRequests(requests);
       if (mine.length > 0) {
         const shares = await listSharesForDocuments(mine.map((d) => d.id));
         setDocShares(shares);
@@ -65,6 +71,18 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
       setIsLoadingDocs(false);
     }
   }, [user, setSavedDocuments, setIsLoadingDocs]);
+
+  async function handleReviewRequest(requestId: string, status: "approved" | "denied") {
+    setReviewingId(requestId);
+    try {
+      await reviewAccessRequest({ requestId, status });
+      setPendingRequests((prev) => prev.filter((r) => r.id !== requestId));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to review request");
+    } finally {
+      setReviewingId(null);
+    }
+  }
 
   // Fetch list whenever panel opens (and user is logged in)
   useEffect(() => {
@@ -161,6 +179,55 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
             <p className="text-xs text-red-600 text-center mt-8">{error}</p>
           ) : (
             <>
+              {/* ── Access Requests ──────────────────────────── */}
+              {pendingRequests.length > 0 && (
+                <section>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-2 flex items-center gap-1.5">
+                    Requests
+                    <span className="bg-amber-500 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                      {pendingRequests.length}
+                    </span>
+                  </p>
+                  <ul className="space-y-2">
+                    {pendingRequests.map((req) => (
+                      <li
+                        key={req.id}
+                        className="p-3 rounded-xl border border-amber-200 bg-amber-50 flex flex-col gap-2"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-[10px] font-black flex items-center justify-center uppercase shrink-0">
+                            {req.display_name[0]}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold text-slate-800 truncate">{req.display_name}</p>
+                            <p className="text-[10px] text-slate-500 truncate">{req.document_title}</p>
+                          </div>
+                        </div>
+                        {req.message && (
+                          <p className="text-[10px] text-slate-500 italic px-1">"{req.message}"</p>
+                        )}
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={() => handleReviewRequest(req.id, "approved")}
+                            disabled={reviewingId === req.id}
+                            className="flex-1 py-1 rounded-lg bg-green-600 text-white text-[11px] font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                          >
+                            {reviewingId === req.id ? "…" : "Approve"}
+                          </button>
+                          <button
+                            onClick={() => handleReviewRequest(req.id, "denied")}
+                            disabled={reviewingId === req.id}
+                            className="flex-1 py-1 rounded-lg border border-slate-200 bg-white text-slate-600 text-[11px] font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50"
+                          >
+                            Deny
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
               {/* ── My Documents ─────────────────────────────── */}
               <section>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
