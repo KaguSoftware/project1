@@ -15,6 +15,9 @@ import type {
   MyDocumentRole,
   ProfileRow,
   DocumentWithOwner,
+  AccessRequest,
+  PendingAccessRequest,
+  PendingAccessRequestWithDoc,
 } from './types'
 
 // ── Save / Update ─────────────────────────────────────────────────────────────
@@ -335,6 +338,80 @@ export async function listShareableUsers(): Promise<{ id: string; email: string;
   const { data, error } = await supabase.rpc('list_shareable_users')
   if (error) throw error
   return (data ?? []) as { id: string; email: string; display_name: string | null }[]
+}
+
+// ── Access requests ───────────────────────────────────────────────────────────
+
+/**
+ * Submit (or re-submit after denial) a request to become an editor.
+ * Caller must currently be a viewer on the document.
+ */
+export async function requestEditorAccess(params: {
+  documentId: string
+  message?: string
+}): Promise<AccessRequest> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('request_editor_access', {
+    doc_id: params.documentId,
+    msg: params.message ?? null,
+  })
+  if (error) throw error
+  return data as AccessRequest
+}
+
+/**
+ * Get the current user's own request status for a document.
+ * Returns null if no request exists.
+ */
+export async function getMyRequestStatus(documentId: string): Promise<AccessRequest | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_my_request_status', {
+    doc_id: documentId,
+  })
+  if (error) throw error
+  return (data as AccessRequest) ?? null
+}
+
+/**
+ * List all pending requests across every document the caller owns (or all if admin).
+ * Includes document title for display.
+ */
+export async function listAllPendingRequests(): Promise<PendingAccessRequestWithDoc[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('list_all_pending_requests')
+  if (error) throw error
+  return (data ?? []) as PendingAccessRequestWithDoc[]
+}
+
+/**
+ * List all pending access requests for a document.
+ * Only callable by the document owner or a global admin.
+ */
+export async function listPendingRequests(documentId: string): Promise<PendingAccessRequest[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('list_pending_requests_for_document', {
+    doc_id: documentId,
+  })
+  if (error) throw error
+  return (data ?? []) as PendingAccessRequest[]
+}
+
+/**
+ * Approve or deny a pending access request.
+ * Only callable by the document owner or a global admin.
+ * On approval the viewer's document_access row is automatically upgraded to editor.
+ */
+export async function reviewAccessRequest(params: {
+  requestId: string
+  status: 'approved' | 'denied'
+}): Promise<AccessRequest> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('review_access_request', {
+    request_id: params.requestId,
+    new_status: params.status,
+  })
+  if (error) throw error
+  return data as AccessRequest
 }
 
 // ── Admin helpers ─────────────────────────────────────────────────────────────

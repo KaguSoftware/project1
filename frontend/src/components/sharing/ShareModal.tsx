@@ -17,8 +17,10 @@ import {
   shareDocument,
   unshareDocument,
   listShareableUsers,
+  listPendingRequests,
+  reviewAccessRequest,
 } from "@/src/lib/db/documents";
-import type { DocumentShare, DocumentRole } from "@/src/lib/db/types";
+import type { DocumentShare, DocumentRole, PendingAccessRequest } from "@/src/lib/db/types";
 
 interface ShareModalProps {
   onClose: () => void;
@@ -32,6 +34,34 @@ interface ShareableUser {
 
 export function ShareModal({ onClose }: ShareModalProps) {
   const currentDocumentId = useAppStore((s) => s.currentDocumentId);
+
+  // Pending access requests (owner/admin only)
+  const [pendingRequests, setPendingRequests] = useState<PendingAccessRequest[]>([]);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
+
+  const fetchPendingRequests = useCallback(async () => {
+    if (!currentDocumentId) return;
+    try {
+      const data = await listPendingRequests(currentDocumentId);
+      setPendingRequests(data);
+    } catch {
+      // Non-fatal — non-owners will get a permission error which we silently ignore
+      setPendingRequests([]);
+    }
+  }, [currentDocumentId]);
+
+  async function handleReview(requestId: string, status: "approved" | "denied") {
+    setReviewingId(requestId);
+    try {
+      await reviewAccessRequest({ requestId, status });
+      setPendingRequests((prev) => prev.filter((r) => r.id !== requestId));
+      if (status === "approved") await fetchShares();
+    } catch (e) {
+      setSharesError(e instanceof Error ? e.message : "Failed to review request");
+    } finally {
+      setReviewingId(null);
+    }
+  }
 
   const [shares, setShares] = useState<DocumentShare[]>([]);
   const [loadingShares, setLoadingShares] = useState(true);
@@ -74,7 +104,8 @@ export function ShareModal({ onClose }: ShareModalProps) {
 
   useEffect(() => {
     fetchShares();
-  }, [fetchShares]);
+    fetchPendingRequests();
+  }, [fetchShares, fetchPendingRequests]);
 
   useEffect(() => {
     listShareableUsers()
@@ -192,6 +223,49 @@ export function ShareModal({ onClose }: ShareModalProps) {
             ×
           </button>
         </div>
+
+        {/* Pending access requests */}
+        {pendingRequests.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-3">
+            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">
+              Access requests ({pendingRequests.length})
+            </p>
+            <ul className="space-y-3">
+              {pendingRequests.map((req) => (
+                <li key={req.id} className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-7 h-7 rounded-full bg-amber-200 text-amber-800 text-xs font-black flex items-center justify-center uppercase shrink-0">
+                      {req.display_name[0]}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-800 truncate">{req.display_name}</p>
+                      <p className="text-[10px] text-slate-500 truncate">{req.email}</p>
+                      {req.message && (
+                        <p className="text-[10px] text-slate-500 italic mt-0.5 truncate">"{req.message}"</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={() => handleReview(req.id, "approved")}
+                      disabled={reviewingId === req.id}
+                      className="px-2.5 py-1 rounded-lg bg-green-600 text-white text-xs font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                    >
+                      {reviewingId === req.id ? "…" : "Approve"}
+                    </button>
+                    <button
+                      onClick={() => handleReview(req.id, "denied")}
+                      disabled={reviewingId === req.id}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    >
+                      Deny
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Add share form */}
         <form onSubmit={handleAddShare} className="space-y-3">

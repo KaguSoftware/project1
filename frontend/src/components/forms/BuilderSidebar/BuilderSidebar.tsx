@@ -7,12 +7,15 @@ import { UserMenu } from "@/src/components/auth/UserMenu";
 import { SaveButton } from "@/src/components/documents/SaveButton";
 import { MyDocumentsPanel } from "@/src/components/documents/MyDocumentsPanel";
 import { ShareModal } from "@/src/components/sharing/ShareModal";
+import { RequestAccessButton } from "@/src/components/sharing/RequestAccessButton";
+import { AccessRequestToast } from "@/src/components/sharing/AccessRequestToast";
 import { usePermissions } from "@/src/lib/permissions";
-import { getMyRole, getMyProfile } from "@/src/lib/db/documents";
+import { getMyRole, getMyProfile, listPendingRequests } from "@/src/lib/db/documents";
 
 export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
     const [docsOpen, setDocsOpen] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
+    const [pendingRequestCount, setPendingRequestCount] = useState(0);
     const user = useAppStore((s) => s.user);
     const setUser = useAppStore((s) => s.setUser);
     const currentDocumentId = useAppStore((s) => s.currentDocumentId);
@@ -43,6 +46,24 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
             })
             .catch(() => {/* non-fatal */});
     }, [user, setUser]);
+
+    // Poll pending access requests count so the Share button badge stays current.
+    useEffect(() => {
+        if (!currentDocumentId || !canShare) {
+            setPendingRequestCount(0);
+            return;
+        }
+        let cancelled = false;
+        function refresh() {
+            if (!currentDocumentId) return;
+            listPendingRequests(currentDocumentId)
+                .then((reqs) => { if (!cancelled) setPendingRequestCount(reqs.length); })
+                .catch(() => { if (!cancelled) setPendingRequestCount(0); });
+        }
+        refresh();
+        const interval = setInterval(refresh, 30_000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, [currentDocumentId, canShare]);
 
     // Role badge config
     const roleBadge = (() => {
@@ -99,15 +120,23 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
                     {canShare && (
                         <button
                             onClick={() => setShareOpen(true)}
-                            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
+                            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200 relative"
                         >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                     d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
                             Share
+                            {pendingRequestCount > 0 && (
+                                <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center leading-none">
+                                    {pendingRequestCount}
+                                </span>
+                            )}
                         </button>
                     )}
+
+                    {/* Request editor access — only visible to viewers */}
+                    {role === "viewer" && <RequestAccessButton />}
 
                     {/* Delete button — only owner/admin on a loaded doc */}
                     {canDelete && currentDocumentId && (
@@ -136,6 +165,9 @@ export const BuilderSidebar = ({ className = "" }: BuilderSidebarProps) => {
 
             {/* ── Share modal ────────────────────────────────────── */}
             {shareOpen && <ShareModal onClose={() => setShareOpen(false)} />}
+
+            {/* ── Access request toasts (owners/admins only) ─────── */}
+            {canShare && <AccessRequestToast />}
         </div>
     );
 };
