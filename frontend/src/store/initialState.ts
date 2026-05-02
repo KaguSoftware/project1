@@ -8,6 +8,7 @@ export const initialDocumentState: DocumentData = {
     projectTitle: "",
     clientName: "",
     additionalInstructions: "",
+    instructionImages: [],
     aiIntro: "",
     scopeOfWork: "",
     pricingPackage: "",

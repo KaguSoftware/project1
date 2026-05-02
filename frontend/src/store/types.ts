@@ -155,6 +155,7 @@ export interface DocumentData {
 	projectTitle: string; // The specific project name
 	clientName: string;
 	additionalInstructions: string;
+	instructionImages: string[]; // base64 data URLs for vision input
 	aiIntro: string;
 	scopeOfWork: string;
 	pricingPackage: string;

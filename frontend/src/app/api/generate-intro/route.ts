@@ -1,8 +1,10 @@
 // src/app/api/generate-intro/route.ts
 import Groq from "groq-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "" });
+const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 function buildProposalPrompt(doc: any, providedData: string, packageCount: number) {
     const lang = doc.language ?? "en";
@@ -172,20 +174,29 @@ function buildPrompt(doc: any, providedData: string, packageCount: number) {
             return `
         ${baseRules}
 
+        ${
+            doc.instructionImages?.length > 0
+                ? `SCREENSHOTS PROVIDED. STRICT EXTRACTION RULES — NO EXCEPTIONS:
+        1. ONLY include metrics that are explicitly visible as numbers in the screenshots. Do NOT estimate, infer, calculate, or invent any number.
+        2. If a metric is not clearly readable in the screenshots, OMIT it entirely — do not guess or approximate.
+        3. For performanceMetrics: only use numbers you can directly read (e.g. "1,204 likes", "4.7% engagement rate"). Leave "delta" as "" if no comparison period is shown.
+        4. For topPosts: only include posts visible in the screenshots. Use the exact caption text shown. Only fill likes/comments/shares if those exact numbers appear on that post in the screenshot.
+        5. The aiIntro must be based solely on what the screenshots show — do not add context, claims, or praise that isn't supported by the visible data.
+        6. NEVER fabricate a number. If you are uncertain about a value, leave that field as an empty string "".`
+                : `Generate 5-7 realistic performance metrics and 3-5 top posts based on the project context. Use realistic social media numbers. Deltas can be positive or negative.`
+        }
+
         Return ONLY a JSON object with this exact structure:
 
         {
-          "aiIntro": "2-paragraph executive summary of the social media campaign performance",
+          "aiIntro": "2-paragraph executive summary based strictly on visible screenshot data",
           "performanceMetrics": [
-            { "metric": "Metric name e.g. Engagement Rate", "number": "e.g. 4.7%", "delta": "+0.3%" }
+            { "metric": "Metric name", "number": "Exact number from screenshot", "delta": "" }
           ],
           "topPosts": [
-            { "post": "Post description or caption snippet", "likes": "1.2K", "comments": "234", "shares": "89" }
+            { "post": "Exact caption from screenshot", "likes": "exact number or empty string", "comments": "exact number or empty string", "shares": "exact number or empty string" }
           ]
         }
-
-        Generate 5-7 realistic performance metrics and 3-5 top posts based on the project context.
-        Use realistic social media numbers. Deltas can be positive or negative.
         `;
 
         case "weekly_sales_report":
@@ -262,22 +273,42 @@ function buildOnlyFieldsDirective(onlyFields: string[]): string {
     return `\n\nFIELD SCOPE (strict): Only populate these fields in your JSON response: ${list}. Do NOT include any other fields in the JSON output. Leave them out entirely.`;
 }
 
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
     try {
         const doc = await req.json();
         const onlyFields: string[] | undefined = Array.isArray(doc.onlyFields) ? doc.onlyFields : undefined;
 
-        const providedData = JSON.stringify(doc, null, 2);
+        // Strip images from the text context — they're passed separately to Gemini
+        const { instructionImages: _imgs, ...docWithoutImages } = doc;
+        const providedData = JSON.stringify(docWithoutImages, null, 2);
         const packageCount = Number(doc.packageCount) || 1;
         const basePrompt = buildPrompt(doc, providedData, packageCount);
         const prompt = onlyFields ? basePrompt + buildOnlyFieldsDirective(onlyFields) : basePrompt;
 
-        const completion = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
-            messages: [{ role: "user", content: prompt }],
-            response_format: { type: "json_object" },
-        });
-        const text = completion.choices[0].message.content ?? "{}";
+        const images: string[] = Array.isArray(doc.instructionImages) ? doc.instructionImages : [];
+        const useVision = doc.type === "social_media_report" && images.length > 0;
+
+        let text: string;
+
+        if (useVision) {
+            const model = gemini.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const imageParts = images.map((dataUrl: string) => {
+                const [meta, base64] = dataUrl.split(",");
+                const mimeType = meta.match(/:(.*?);/)?.[1] ?? "image/jpeg";
+                return { inlineData: { data: base64, mimeType } };
+            });
+            const result = await model.generateContent([prompt, ...imageParts]);
+            text = result.response.text().replace(/```json|```/g, "").trim();
+        } else {
+            const completion = await groq.chat.completions.create({
+                model: "llama-3.3-70b-versatile",
+                messages: [{ role: "user", content: prompt }],
+                response_format: { type: "json_object" },
+            });
+            text = completion.choices[0].message.content ?? "{}";
+        }
         const data = JSON.parse(text);
 
         // Normalize proposal-specific fields so the existing store/preview stays intact
@@ -336,10 +367,10 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json(data);
-    } catch (error) {
-        console.error("AI Generation Error:", error);
+    } catch (error: any) {
+        console.error("AI Generation Error:", error?.message ?? error, error?.status, error?.error);
         return NextResponse.json(
-            { error: "AI Failed to generate valid data" },
+            { error: "AI Failed to generate valid data", detail: error?.message },
             { status: 500 }
         );
     }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import imageCompression from "browser-image-compression";
 import { useAppStore, DocType } from "@/src/store";
 import { usePermissions } from "@/src/lib/permissions";
 import { t } from "@/src/lib/translations";
@@ -11,6 +12,8 @@ import {
 	TypeIcon,
 	BarChart3Icon,
 	UsersIcon,
+	ImagePlusIcon,
+	XIcon,
 } from "lucide-react";
 
 import { ProposalFields } from "./sections/ProposalFields";
@@ -45,7 +48,14 @@ export const DocumentForm = () => {
 		setModalStage("none");
 
 		if (opts.reset) {
-			updateDocument({ ...initialDocumentState, type: document.type });
+			updateDocument({
+				...initialDocumentState,
+				type: document.type,
+				projectTitle: document.projectTitle,
+				clientName: document.clientName,
+				additionalInstructions: document.additionalInstructions,
+				instructionImages: document.instructionImages,
+			});
 		} else if (opts.onlyFields && opts.onlyFields.length > 0) {
 			// Clear checked-but-filled fields so AI treats them as empty
 			const fields = getGeneratableFields(document.type);
@@ -347,6 +357,65 @@ export const DocumentForm = () => {
 								updateDocument({ additionalInstructions: e.target.value })
 							}
 						/>
+						{document.type === "social_media_report" && (
+							<div className="mt-3 space-y-2">
+								<label className="flex items-center gap-2 cursor-pointer w-fit text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">
+									<ImagePlusIcon size={14} />
+									<span>Attach Screenshots</span>
+									<input
+										type="file"
+										accept="image/*"
+										multiple
+										className="hidden"
+										onChange={async (e) => {
+											const files = Array.from(e.target.files ?? []);
+											if (files.length === 0) return;
+											e.target.value = "";
+											const base64s = await Promise.all(
+												files.map(async (file) => {
+													const compressed = await imageCompression(file, {
+														maxSizeMB: 0.5,
+														maxWidthOrHeight: 1280,
+														useWebWorker: true,
+													});
+													return new Promise<string>((resolve) => {
+														const reader = new FileReader();
+														reader.onload = () => resolve(reader.result as string);
+														reader.readAsDataURL(compressed);
+													});
+												})
+											);
+											updateDocument({
+												instructionImages: [...(document.instructionImages ?? []), ...base64s],
+											});
+										}}
+									/>
+								</label>
+								{(document.instructionImages ?? []).length > 0 && (
+									<div className="flex flex-wrap gap-2">
+										{(document.instructionImages ?? []).map((src, i) => (
+											<div key={i} className="relative group">
+												<img
+													src={src}
+													alt={`screenshot ${i + 1}`}
+													className="w-16 h-16 object-cover rounded-lg border border-slate-200"
+												/>
+												<button
+													onClick={() =>
+														updateDocument({
+															instructionImages: (document.instructionImages ?? []).filter((_, idx) => idx !== i),
+														})
+													}
+													className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+												>
+													<XIcon size={10} />
+												</button>
+											</div>
+										))}
+									</div>
+								)}
+							</div>
+						)}
 					</FormField>
 				)}
 				{document.type === "proposal" && (
