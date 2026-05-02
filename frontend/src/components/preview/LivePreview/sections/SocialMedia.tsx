@@ -10,27 +10,19 @@ export const PerformanceMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentD
 			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
 				{t("Performance Metrics", lang)}
 			</h3>
-			<div className="space-y-4">
+			<div className="flex flex-wrap gap-3">
 				{filtered.map((m) => (
 					<div
 						key={m.id}
-						className="flex justify-between border-b border-slate-50 pb-2"
+						className="flex flex-col gap-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 min-w-[100px]"
 					>
-						<span className="font-bold text-slate-600">{m.metric}</span>
-						<div className="text-right">
-							<p className="font-black text-slate-900">{m.number}</p>
-							{m.delta && (
-								<p
-									className={`text-[10px] font-bold ${
-										m.delta.startsWith("-")
-											? "text-red-500"
-											: "text-emerald-500"
-									}`}
-								>
-									{m.delta}
-								</p>
-							)}
-						</div>
+						<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{m.metric}</span>
+						<p className="font-black text-slate-900 text-lg leading-none">{m.number}</p>
+						{m.delta && (
+							<p className={`text-[10px] font-bold ${m.delta.startsWith("-") ? "text-red-500" : "text-emerald-500"}`}>
+								{m.delta}
+							</p>
+						)}
 					</div>
 				))}
 			</div>

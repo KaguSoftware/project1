@@ -21,28 +21,31 @@ export const PerformanceMetrics = ({
             <Text style={[styles.sectionTitle, af(lang)]}>
                 {fixArabic(t("Performance Metrics", lang), lang)}
             </Text>
-            {filtered.map((m) => (
-                <View
-                    key={m.id}
-                    style={[styles.metricRow, rowDir(lang)]}
-                    wrap={false}
-                >
-                    <Text style={[styles.metricLabel, afB(lang)]}>
-                        {fixArabic(m.metric, lang)}
-                    </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                {filtered.map((m) => (
                     <View
+                        key={m.id}
+                        wrap={false}
                         style={{
-                            alignItems:
-                                lang === "ar" ? "flex-start" : "flex-end",
+                            backgroundColor: "#f8fafc",
+                            borderWidth: 0.5,
+                            borderColor: "#e2e8f0",
+                            borderRadius: 8,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            minWidth: 90,
                         }}
                     >
+                        <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: "#94a3b8", textTransform: "uppercase", marginBottom: 3 }}>
+                            {fixArabic(m.metric, lang)}
+                        </Text>
                         <Text style={[styles.metricValue, afB(lang)]}>
                             {fixArabic(m.number, lang)}
                         </Text>
-                        <Text style={deltaStyle(m.delta)}>{m.delta}</Text>
+                        {m.delta ? <Text style={deltaStyle(m.delta)}>{m.delta}</Text> : null}
                     </View>
-                </View>
-            ))}
+                ))}
+            </View>
         </View>
     );
 };
