@@ -17,7 +17,7 @@ import {
     ScopeOfWork,
 } from "./sections/proposal-contract";
 import { InvoiceTable } from "./sections/invoice";
-import { PerformanceMetrics, TopPostsTable } from "./sections/social-media";
+import { PerformanceMetrics, TopPostsTable, KeyInsightsPDF, TopPerformingContentPDF, AudienceInsightsPDF } from "./sections/social-media";
 import { SalesMetrics, DealBreakdownTable, WeeklySalesPDF } from "./sections/sales";
 import { KPIGrid, InfluencerRoster } from "./sections/influencer";
 
@@ -98,6 +98,9 @@ export const PDFDocument = ({
                         lang={lang}
                     />
                     <TopPostsTable posts={data.topPosts} lang={lang} />
+                    <KeyInsightsPDF insights={data.keyInsights} lang={lang} />
+                    <TopPerformingContentPDF content={data.topPerformingContent} lang={lang} />
+                    <AudienceInsightsPDF insights={data.audienceInsights} lang={lang} />
                 </View>
             )}
 

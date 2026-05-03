@@ -74,6 +74,9 @@ export const initialDocumentState: DocumentData = {
     topPosts: [
         { id: generateId(), post: "", likes: "", comments: "", shares: "" },
     ],
+    keyInsights: [{ id: generateId(), insight: "", impact: "neutral" }],
+    topPerformingContent: [{ id: generateId(), title: "", metric: "", value: "", note: "" }],
+    audienceInsights: [{ id: generateId(), label: "", value: "", detail: "" }],
     performanceMetrics: [
         { id: generateId(), metric: "", number: "", delta: "" },
     ],

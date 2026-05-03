@@ -182,19 +182,31 @@ function buildPrompt(doc: any, providedData: string, packageCount: number) {
         3. For performanceMetrics: only use numbers you can directly read (e.g. "1,204 likes", "4.7% engagement rate"). Leave "delta" as "" if no comparison period is shown.
         4. For topPosts: only include posts visible in the screenshots. Use the exact caption text shown. Only fill likes/comments/shares if those exact numbers appear on that post in the screenshot.
         5. The aiIntro must be based solely on what the screenshots show — do not add context, claims, or praise that isn't supported by the visible data.
-        6. NEVER fabricate a number. If you are uncertain about a value, leave that field as an empty string "".`
-                : `Generate 5-7 realistic performance metrics and 3-5 top posts based on the project context. Use realistic social media numbers. Deltas can be positive or negative.`
+        6. NEVER fabricate a number. If you are uncertain about a value, leave that field as an empty string "".
+        7. For keyInsights: derive ONLY insights logically supported by visible metrics. Each insight must reference a specific visible number. impact = "positive" if it indicates growth/success, "negative" if decline/issue, "neutral" otherwise.
+        8. For topPerformingContent: ONLY list content whose performance numbers are visible in screenshots. title = caption/title visible, metric = the metric name (e.g. "Likes"), value = the exact number, note = one sentence on why it performed well based on visible data.
+        9. For audienceInsights: ONLY include audience data explicitly shown (e.g. age breakdown, gender split, top location). If no audience data is visible, return an empty array.`
+                : `Generate 5-7 realistic performance metrics, 3-5 top posts, 4-6 key insights, 3-5 top performing content items, and 3-5 audience insights based on the project context. Use realistic social media numbers. All insights must logically follow from the metrics you generate. Deltas can be positive or negative.`
         }
 
         Return ONLY a JSON object with this exact structure:
 
         {
-          "aiIntro": "2-paragraph executive summary based strictly on visible screenshot data",
+          "aiIntro": "2-paragraph executive summary based on visible screenshot data or project context",
           "performanceMetrics": [
-            { "metric": "Metric name", "number": "Exact number from screenshot", "delta": "" }
+            { "metric": "Metric name", "number": "Exact number", "delta": "" }
           ],
           "topPosts": [
-            { "post": "Exact caption from screenshot", "likes": "exact number or empty string", "comments": "exact number or empty string", "shares": "exact number or empty string" }
+            { "post": "Caption text", "likes": "", "comments": "", "shares": "" }
+          ],
+          "keyInsights": [
+            { "insight": "One specific, data-backed insight sentence referencing a real metric", "impact": "positive|negative|neutral" }
+          ],
+          "topPerformingContent": [
+            { "title": "Content title or caption", "metric": "Primary metric name", "value": "Number", "note": "One sentence why it performed well" }
+          ],
+          "audienceInsights": [
+            { "label": "e.g. Top Age Group", "value": "e.g. 25-34", "detail": "One sentence elaboration" }
           ]
         }
         `;
@@ -288,7 +300,7 @@ export async function POST(req: Request) {
         const prompt = onlyFields ? basePrompt + buildOnlyFieldsDirective(onlyFields) : basePrompt;
 
         const images: string[] = Array.isArray(doc.instructionImages) ? doc.instructionImages : [];
-        const useVision = doc.type === "social_media_report" && images.length > 0;
+        const useVision = doc.type === "social_media_report" || images.length > 0;
 
         let text: string;
 
@@ -356,6 +368,31 @@ export async function POST(req: Request) {
                 data.timeline = data.contractPeriod;
             }
             delete data.contractPeriod;
+        }
+
+        // Normalize social_media_report: add ids to new array fields
+        if (doc.type === "social_media_report") {
+            if (Array.isArray(data.keyInsights) && data.keyInsights.length > 0)
+                data.keyInsights = data.keyInsights.map((k: any, i: number) => ({
+                    id: `ai-ki-${i}-${Date.now()}`,
+                    insight: k.insight ?? "",
+                    impact: ["positive", "negative", "neutral"].includes(k.impact) ? k.impact : "neutral",
+                }));
+            if (Array.isArray(data.topPerformingContent) && data.topPerformingContent.length > 0)
+                data.topPerformingContent = data.topPerformingContent.map((c: any, i: number) => ({
+                    id: `ai-tpc-${i}-${Date.now()}`,
+                    title: c.title ?? "",
+                    metric: c.metric ?? "",
+                    value: c.value ?? "",
+                    note: c.note ?? "",
+                }));
+            if (Array.isArray(data.audienceInsights) && data.audienceInsights.length > 0)
+                data.audienceInsights = data.audienceInsights.map((a: any, i: number) => ({
+                    id: `ai-ai-${i}-${Date.now()}`,
+                    label: a.label ?? "",
+                    value: a.value ?? "",
+                    detail: a.detail ?? "",
+                }));
         }
 
         // Normalize weekly_sales_report: add ids to leads

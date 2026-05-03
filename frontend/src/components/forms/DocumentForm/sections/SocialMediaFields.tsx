@@ -179,6 +179,148 @@ export const SocialMediaFields = () => {
 					{tr("+ Add Post")}
 				</button>
 			</section>
+
+			<section className="space-y-6">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
+					{tr("Key Insights")}
+				</label>
+				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
+					<div className="col-span-8">{tr("Insight")}</div>
+					<div className="col-span-3">{tr("Impact")}</div>
+				</div>
+				{document.keyInsights.map((row) => (
+					<div key={row.id} className="grid grid-cols-12 gap-3 items-start group">
+						<textarea
+							className={`${inputClass} col-span-8 py-2 resize-none h-16`}
+							placeholder={tr("e.g. Engagement rate increased 12% this month")}
+							value={row.insight}
+							onChange={(e) => updateArrayItem("keyInsights", row.id, { insight: e.target.value })}
+						/>
+						<select
+							className={`${inputClass} col-span-3 py-2 ${
+								row.impact === "positive" ? "text-emerald-500" :
+								row.impact === "negative" ? "text-red-500" :
+								"text-slate-400"
+							}`}
+							value={row.impact}
+							onChange={(e) => updateArrayItem("keyInsights", row.id, { impact: e.target.value as "positive" | "negative" | "neutral" })}
+						>
+							<option value="neutral">{tr("Neutral")}</option>
+							<option value="positive">{tr("Positive")}</option>
+							<option value="negative">{tr("Negative")}</option>
+						</select>
+						<button
+							onClick={() => removeArrayItem("keyInsights", row.id)}
+							className="col-span-1 text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity mt-2"
+						>
+							<TrashIcon size={14} />
+						</button>
+					</div>
+				))}
+				<button
+					onClick={() => addArrayItem("keyInsights", { insight: "", impact: "neutral" })}
+					className="btn btn-ghost btn-sm text-primary font-bold"
+				>
+					{tr("+ Add Insight")}
+				</button>
+			</section>
+
+			<section className="space-y-6">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
+					{tr("Top Performing Content")}
+				</label>
+				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
+					<div className="col-span-3">{tr("Title")}</div>
+					<div className="col-span-2">{tr("Metric")}</div>
+					<div className="col-span-2">{tr("Value")}</div>
+					<div className="col-span-4">{tr("Note")}</div>
+				</div>
+				{document.topPerformingContent.map((row) => (
+					<div key={row.id} className="grid grid-cols-12 gap-3 items-start group">
+						<input
+							className={`${inputClass} col-span-3 py-2`}
+							placeholder={tr("e.g. Reel title")}
+							value={row.title}
+							onChange={(e) => updateArrayItem("topPerformingContent", row.id, { title: e.target.value })}
+						/>
+						<input
+							className={`${inputClass} col-span-2 py-2`}
+							placeholder={tr("Likes")}
+							value={row.metric}
+							onChange={(e) => updateArrayItem("topPerformingContent", row.id, { metric: e.target.value })}
+						/>
+						<input
+							className={`${inputClass} col-span-2 py-2`}
+							placeholder="12,400"
+							value={row.value}
+							onChange={(e) => updateArrayItem("topPerformingContent", row.id, { value: e.target.value })}
+						/>
+						<textarea
+							className={`${inputClass} col-span-4 py-2 resize-none h-16`}
+							placeholder={tr("Why it performed well")}
+							value={row.note}
+							onChange={(e) => updateArrayItem("topPerformingContent", row.id, { note: e.target.value })}
+						/>
+						<button
+							onClick={() => removeArrayItem("topPerformingContent", row.id)}
+							className="col-span-1 text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity mt-2"
+						>
+							<TrashIcon size={14} />
+						</button>
+					</div>
+				))}
+				<button
+					onClick={() => addArrayItem("topPerformingContent", { title: "", metric: "", value: "", note: "" })}
+					className="btn btn-ghost btn-sm text-primary font-bold"
+				>
+					{tr("+ Add Content")}
+				</button>
+			</section>
+
+			<section className="space-y-6">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
+					{tr("Audience Insights")}
+				</label>
+				<div className="grid grid-cols-12 gap-4 px-1 text-[10px] font-black uppercase text-slate-400">
+					<div className="col-span-4">{tr("Label")}</div>
+					<div className="col-span-3">{tr("Value")}</div>
+					<div className="col-span-4">{tr("Detail")}</div>
+				</div>
+				{document.audienceInsights.map((row) => (
+					<div key={row.id} className="grid grid-cols-12 gap-3 items-center group">
+						<input
+							className={`${inputClass} col-span-4 py-2`}
+							placeholder={tr("e.g. Top Age Group")}
+							value={row.label}
+							onChange={(e) => updateArrayItem("audienceInsights", row.id, { label: e.target.value })}
+						/>
+						<input
+							className={`${inputClass} col-span-3 py-2`}
+							placeholder="25-34"
+							value={row.value}
+							onChange={(e) => updateArrayItem("audienceInsights", row.id, { value: e.target.value })}
+						/>
+						<input
+							className={`${inputClass} col-span-4 py-2`}
+							placeholder={tr("One sentence elaboration")}
+							value={row.detail}
+							onChange={(e) => updateArrayItem("audienceInsights", row.id, { detail: e.target.value })}
+						/>
+						<button
+							onClick={() => removeArrayItem("audienceInsights", row.id)}
+							className="col-span-1 text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
+						>
+							<TrashIcon size={14} />
+						</button>
+					</div>
+				))}
+				<button
+					onClick={() => addArrayItem("audienceInsights", { label: "", value: "", detail: "" })}
+					className="btn btn-ghost btn-sm text-primary font-bold"
+				>
+					{tr("+ Add Insight")}
+				</button>
+			</section>
 		</div>
 	);
 };

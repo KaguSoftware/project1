@@ -44,6 +44,9 @@ const FIELDS_BY_TYPE: Record<DocType, GeneratableField[]> = {
     ...sharedFields,
     { key: "performanceMetrics", label: "Performance Metrics", isEmpty: (d) => isEmptyArray(d.performanceMetrics) },
     { key: "topPosts", label: "Top Posts", isEmpty: (d) => isEmptyArray(d.topPosts) },
+    { key: "keyInsights", label: "Key Insights", isEmpty: (d) => isEmptyArray(d.keyInsights) },
+    { key: "topPerformingContent", label: "Top Performing Content", isEmpty: (d) => isEmptyArray(d.topPerformingContent) },
+    { key: "audienceInsights", label: "Audience Insights", isEmpty: (d) => isEmptyArray(d.audienceInsights) },
   ],
   weekly_sales_report: [
     ...sharedFields,

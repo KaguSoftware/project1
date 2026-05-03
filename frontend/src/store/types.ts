@@ -185,6 +185,9 @@ export interface DocumentData {
 	lineItems: InvoiceLineItem[];
 	performanceMetrics: PerformanceRow[];
 	topPosts: TopPostRow[];
+	keyInsights: { id: string; insight: string; impact: "positive" | "negative" | "neutral" }[];
+	topPerformingContent: { id: string; title: string; metric: string; value: string; note: string }[];
+	audienceInsights: { id: string; label: string; value: string; detail: string }[];
 	salesMetrics: SalesMetricRow[];
 	dealBreakdown: DealRow[];
 	influencers: InfluencerRow[];

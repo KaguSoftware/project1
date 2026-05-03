@@ -16,7 +16,7 @@ import { DocHeader } from "./sections/DocHeader";
 import { TextSectionPreview, ScopeOfWorkPreview, TermsPreview, DeliverablesPreview, CustomSectionPreview } from "./sections/Common";
 import { EngagementOverviewPreview } from "./sections/ProposalContract";
 import { InvoicePreview } from "./sections/Invoice";
-import { PerformanceMetricsPreview, TopPostsPreview } from "./sections/SocialMedia";
+import { PerformanceMetricsPreview, TopPostsPreview, KeyInsightsPreview, TopPerformingContentPreview, AudienceInsightsPreview } from "./sections/SocialMedia";
 import { SalesMetricsPreview, DealBreakdownPreview, WeeklySalesPreview, WSHeaderPreview, WSStatusGridPreview, WSLeadsPreview, WSWeekSummaryPreview, WSChallengesPreview, WSNextWeekGoalsPreview, WSAdditionalNotesPreview } from "./sections/Sales";
 import { KPIGridPreview, InfluencerRosterPreview } from "./sections/Influencer";
 import { AddSectionBar } from "./AddSectionBar";
@@ -121,6 +121,12 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 			<TextSectionPreview text={doc.aiIntro} label="Executive Summary" lang={language} />);
 		push("performanceMetrics", t("Performance Metrics", language), <PerformanceMetricsPreview doc={doc} lang={language} />);
 		push("topPosts", t("Top Posts", language), <TopPostsPreview doc={doc} lang={language} />);
+		if (doc.keyInsights?.some((k) => k.insight))
+			push("keyInsights", t("Key Insights", language), <KeyInsightsPreview doc={doc} lang={language} />);
+		if (doc.topPerformingContent?.some((c) => c.title))
+			push("topPerformingContent", t("Top Performing Content", language), <TopPerformingContentPreview doc={doc} lang={language} />);
+		if (doc.audienceInsights?.some((a) => a.label))
+			push("audienceInsights", t("Audience Insights", language), <AudienceInsightsPreview doc={doc} lang={language} />);
 	}
 	if (doc.type === "weekly_sales_report") {
 		const ws = doc.weeklySales;
