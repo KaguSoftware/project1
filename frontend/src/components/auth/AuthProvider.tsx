@@ -14,12 +14,16 @@ import { createClient } from "@/src/lib/supabase/client";
 import { useAppStore } from "@/src/store";
 
 async function resolveUser(supabase: ReturnType<typeof createClient>, id: string, email: string) {
-  const { data } = await supabase
-    .from("profiles")
-    .select("app_role")
-    .eq("id", id)
-    .single();
-  return { id, email, app_role: data?.app_role ?? undefined };
+  try {
+    const { data } = await supabase
+      .from("profiles")
+      .select("app_role")
+      .eq("id", id)
+      .single();
+    return { id, email, app_role: data?.app_role ?? undefined };
+  } catch {
+    return { id, email };
+  }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -28,24 +32,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createClient();
 
-    // Sync initial session (resolves immediately from the cookie-based session)
+    // Set user immediately from session, then enrich with app_role
     supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (user) {
-        setUser(await resolveUser(supabase, user.id, user.email ?? ""));
-      } else {
-        setUser(null);
-      }
+      if (!user) { setUser(null); return; }
+      setUser({ id: user.id, email: user.email ?? "" });
+      resolveUser(supabase, user.id, user.email ?? "").then(setUser);
     });
 
     // Keep in sync as auth state changes (sign-in, sign-out, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         const u = session?.user ?? null;
-        if (u) {
-          setUser(await resolveUser(supabase, u.id, u.email ?? ""));
-        } else {
-          setUser(null);
-        }
+        if (!u) { setUser(null); return; }
+        setUser({ id: u.id, email: u.email ?? "" });
+        resolveUser(supabase, u.id, u.email ?? "").then(setUser);
       }
     );
 
