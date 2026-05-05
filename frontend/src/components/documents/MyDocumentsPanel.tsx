@@ -53,10 +53,13 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
+    // Read role directly from store at call time — avoids stale closure over isAdmin
+    const currentRole = useAppStore.getState().user?.app_role;
+    const asAdmin = currentRole === "admin";
     setIsLoadingDocs(true);
     setError(null);
     try {
-      if (isAdmin) {
+      if (asAdmin) {
         const [all, requests] = await Promise.all([
           adminListDocuments(),
           listAllPendingRequests().catch(() => []),
@@ -87,7 +90,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
     } finally {
       setIsLoadingDocs(false);
     }
-  }, [user, isAdmin, setSavedDocuments, setIsLoadingDocs]);
+  }, [user, setSavedDocuments, setIsLoadingDocs]);
 
   async function handleReviewRequest(requestId: string, status: "approved" | "denied") {
     setReviewingId(requestId);
@@ -101,11 +104,11 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
     }
   }
 
-  // Fetch list whenever panel opens (and user is logged in)
+  // Fetch list whenever panel opens, user changes, or role resolves
   useEffect(() => {
     if (!isOpen || !user) return;
     fetchAll();
-  }, [isOpen, user, fetchAll]);
+  }, [isOpen, user, isAdmin, fetchAll]);
 
   async function handleLoad(meta: SavedDocumentMeta, knownRole?: "editor" | "viewer") {
     setLoadingId(meta.id);
