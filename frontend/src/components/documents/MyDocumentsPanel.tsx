@@ -60,10 +60,11 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
     setError(null);
     try {
       if (asAdmin) {
-        const [all, requests] = await Promise.all([
-          adminListDocuments(),
+        const [allRes, requests] = await Promise.all([
+          fetch("/api/admin/documents").then((r) => r.json()),
           listAllPendingRequests().catch(() => []),
         ]);
+        const all = Array.isArray(allRes) ? allRes : [];
         setSavedDocuments(all as SavedDocumentMeta[]);
         setSharedDocs([]);
         setPendingRequests(requests);
