@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 
-export async function GET() {
-  // Verify caller is authenticated and is admin using session cookie
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,7 +19,6 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Use service role to bypass RLS entirely
   const service = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -26,10 +26,11 @@ export async function GET() {
 
   const { data, error } = await service
     .from("documents")
-    .select("id, owner_id, title, doc_type, created_at, updated_at, profiles!owner_id(email, display_name)")
-    .order("created_at", { ascending: false });
+    .select("*")
+    .eq("id", id)
+    .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json(data ?? []);
+  return NextResponse.json(data);
 }

@@ -42,6 +42,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
   const currentDocumentId = useAppStore((s) => s.currentDocumentId);
 
   const [sharedDocs, setSharedDocs] = useState<SavedDocumentMeta[]>([]);
+  const [docOwners, setDocOwners] = useState<Map<string, string>>(new Map());
   const [docShares, setDocShares] = useState<Map<string, DocumentShare[]>>(new Map());
   const [pendingRequests, setPendingRequests] = useState<PendingAccessRequestWithDoc[]>([]);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
@@ -68,8 +69,15 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
         setSavedDocuments(all as SavedDocumentMeta[]);
         setSharedDocs([]);
         setPendingRequests(requests);
+        // Build owner name map from joined profiles data
+        const owners = new Map<string, string>();
+        all.forEach((d: any) => {
+          const p = d.profiles;
+          if (p) owners.set(d.id, p.display_name || p.email || d.owner_id);
+        });
+        setDocOwners(owners);
         if (all.length > 0) {
-          const shares = await listSharesForDocuments(all.map((d) => d.id));
+          const shares = await listSharesForDocuments(all.map((d: any) => d.id));
           setDocShares(shares);
         }
       } else {
@@ -114,7 +122,18 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
   async function handleLoad(meta: SavedDocumentMeta, knownRole?: "editor" | "viewer") {
     setLoadingId(meta.id);
     try {
-      const saved = await loadDocument(meta.id);
+      const currentRole = useAppStore.getState().user?.app_role;
+      const asAdmin = currentRole === "admin";
+
+      let saved;
+      if (asAdmin) {
+        const res = await fetch(`/api/admin/documents/${meta.id}`);
+        if (!res.ok) throw new Error("Failed to load document");
+        saved = await res.json();
+      } else {
+        saved = await loadDocument(meta.id);
+      }
+
       const content = saved.content as {
         document?: DocumentData;
         language?: "en" | "ar" | "tr";
@@ -131,9 +150,8 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
       if (knownRole) {
         setCurrentDocumentRole(knownRole);
       } else {
-        // Owner — resolve via RPC to be certain
-        const r = await getMyRole(saved.id);
-        setCurrentDocumentRole(r ?? null);
+        const r = await getMyRole(saved.id).catch(() => null);
+        setCurrentDocumentRole(asAdmin ? "owner" : (r ?? null));
       }
 
       onClose();
@@ -270,6 +288,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
                         showDelete
                         formatDate={formatDate}
                         shares={docShares.get(doc.id) ?? []}
+                        ownerName={isAdmin ? docOwners.get(doc.id) : undefined}
                       />
                     ))}
                   </ul>
@@ -321,6 +340,7 @@ interface DocRowProps {
   formatDate: (iso: string) => string;
   sharedRole?: "editor" | "viewer";
   shares?: DocumentShare[];
+  ownerName?: string;
 }
 
 const AVATAR_COLORS = [
@@ -340,7 +360,7 @@ function avatarColor(str: string) {
 
 function DocRow({
   doc, isCurrent, isLoading, isDeleting,
-  onLoad, onDelete, showDelete, formatDate, sharedRole, shares = [],
+  onLoad, onDelete, showDelete, formatDate, sharedRole, shares = [], ownerName,
 }: DocRowProps) {
   const MAX_VISIBLE = 3;
   const visible = shares.slice(0, MAX_VISIBLE);
@@ -357,6 +377,11 @@ function DocRow({
     >
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-slate-800 truncate">{doc.title}</p>
+        {ownerName && (
+          <p className="text-[9px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 rounded-full px-2 py-0.5 mt-1 w-fit truncate max-w-full">
+            by {ownerName}
+          </p>
+        )}
         <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
           <p className="text-[10px] text-slate-400 capitalize">
             {doc.doc_type.replace(/_/g, " ")} · {formatDate(doc.updated_at)}

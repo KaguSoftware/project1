@@ -13,17 +13,20 @@
  */
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  adminListUsers,
-  adminListDocuments,
-  adminSetUserRole,
-} from "@/src/lib/db/documents";
+import { useAppStore } from "@/src/store";
+import type { DocumentData } from "@/src/store/types";
+import { adminSetUserRole } from "@/src/lib/db/documents";
 import type { ProfileRow, DocumentWithOwner } from "@/src/lib/db/types";
 
-type RoleOption = "admin" | "member" | "client";
+type RoleOption = "admin" | "member";
 
 export function AdminPanel() {
+  const router = useRouter();
+  const loadDocumentIntoStore = useAppStore((s) => s.loadDocument);
+  const setCurrentDocumentRole = useAppStore((s) => s.setCurrentDocumentRole);
+  const setIsLoadingDocs = useAppStore((s) => s.setIsLoadingDocs);
   const [users, setUsers] = useState<ProfileRow[]>([]);
   const [documents, setDocuments] = useState<DocumentWithOwner[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -32,16 +35,19 @@ export function AdminPanel() {
   const [docsError, setDocsError] = useState<string | null>(null);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [roleError, setRoleError] = useState<string | null>(null);
+  const [openingId, setOpeningId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"users" | "documents">("users");
 
   useEffect(() => {
-    adminListUsers()
-      .then(setUsers)
+    fetch("/api/admin/users")
+      .then((r) => r.json())
+      .then((d) => setUsers(Array.isArray(d) ? d : []))
       .catch((e) => setUsersError(e instanceof Error ? e.message : "Failed to load users"))
       .finally(() => setLoadingUsers(false));
 
-    adminListDocuments()
-      .then(setDocuments)
+    fetch("/api/admin/documents")
+      .then((r) => r.json())
+      .then((d) => setDocuments(Array.isArray(d) ? d : []))
       .catch((e) => setDocsError(e instanceof Error ? e.message : "Failed to load documents"))
       .finally(() => setLoadingDocs(false));
   }, []);
@@ -58,6 +64,32 @@ export function AdminPanel() {
       setRoleError(e instanceof Error ? e.message : "Failed to update role");
     } finally {
       setUpdatingRole(null);
+    }
+  }
+
+  async function handleOpen(docId: string) {
+    setOpeningId(docId);
+    setIsLoadingDocs(true);
+    try {
+      const res = await fetch(`/api/admin/documents/${docId}`);
+      const saved = await res.json();
+      if (!saved || saved.error) return;
+      const content = saved.content as {
+        document?: DocumentData;
+        language?: "en" | "ar" | "tr";
+        hiddenFields?: string[];
+      };
+      loadDocumentIntoStore({
+        id: saved.id,
+        document: content.document ?? (saved.content as unknown as DocumentData),
+        language: content.language ?? "en",
+        hiddenFields: content.hiddenFields ?? [],
+      });
+      setCurrentDocumentRole("owner");
+      router.push("/");
+    } finally {
+      setOpeningId(null);
+      setIsLoadingDocs(false);
     }
   }
 
@@ -156,7 +188,6 @@ export function AdminPanel() {
                           >
                             <option value="member">Member</option>
                             <option value="admin">Admin</option>
-                            <option value="client">Client</option>
                           </select>
                           {updatingRole === user.id && (
                             <span className="ml-2 w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin inline-block align-middle" />
@@ -198,6 +229,7 @@ export function AdminPanel() {
                     <th className="text-left px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:table-cell">Type</th>
                     <th className="text-left px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Owner</th>
                     <th className="text-left px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Updated</th>
+                    <th className="px-6 py-3" />
                   </tr>
                 </thead>
                 <tbody>
@@ -208,10 +240,22 @@ export function AdminPanel() {
                         {doc.doc_type.replace(/_/g, " ")}
                       </td>
                       <td className="px-6 py-3 text-xs text-slate-500 truncate max-w-[150px]">
-                        {doc.owner_email ?? doc.owner_id}
+                        {(() => {
+                          const p = (doc as any).profiles;
+                          return p?.display_name || p?.email || doc.owner_email || doc.owner_id;
+                        })()}
                       </td>
                       <td className="px-6 py-3 text-xs text-slate-400 hidden md:table-cell">
                         {formatDate(doc.updated_at)}
+                      </td>
+                      <td className="px-6 py-3">
+                        <button
+                          onClick={() => handleOpen(doc.id)}
+                          disabled={openingId === doc.id}
+                          className="text-[10px] font-bold text-primary hover:underline whitespace-nowrap disabled:opacity-50"
+                        >
+                          {openingId === doc.id ? "Opening…" : "Open →"}
+                        </button>
                       </td>
                     </tr>
                   ))}
