@@ -14,6 +14,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAppStore } from "@/src/store";
 import {
   listMyDocuments,
+  adminListDocuments,
   listSharedWithMe,
   loadDocument,
   deleteDocument,
@@ -48,29 +49,45 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
+  const isAdmin = user?.app_role === "admin";
+
   const fetchAll = useCallback(async () => {
     if (!user) return;
     setIsLoadingDocs(true);
     setError(null);
     try {
-      const [mine, shared, requests] = await Promise.all([
-        listMyDocuments(),
-        listSharedWithMe(),
-        listAllPendingRequests().catch(() => []),
-      ]);
-      setSavedDocuments(mine);
-      setSharedDocs(shared);
-      setPendingRequests(requests);
-      if (mine.length > 0) {
-        const shares = await listSharesForDocuments(mine.map((d) => d.id));
-        setDocShares(shares);
+      if (isAdmin) {
+        const [all, requests] = await Promise.all([
+          adminListDocuments(),
+          listAllPendingRequests().catch(() => []),
+        ]);
+        setSavedDocuments(all as SavedDocumentMeta[]);
+        setSharedDocs([]);
+        setPendingRequests(requests);
+        if (all.length > 0) {
+          const shares = await listSharesForDocuments(all.map((d) => d.id));
+          setDocShares(shares);
+        }
+      } else {
+        const [mine, shared, requests] = await Promise.all([
+          listMyDocuments(),
+          listSharedWithMe(),
+          listAllPendingRequests().catch(() => []),
+        ]);
+        setSavedDocuments(mine);
+        setSharedDocs(shared);
+        setPendingRequests(requests);
+        if (mine.length > 0) {
+          const shares = await listSharesForDocuments(mine.map((d) => d.id));
+          setDocShares(shares);
+        }
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load documents");
     } finally {
       setIsLoadingDocs(false);
     }
-  }, [user, setSavedDocuments, setIsLoadingDocs]);
+  }, [user, isAdmin, setSavedDocuments, setIsLoadingDocs]);
 
   async function handleReviewRequest(requestId: string, status: "approved" | "denied") {
     setReviewingId(requestId);
@@ -155,7 +172,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
       <div className="fixed top-0 right-0 h-full w-80 z-50 bg-white shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
-          <h2 className="text-sm font-semibold text-slate-800">My Documents</h2>
+          <h2 className="text-sm font-semibold text-slate-800">{isAdmin ? "All Documents" : "My Documents"}</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 transition-colors"
@@ -231,7 +248,7 @@ export function MyDocumentsPanel({ isOpen, onClose }: MyDocumentsPanelProps) {
               {/* ── My Documents ─────────────────────────────── */}
               <section>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                  My Documents
+                  {isAdmin ? "All Documents" : "My Documents"}
                 </p>
                 {savedDocuments.length === 0 ? (
                   <p className="text-xs text-slate-400 italic">No saved documents yet.</p>

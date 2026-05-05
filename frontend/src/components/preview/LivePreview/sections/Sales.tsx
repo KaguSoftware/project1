@@ -210,7 +210,7 @@ export const SalesMetricsPreview = ({ doc, lang = "en" }: { doc: DocumentData; l
 	if (filtered.length === 0) return null;
 	return (
 		<section>
-			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">Sales Metrics</h3>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">{t("Sales Metrics", lang)}</h3>
 			<div className="space-y-4">
 				{filtered.map((m) => (
 					<div key={m.id} className="flex justify-between border-b border-slate-50 pb-2">
@@ -235,7 +235,7 @@ export const DealBreakdownPreview = ({ doc, lang = "en" }: { doc: DocumentData; 
 	if (filtered.length === 0) return null;
 	return (
 		<section>
-			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">Deal Breakdown</h3>
+			<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">{t("Deal Breakdown", lang)}</h3>
 			<table className="w-full text-left">
 				<thead>
 					<tr className="border-b border-slate-900">
