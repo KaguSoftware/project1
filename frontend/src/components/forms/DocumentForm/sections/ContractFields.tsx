@@ -4,6 +4,7 @@ import { LayoutGridIcon, TrashIcon } from "lucide-react";
 import { t } from "@/src/lib/translations";
 import { FormField, inputClass } from "../ui/FormField";
 import { SectionHeader } from "../ui/SectionHeader";
+import { PenLineIcon } from "lucide-react";
 
 export const ContractFields = () => {
 	const {
@@ -114,6 +115,63 @@ export const ContractFields = () => {
 				>
 					{tr("+ Add Row")}
 				</button>
+			</div>
+
+			{/* ── Terms & Conditions ───────────────────────────────────── */}
+			<div className="space-y-4">
+				<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-1">
+					{tr("Terms & Conditions")}
+				</label>
+				{document.termsAndConditions.map((clause, idx) => (
+					<div key={clause.id} className="flex gap-3 items-center group">
+						<div className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-400 border border-slate-200">
+							{idx + 1}
+						</div>
+						<input
+							type="text"
+							className={inputClass}
+							value={clause.text}
+							onChange={(e) =>
+								updateArrayItem("termsAndConditions", clause.id, { text: e.target.value })
+							}
+						/>
+						<button
+							onClick={() => removeArrayItem("termsAndConditions", clause.id)}
+							className="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
+						>
+							<TrashIcon size={16} />
+						</button>
+					</div>
+				))}
+				<button
+					onClick={() => addArrayItem("termsAndConditions", { text: "" })}
+					className="btn btn-ghost btn-sm text-primary font-bold"
+				>
+					{tr("+ Add Clause")}
+				</button>
+			</div>
+
+			{/* ── Signature Block ───────────────────────────────────────── */}
+			<div className="space-y-3">
+				<div className="flex items-center gap-2 px-1">
+					<PenLineIcon size={13} className="text-slate-400" />
+					<label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+						{tr("Signature Block")}
+					</label>
+				</div>
+				<div className="border border-dashed border-slate-200 rounded-xl p-5 bg-slate-50/40 space-y-4">
+					<div className="grid grid-cols-3 gap-4">
+						{[tr("Signature"), tr("Name & Title"), tr("Date")].map((label) => (
+							<div key={label} className="space-y-2">
+								<div className="h-10 border-b border-slate-300" />
+								<p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">{label}</p>
+							</div>
+						))}
+					</div>
+					<p className="text-[10px] text-slate-400 italic">
+						{tr("This signature block will appear at the bottom of the contract PDF.")}
+					</p>
+				</div>
 			</div>
 		</div>
 	);

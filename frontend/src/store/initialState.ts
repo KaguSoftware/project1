@@ -44,6 +44,7 @@ export const initialDocumentState: DocumentData = {
     additionalNotes: "",
     agreementOverview: "",
     body: "",
+    signatureBlock: "",
     campaignOverview: "",
     campaignKPIs: "",
 

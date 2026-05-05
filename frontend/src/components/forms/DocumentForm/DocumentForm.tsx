@@ -731,6 +731,24 @@ export const DocumentForm = () => {
 									);
 								}
 
+								if (s.type === "signature") {
+									return (
+										<div className="border border-dashed border-slate-200 rounded-xl p-5 bg-slate-50/40 space-y-4">
+											<div className="grid grid-cols-3 gap-4">
+												{[tr("Signature"), tr("Name & Title"), tr("Date")].map((label) => (
+													<div key={label} className="space-y-2">
+														<div className="h-10 border-b border-slate-300" />
+														<p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">{label}</p>
+													</div>
+												))}
+											</div>
+											<p className="text-[10px] text-slate-400 italic">
+												{tr("This signature block will appear in the PDF.")}
+											</p>
+										</div>
+									);
+								}
+
 								return null;
 							})()}
 						</div>

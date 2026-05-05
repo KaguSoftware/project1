@@ -219,6 +219,42 @@ export const TermsList = ({
     );
 };
 
+export const SignatureBlock = ({
+    label,
+    signerLabel,
+    lang = "en",
+}: {
+    label?: string;
+    signerLabel?: string;
+    lang?: Lang;
+}) => (
+    <View style={styles.section}>
+        <Text style={[styles.sectionTitle, af(lang)]}>
+            {fixArabic(t(label || "Authorized Signature", lang), lang)}
+        </Text>
+        <View style={[{ flexDirection: lang === "ar" ? "row-reverse" : "row", gap: 40, marginTop: 8 }]}>
+            <View style={{ flex: 1 }}>
+                <View style={{ borderBottomWidth: 1, borderBottomColor: "#94a3b8", marginBottom: 6, height: 36 }} />
+                <Text style={[styles.labelSmall, af(lang)]}>
+                    {fixArabic(t(signerLabel || "Signature", lang), lang)}
+                </Text>
+            </View>
+            <View style={{ flex: 1 }}>
+                <View style={{ borderBottomWidth: 1, borderBottomColor: "#94a3b8", marginBottom: 6, height: 36 }} />
+                <Text style={[styles.labelSmall, af(lang)]}>
+                    {fixArabic(t("Name & Title", lang), lang)}
+                </Text>
+            </View>
+            <View style={{ flex: 1 }}>
+                <View style={{ borderBottomWidth: 1, borderBottomColor: "#94a3b8", marginBottom: 6, height: 36 }} />
+                <Text style={[styles.labelSmall, af(lang)]}>
+                    {fixArabic(t("Date", lang), lang)}
+                </Text>
+            </View>
+        </View>
+    </View>
+);
+
 export const PageFooter = ({ lang = "en" }: { lang?: Lang }) => (
     <View style={[styles.footer, rowDir(lang)]} fixed>
         <Text style={[styles.footerTextItalic, af(lang)]}>

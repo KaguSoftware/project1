@@ -249,6 +249,25 @@ export const CustomSectionPreview = ({
 		);
 	}
 
+	if (section.type === "signature") {
+		return (
+			<section className="relative group/cs">
+				<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+					{section.header || "Authorized Signature"}
+				</h3>
+				<Controls />
+				<div className="grid grid-cols-3 gap-6 mt-2">
+					{["Signature", "Name & Title", "Date"].map((label) => (
+						<div key={label} className="space-y-2">
+							<div className="h-10 border-b border-slate-300" />
+							<p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">{label}</p>
+						</div>
+					))}
+				</div>
+			</section>
+		);
+	}
+
 	if (section.type === "deliverables") {
 		const rows = (section.deliverablesRows ?? []).filter((d) => d.deliverable);
 		return (

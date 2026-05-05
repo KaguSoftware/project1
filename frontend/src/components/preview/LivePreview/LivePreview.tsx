@@ -24,7 +24,7 @@ import { AddSectionBar } from "./AddSectionBar";
 type SectionEntry = { id: string; label: string; node: ReactNode };
 
 export const LivePreview = ({ className = "" }: LivePreviewProps) => {
-	const { document: doc, updateDocument, language, setLanguage } = useAppStore();
+	const { document: doc, updateDocument, language, setLanguage, hiddenFields, hideField } = useAppStore();
 	const user = useAppStore((s) => s.user);
 	const setUser = useAppStore((s) => s.setUser);
 	const resetDocument = useAppStore((s) => s.resetDocument);
@@ -108,6 +108,34 @@ export const LivePreview = ({ className = "" }: LivePreviewProps) => {
 		if (doc.scopeOfWork) push("scopeOfServices", t("Scope of Services", language),
 			<ScopeOfWorkPreview text={doc.scopeOfWork} lang={language} />);
 		push("deliverables", t("Deliverables", language), <DeliverablesPreview rows={doc.deliverables} lang={language} />);
+		push("terms", t("Terms & Conditions", language), <TermsPreview doc={doc} label="Terms & Conditions" lang={language} />);
+		if (!hiddenFields.includes("contractSignature")) {
+			push("contractSignature", t("Signature", language), (
+				<section className="relative group/cs">
+					<h3 className="text-xs text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">
+						{t("Authorized Signature", language)}
+					</h3>
+					<span className="absolute top-0 right-0 opacity-0 group-hover/cs:opacity-100 transition-opacity pointer-events-none group-hover/cs:pointer-events-auto">
+						<span
+							role="button"
+							onClick={() => hideField("contractSignature")}
+							className="w-5 h-5 flex items-center justify-center rounded-full bg-red-50 border border-red-200 text-red-400 hover:bg-red-500 hover:text-white transition-all text-[10px] font-bold cursor-pointer"
+							title="Remove section"
+						>
+							✕
+						</span>
+					</span>
+					<div className="grid grid-cols-3 gap-6 mt-2">
+						{["Signature", "Name & Title", "Date"].map((label) => (
+							<div key={label} className="space-y-2">
+								<div className="h-10 border-b border-slate-300" />
+								<p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">{label}</p>
+							</div>
+						))}
+					</div>
+				</section>
+			));
+		}
 	}
 	if (doc.type === "invoice") {
 		push("invoice", "Invoice", <InvoicePreview doc={doc} lang={language} />);

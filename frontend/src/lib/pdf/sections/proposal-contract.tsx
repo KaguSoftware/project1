@@ -444,9 +444,11 @@ export const ScopeOfWork = ({
 export const DeliverablesTable = ({
     rows,
     lang = "en",
+    label,
 }: {
     rows: DocumentData["deliverables"];
     lang?: Lang;
+    label?: string;
 }) => {
     const filtered = rows.filter((d) => d.deliverable);
     if (filtered.length === 0) return <View />;
@@ -463,7 +465,7 @@ export const DeliverablesTable = ({
                     { color: colors.indigo500 },
                 ]}
             >
-                {fixArabic(t("Deliverables", lang), lang)}
+                {fixArabic(t(label || "Deliverables", lang), lang)}
             </Text>
             <View
                 style={{

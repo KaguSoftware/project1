@@ -9,6 +9,7 @@ import {
     ExecutiveSummary,
     TextSection,
     TermsList,
+    SignatureBlock,
     PageFooter,
 } from "./sections/common";
 import {
@@ -68,10 +69,12 @@ export const PDFDocument = ({
                 </View>
             )}
 
-            {data.type === "proposal" ? (
+            {(data.type === "proposal" || data.type === "contract") && (
                 <TermsList terms={data.termsAndConditions} lang={lang} />
-            ) : (
-                <View />
+            )}
+
+            {data.type === "contract" && (
+                <SignatureBlock lang={lang} />
             )}
 
             {data.type === "invoice" && (
@@ -130,39 +133,41 @@ export const PDFDocument = ({
             )}
 
             {data.customSections?.map((section: CustomSection) => {
-                if (section.type === "text" && section.content) {
+                if (section.type === "text") {
                     return (
                         <TextSection
                             key={section.id}
-                            text={section.content}
+                            text={section.content || ""}
                             label={section.header}
                             lang={lang}
                         />
                     );
                 }
-                if (
-                    section.type === "terms" &&
-                    section.termsRows &&
-                    section.termsRows.length > 0
-                ) {
+                if (section.type === "terms") {
                     return (
                         <TermsList
                             key={section.id}
-                            terms={section.termsRows}
+                            terms={section.termsRows ?? []}
                             label={section.header}
                             lang={lang}
                         />
                     );
                 }
-                if (
-                    section.type === "deliverables" &&
-                    section.deliverablesRows &&
-                    section.deliverablesRows.length > 0
-                ) {
+                if (section.type === "deliverables") {
                     return (
                         <DeliverablesTable
                             key={section.id}
-                            rows={section.deliverablesRows}
+                            rows={section.deliverablesRows ?? []}
+                            label={section.header}
+                            lang={lang}
+                        />
+                    );
+                }
+                if (section.type === "signature") {
+                    return (
+                        <SignatureBlock
+                            key={section.id}
+                            label={section.header}
                             lang={lang}
                         />
                     );

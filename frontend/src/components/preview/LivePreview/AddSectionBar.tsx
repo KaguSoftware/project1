@@ -56,13 +56,7 @@ const OPTION_GROUPS: {
 				description: "Miscellaneous notes or remarks",
 				defaultHeader: "Additional Notes",
 			},
-			{
-				type: "text",
-				label: "Signature Block",
-				description: "Authorized signature section",
-				defaultHeader: "Authorized Signature",
-			},
-			{
+{
 				type: "text",
 				label: "Disclaimer",
 				description: "Legal disclaimer or notice",
@@ -108,6 +102,29 @@ const OPTION_GROUPS: {
 				label: "Objectives",
 				description: "Project or campaign objectives",
 				defaultHeader: "Objectives",
+			},
+		],
+	},
+	{
+		group: "Signature",
+		options: [
+			{
+				type: "signature",
+				label: "Signature Block",
+				description: "Signature, name & title, and date fields",
+				defaultHeader: "Authorized Signature",
+			},
+			{
+				type: "signature",
+				label: "Client Signature",
+				description: "Client sign-off section",
+				defaultHeader: "Client Signature",
+			},
+			{
+				type: "signature",
+				label: "Mutual Agreement",
+				description: "Two-party signature block",
+				defaultHeader: "Mutual Agreement",
 			},
 		],
 	},

@@ -97,7 +97,7 @@ export interface InfluencerRow {
 	status: string;
 }
 
-export type CustomSectionType = "text" | "terms" | "deliverables";
+export type CustomSectionType = "text" | "terms" | "deliverables" | "signature";
 
 export interface CustomSection {
 	id: string;
@@ -167,6 +167,7 @@ export interface DocumentData {
 	additionalNotes: string;
 	agreementOverview: string;
 	body: string;
+	signatureBlock: string;
 	campaignOverview: string;
 	campaignKPIs: string;
 
