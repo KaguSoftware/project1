@@ -13,6 +13,15 @@ import { useEffect } from "react";
 import { createClient } from "@/src/lib/supabase/client";
 import { useAppStore } from "@/src/store";
 
+async function resolveUser(supabase: ReturnType<typeof createClient>, id: string, email: string) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("app_role")
+    .eq("id", id)
+    .single();
+  return { id, email, app_role: data?.app_role ?? undefined };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useAppStore((s) => s.setUser);
 
@@ -20,17 +29,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient();
 
     // Sync initial session (resolves immediately from the cookie-based session)
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(
-        user ? { id: user.id, email: user.email ?? "" } : null
-      );
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (user) {
+        setUser(await resolveUser(supabase, user.id, user.email ?? ""));
+      } else {
+        setUser(null);
+      }
     });
 
     // Keep in sync as auth state changes (sign-in, sign-out, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         const u = session?.user ?? null;
-        setUser(u ? { id: u.id, email: u.email ?? "" } : null);
+        if (u) {
+          setUser(await resolveUser(supabase, u.id, u.email ?? ""));
+        } else {
+          setUser(null);
+        }
       }
     );
 
