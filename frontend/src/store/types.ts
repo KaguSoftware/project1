@@ -20,6 +20,13 @@ export interface InvoiceLineItem {
 	rate: number;
 	amount: number;
 }
+
+export interface InvoiceSegment {
+	id: string;
+	name: string;
+	paid: number;
+	totalPayment: number;
+}
 export interface PerformanceRow {
 	id: string;
 	metric: string;
@@ -184,6 +191,7 @@ export interface DocumentData {
 	termsAndConditions: { id: string; text: string }[];
 	deliverables: DeliverableRow[];
 	lineItems: InvoiceLineItem[];
+	invoiceSegments: InvoiceSegment[];
 	performanceMetrics: PerformanceRow[];
 	topPosts: TopPostRow[];
 	keyInsights: { id: string; insight: string; impact: "positive" | "negative" | "neutral" }[];

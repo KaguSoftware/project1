@@ -152,6 +152,12 @@ const ar: Record<string, string> = {
     Amount: "المبلغ",
     "+ Add Item": "+ إضافة بند",
     "+ Add Term": "+ إضافة شرط",
+    Segment: "القطاع",
+    Paid: "المدفوع",
+    Remaining: "المتبقي",
+    "Total Payment": "إجمالي المدفوعات",
+    "+ Add Segment": "+ إضافة قطاع",
+    "e.g. Marketing": "مثال: التسويق",
 
     // Letter form
     "Letter Content": "محتوى الرسالة",
@@ -379,6 +385,12 @@ const tr: Record<string, string> = {
     Amount: "Tutar",
     "+ Add Item": "+ Kalem Ekle",
     "+ Add Term": "+ Şart Ekle",
+    Segment: "Bölüm",
+    Paid: "Ödenen",
+    Remaining: "Kalan",
+    "Total Payment": "Toplam Ödeme",
+    "+ Add Segment": "+ Bölüm Ekle",
+    "e.g. Marketing": "örn. Pazarlama",
 
     // Letter form
     "Letter Content": "Mektup İçeriği",

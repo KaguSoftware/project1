@@ -72,6 +72,9 @@ export const initialDocumentState: DocumentData = {
     lineItems: [
         { id: generateId(), description: "", qty: 1, rate: 0, amount: 0 },
     ],
+    invoiceSegments: [
+        { id: generateId(), name: "Marketing", paid: 0, totalPayment: 0 },
+    ],
     topPosts: [
         { id: generateId(), post: "", likes: "", comments: "", shares: "" },
     ],
